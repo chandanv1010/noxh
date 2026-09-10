@@ -300,3 +300,60 @@ một lần.
    nhiều-nhiều (81 liên kết / 69 sản phẩm). Với dự án NOXH thì "danh mục" nên hiểu là gì —
    theo tỉnh, theo trạng thái, hay theo phân khúc? Nếu chỉ theo tỉnh/trạng thái thì đã có
    cột riêng rồi, không cần danh mục nữa.
+
+---
+
+## 9. Bổ sung sau khi có sơ đồ menu (10/09/2026)
+
+Sơ đồ điều hướng đã chốt:
+
+```
+TRANG CHỦ
+DỰ ÁN               → Danh sách dự án / Theo tỉnh–thành / Chi tiết dự án
+KIỂM TRA ĐIỀU KIỆN  → Câu hỏi / Nhập SĐT / Kết quả
+PHÒNG PHÁP LÝ       → Đối tượng / Điều kiện / Chính sách / Hỏi đáp pháp lý
+HỒ SƠ               → Hồ sơ cần chuẩn bị / Mẫu đơn / Checklist
+TÀI CHÍNH           → Tính khoản vay / Khả năng tài chính
+HỎI ĐÁP
+TIN TỨC
+CÔNG HÒA            → Tư vấn
+```
+
+Sơ đồ này làm lộ **hai module mà bản phân tích ban đầu bỏ sót**. Trên trang chủ chúng
+chỉ hiện như hai ô trong khối "Thông tin hữu ích" nên tôi tưởng là bài viết tĩnh — thực ra
+chúng là mục cấp 1 có màn hình riêng.
+
+### 9.1. TÀI CHÍNH — là công cụ tính, không phải nội dung
+
+Hai màn hình con:
+
+- **Tính khoản vay**: nhập giá căn hộ, tỉ lệ vay, kỳ hạn → ra số tiền vay, trả hàng tháng,
+  tổng lãi. Cần dữ liệu lãi suất ngân hàng.
+- **Khả năng tài chính**: nhập thu nhập và chi tiêu → ra mức giá căn hộ phù hợp.
+
+Bảng mới `loan_packages`. Điểm cần chú ý: lãi suất ưu đãi **chỉ áp dụng vài năm đầu rồi
+thả nổi**, nên phải tách `preferential_rate` + `preferential_months` và `standard_rate`,
+không thể một con số. Lãi suất thay đổi liên tục nên phải sửa được trong admin, cùng lý do
+với quy tắc chấm điểm điều kiện.
+
+### 9.2. HỒ SƠ — checklist tích chọn được, kèm mẫu đơn tải về
+
+Ba màn hình con dùng chung một bộ dữ liệu, chỉ khác cách hiển thị:
+
+- **Hồ sơ cần chuẩn bị**: danh sách giấy tờ theo nhóm đối tượng
+- **Mẫu đơn**: lọc ra những giấy tờ có file mẫu
+- **Checklist**: chính danh sách đó nhưng tích chọn được để theo dõi tiến độ
+
+Nên hai bảng `dossier_sets` (bộ hồ sơ theo nhóm đối tượng: công nhân, cán bộ, hộ nghèo…) và
+`dossier_items` (từng loại giấy tờ, kèm nơi cấp, số bản, file mẫu). Không tách "mẫu đơn"
+thành bảng riêng — nó chỉ là `dossier_items` có `template_file`.
+
+### 9.3. Hai điểm khác đáng chú ý trong sơ đồ
+
+**"Nhập SĐT" là một bước riêng giữa câu hỏi và kết quả.** Đây là cổng thu lead: người dùng
+trả lời xong 8 câu mới phải để lại số điện thoại để xem kết quả. Bảng `eligibility_checks`
+đã có sẵn cột `phone`, không cần đổi gì.
+
+**"Theo tỉnh/thành" là trang đích riêng, không phải bộ lọc.** Mỗi tỉnh một URL để làm SEO
+("nhà ở xã hội Thái Nguyên"). Với 34 tỉnh thì đây là 34 trang có nội dung thật — cần
+`vn_provinces` có thêm phần mô tả và ảnh, sẽ bổ sung khi làm màn hình đó.
