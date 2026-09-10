@@ -1,0 +1,470 @@
+// ==========================================
+// HEADER COMPONENT SCSS
+// ==========================================
+
+.tazen-header {
+    background: #000;
+    color: #fff;
+    font-family: var(--second-font), sans-serif;
+    position: relative;
+    z-index: 9999;
+
+    button, input, select, textarea {
+        font-family: inherit;
+    }
+    
+    // Links default
+    a {
+        color: #fff;
+        text-decoration: none;
+        transition: color 0.2s ease;
+        
+        &:hover {
+            color: #ffc600;
+        }
+    }
+}
+
+// ------------------------------------------
+// 1. TOP BAR
+// ------------------------------------------
+.header-top-bar {
+    background: #000;
+    border-bottom: 1px solid rgba(255, 198, 0, 0.25);
+    font-size: 12px;
+    padding: 8px 0;
+    
+    .top-bar-flex {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 28px;
+    }
+    
+    .top-bar-left {
+        gap: 20px;
+    }
+
+    .top-bar-middle {
+        gap: 20px;
+    }
+    
+    .top-bar-item {
+        display: flex;
+        align-items: center;
+        color: #ccc;
+        
+        span {
+            strong {
+                color: #fff;
+                font-weight: 700;
+            }
+        }
+    }
+    
+    .top-bar-icon {
+        width: 16px;
+        height: 16px;
+        object-fit: contain;
+        margin-right: 6px;
+        display: inline-block;
+        vertical-align: middle;
+        
+        &.yellow-filter {
+            filter: brightness(0) saturate(100%) invert(84%) sepia(59%) saturate(2250%) hue-rotate(359deg) brightness(102%) contrast(106%);
+        }
+    }
+    
+    .top-link {
+        color: #ccc;
+        display: flex;
+        align-items: center;
+        
+        &:hover {
+            color: #ffc600;
+            
+            .top-bar-icon {
+                filter: brightness(0) saturate(100%) invert(84%) sepia(59%) saturate(2250%) hue-rotate(359deg) brightness(102%) contrast(106%);
+            }
+        }
+    }
+    
+    .top-bar-right {
+        gap: 12px;
+        color: #444;
+        
+        .divider {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 11px;
+        }
+        
+        .top-link {
+            font-weight: 500;
+            color: #ccc;
+            
+            &:hover {
+                color: #ffc600;
+            }
+        }
+    }
+}
+
+// ------------------------------------------
+// 2. MAIN BAR
+// ------------------------------------------
+.header-main-bar {
+    background: #000;
+    padding: 15px 0;
+    
+    .main-bar-flex {
+        gap: 15px;
+    }
+    
+    // Logo styling
+    .logo {
+        img {
+            max-height: 55px;
+            object-fit: contain;
+            display: block;
+        }
+    }
+    
+    .right-utilities {
+        margin-left: auto;
+        gap: 30px;
+    }
+}
+
+// Category Dropdown
+.category-dropdown-wrapper {
+    position: relative;
+    margin-left: 45px;
+    
+    .category-btn {
+        background: #ffc600;
+        color: #000;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 18px;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        outline: none;
+        gap: 8px;
+        height: 42px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: background 0.2s ease, transform 0.1s ease;
+        
+        .btn-icon {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+            filter: brightness(0);
+        }
+        
+        &:hover {
+            background: #e6b200;
+        }
+        
+        &:active {
+            transform: scale(0.98);
+        }
+    }
+    
+    // Hover to reveal dropdown
+    &:hover {
+        .category-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+    }
+}
+
+.category-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 250px;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 8px;
+    margin-top: 5px;
+    padding: 8px 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    z-index: 200;
+    
+    .category-list {
+        margin: 0;
+        padding: 0;
+        
+        li {
+            a {
+                display: flex;
+                align-items: center;
+                padding: 10px 20px;
+                color: #ccc;
+                font-size: 13px;
+                font-weight: 500;
+                border-bottom: 1px solid #222;
+                transition: background 0.2s ease, color 0.2s ease;
+                
+                &:last-child {
+                    border-bottom: none;
+                }
+                
+                .cat-icon {
+                    width: 20px;
+                    height: 20px;
+                    object-fit: contain;
+                    margin-right: 12px;
+                }
+                
+                &:hover {
+                    background: #222;
+                    color: #ffc600;
+                }
+            }
+        }
+    }
+}
+
+// Search Form
+.header-search-form {
+    margin-left: 20px;
+    flex: 1;
+    max-width: 420px;
+    
+    .search-form {
+        position: relative;
+        height: 42px;
+        width: 100%;
+    }
+    
+    .search-input {
+        flex: 1;
+        background: #f5f5f5;
+        border: none;
+        border-radius: 8px 0 0 8px;
+        padding: 0 15px;
+        font-size: 13px;
+        color: #333;
+        outline: none;
+        font-family: var(--second-font), sans-serif;
+        
+        &::placeholder {
+            color: #888;
+        }
+    }
+    
+    .search-submit {
+        background: #ffc600;
+        border: none;
+        border-radius: 0 8px 8px 0;
+        width: 45px;
+        color: #000;
+        cursor: pointer;
+        font-size: 15px;
+        outline: none;
+        transition: background 0.2s ease;
+        
+        &:hover {
+            background: #e6b200;
+        }
+    }
+}
+
+// Utility items (Hotline, Account)
+.header-util-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    .util-icon {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+        transition: transform 0.2s ease;
+        
+        &.yellow-filter {
+            filter: brightness(0) saturate(100%) invert(84%) sepia(59%) saturate(2250%) hue-rotate(359deg) brightness(102%) contrast(106%);
+        }
+    }
+    
+    &:hover {
+        .util-icon {
+            transform: scale(1.05);
+        }
+        .util-value {
+            color: #ffc600;
+        }
+    }
+    
+    .util-text {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .util-label {
+        font-size: 10px;
+        color: #bbb;
+        letter-spacing: 0.5px;
+        line-height: 1.2;
+    }
+    
+    .util-value {
+        font-size: 13px;
+        font-weight: 700;
+        color: #fff;
+        line-height: 1.4;
+    }
+}
+
+// Cart Icon
+.header-cart-wrapper {
+    .cart-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease;
+        
+        .cart-icon {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            filter: brightness(0) saturate(100%) invert(84%) sepia(59%) saturate(2250%) hue-rotate(359deg) brightness(102%) contrast(106%);
+        }
+        
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
+}
+
+// Mobile Menu Button & Mobile Right Actions
+.mobile-right-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-left: auto;
+}
+
+.mobile-cart-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    text-decoration: none;
+
+    .cart-icon-relative {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .mobile-cart-icon {
+        width: 26px;
+        height: 26px;
+        object-fit: contain;
+        filter: brightness(0) saturate(100%) invert(84%) sepia(59%) saturate(2250%) hue-rotate(359deg) brightness(102%) contrast(106%);
+    }
+
+    .mobile-cart-badge {
+        position: absolute;
+        top: -6px;
+        right: -8px;
+        background: #ff2a2a;
+        color: #ffffff;
+        font-size: 10px;
+        font-weight: 800;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+}
+
+.mobile-menu-btn {
+    color: #fff;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    
+    &:hover {
+        color: #ffc600;
+    }
+}
+
+.mobile-menu-offcanvas {
+    background: #111111 !important;
+    color: #ffffff;
+    padding: 20px;
+    z-index: 10001 !important;
+
+    .mobile-menu-close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        color: #ffffff;
+        font-size: 20px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+    }
+
+    .mobile-menu-header {
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #333;
+
+        .mobile-menu-logo img {
+            max-height: 40px;
+            object-fit: contain;
+        }
+    }
+
+    .mobile-menu-list {
+        li {
+            a {
+                color: #ffffff;
+                font-size: 15px;
+                font-weight: 600;
+                padding: 12px 0;
+                display: block;
+                border-bottom: 1px solid #222;
+
+                &:hover {
+                    color: #ffc600;
+                }
+            }
+        }
+    }
+}
+
+// ------------------------------------------
+// 3. RESPONSIVE MEDIA QUERIES
+// ------------------------------------------
+@media (max-width: 1219px) {
+    .header-top-bar {
+        display: none; // Hide top bar on mobile
+    }
+    
+    .header-main-bar {
+        padding: 10px 0;
+        
+        .logo img {
+            max-height: 40px;
+        }
+    }
+}

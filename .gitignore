@@ -1,0 +1,44 @@
+/vendor
+/node_modules
+.env
+.env.backup
+
+# Anh nguoi dung tai len qua admin. De tren may chu, khong dua vao git:
+# hien dang la 21 MB anh cua ma nguon truoc, va anh moi se do vao day.
+/public/uploads
+/public/upload
+/public/userfiles
+
+# Anh resize tu sinh boi ImageResizerController - tu tao lai duoc.
+# (Dong nay truoc bi dinh chuoi "rm public.zip" o cuoi nen khong an gi ca.)
+/public/image-cache
+
+/public/storage
+/public/hot
+
+# Cache va log tu sinh
+/storage/*.key
+/storage/debugbar
+/storage/logs/*.log
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/framework/testing
+/bootstrap/cache/*.php
+
+# Anh mo phong, ban nhap
+/work
+public.zip
+*.zip
+
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+npm-debug.log
+yarn-error.log
+/.idea
+/.vscode
+/.fleet
+.DS_Store
+Thumbs.db

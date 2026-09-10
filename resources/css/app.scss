@@ -1,0 +1,85 @@
+@use "sass:math";
+// ================
+// IMPORT VENDORS
+// ================
+@use 'variables/variables';
+@use "components/article-overlay-card";
+@use "components/article-left-image-card";
+@use "components/footer";
+@use "components/solution";
+@use "components/product_slider";
+@use "components/featured_project";
+@use "components/font";
+@use "components/partner";
+@use "components/news_video";
+@use "components/about";
+@use "components/product_catalogue";
+@use "components/header";
+@use "components/hero";
+@use "components/product_grid";
+@use "components/tel-autolink";
+
+@import "../vendor/backend/css/plugins/toastr/toastr.min.css";
+@import "../vendor/frontend/resources/fonts/font-awesome-4.7.0/css/font-awesome.min.css";
+@import "../vendor/frontend/resources/uikit/css/uikit.modify.css";
+@import "../vendor/frontend/resources/library/css/library.css";
+@import "../vendor/frontend/resources/plugins/wow/css/libs/animate.css";
+@import "../vendor/frontend/core/plugins/jquery-nice-select-1.1.0/css/nice-select.css";
+@import "../vendor/frontend/resources/config.css";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+// ================
+// IMPORT FONTS
+// ================
+
+// VARIABLES
+// ================
+
+
+:root {
+    --primary-color: #051e35;
+    --secondary-color: #83cd20;
+    --third-color: #5f2ded;
+    --four-color: #e7deff;
+    --star-color: #ffcd29;
+    --hover-color: var(--primary-color);
+    --second-font: "Inter";
+    --main-font: "Inter";
+}
+
+// ================
+// BASE STYLES
+// ================
+body {
+    font-family: var(--second-font), sans-serif;
+    font-weight: normal;
+    font-size: 14px;
+    min-height: 1000px;
+}
+
+a {
+    color: #000;
+}
+
+ul li,
+ol li {
+    list-style: none;
+}
+
+// ================
+// UTILITY / OVERRIDE
+// ================
+@media (min-width: 1220px) {
+    .uk-container {
+        max-width: 1280px;
+        padding: 0;
+    }
+}
+
+// GLOBAL HEADINGS LINE-HEIGHT ON MOBILE
+@media (max-width: 767px) {
+    h1, h2, h3, h4, h5, h6 {
+        line-height: 1.35 !important;
+    }
+}
