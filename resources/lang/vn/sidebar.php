@@ -201,6 +201,100 @@ return [
             ]
         ],
         [
+            'title' => 'QL Dự án NOXH',
+            'icon' => 'fa fa-building',
+            'name' => ['investor', 'project'],
+            'subModule' => [
+                [
+                    'title' => 'Chủ đầu tư',
+                    'route' => 'investor/index'
+                ],
+                [
+                    'title' => 'Tiến độ dự án',
+                    'route' => 'project/milestone/index'
+                ],
+                [
+                    'title' => 'Hồ sơ pháp lý dự án',
+                    'route' => 'project/document/index'
+                ],
+                [
+                    'title' => 'Câu hỏi thường gặp',
+                    'route' => 'project/faq/index'
+                ],
+            ]
+        ],
+        [
+            'title' => 'QL Kiểm tra điều kiện',
+            'icon' => 'fa fa-check-square-o',
+            'name' => ['eligibility'],
+            'subModule' => [
+                [
+                    'title' => 'Bộ câu hỏi',
+                    'route' => 'eligibility/question/index'
+                ],
+                [
+                    'title' => 'Đáp án',
+                    'route' => 'eligibility/option/index'
+                ],
+                [
+                    'title' => 'Kết quả khách đã kiểm tra',
+                    'route' => 'eligibility/check/index'
+                ],
+            ]
+        ],
+        [
+            'title' => 'QL Phòng pháp lý',
+            'icon' => 'fa fa-gavel',
+            'name' => ['legal-document', 'qa'],
+            'subModule' => [
+                [
+                    'title' => 'Văn bản pháp luật',
+                    'route' => 'legal-document/index'
+                ],
+                [
+                    'title' => 'Hỏi đáp',
+                    'route' => 'qa/question/index'
+                ],
+            ]
+        ],
+        [
+            'title' => 'QL Hồ sơ',
+            'icon' => 'fa fa-folder-open-o',
+            'name' => ['dossier'],
+            'subModule' => [
+                [
+                    'title' => 'Bộ hồ sơ',
+                    'route' => 'dossier/set/index'
+                ],
+                [
+                    'title' => 'Giấy tờ',
+                    'route' => 'dossier/item/index'
+                ],
+            ]
+        ],
+        [
+            'title' => 'QL Tài chính',
+            'icon' => 'fa fa-calculator',
+            'name' => ['loan-package'],
+            'subModule' => [
+                [
+                    'title' => 'Gói vay ngân hàng',
+                    'route' => 'loan-package/index'
+                ],
+            ]
+        ],
+        [
+            'title' => 'QL Chuyên gia',
+            'icon' => 'fa fa-user-md',
+            'name' => ['expert'],
+            'subModule' => [
+                [
+                    'title' => 'Chuyên gia tư vấn',
+                    'route' => 'expert/index'
+                ],
+            ]
+        ],
+        [
             'title' => 'Cấu hình chung',
             'icon' => 'fa fa-file',
             'name' => ['language', 'generate', 'system', 'widget'],

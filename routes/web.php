@@ -19,6 +19,7 @@ require __DIR__ . '/web/product.route.php';
 require __DIR__ . '/web/post.route.php';
 require __DIR__ . '/web/auth.route.php';
 require __DIR__ . '/web/ajax.route.php';
+require __DIR__ . '/web/noxh.route.php';
 require __DIR__ . '/web/custom.route.php';
 
 /*

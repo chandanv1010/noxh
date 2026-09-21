@@ -622,4 +622,172 @@ return [
             'title' => 'Cài đặt trang Công nghệ'
         ],
     ],
+    'investor' => [
+        'index' => [
+            'title' => 'Quản lý chủ đầu tư',
+            'table' => 'Danh sách chủ đầu tư'
+        ],
+        'create' => [
+            'title' => 'Thêm mới chủ đầu tư'
+        ],
+        'edit' => [
+            'title' => 'Cập nhật chủ đầu tư'
+        ],
+        'delete' => [
+            'title' => 'Xóa chủ đầu tư'
+        ],
+    ],
+    'legalDocument' => [
+        'index' => [
+            'title' => 'Quản lý văn bản pháp luật',
+            'table' => 'Thư viện văn bản pháp luật'
+        ],
+        'create' => [
+            'title' => 'Thêm mới văn bản'
+        ],
+        'edit' => [
+            'title' => 'Cập nhật văn bản'
+        ],
+        'delete' => [
+            'title' => 'Xóa văn bản'
+        ],
+    ],
+    'expert' => [
+        'index' => [
+            'title' => 'Quản lý chuyên gia',
+            'table' => 'Danh sách chuyên gia tư vấn'
+        ],
+        'create' => [
+            'title' => 'Thêm mới chuyên gia'
+        ],
+        'edit' => [
+            'title' => 'Cập nhật chuyên gia'
+        ],
+        'delete' => [
+            'title' => 'Xóa chuyên gia'
+        ],
+    ],
+    'loanPackage' => [
+        'index' => [
+            'title' => 'Quản lý gói vay ngân hàng',
+            'table' => 'Danh sách gói vay'
+        ],
+        'create' => [
+            'title' => 'Thêm mới gói vay'
+        ],
+        'edit' => [
+            'title' => 'Cập nhật gói vay'
+        ],
+        'delete' => [
+            'title' => 'Xóa gói vay'
+        ],
+    ],
+    'dossierSet' => [
+        'index' => [
+            'title' => 'Quản lý bộ hồ sơ',
+            'table' => 'Danh sách bộ hồ sơ theo nhóm đối tượng'
+        ],
+        'create' => [
+            'title' => 'Thêm mới bộ hồ sơ'
+        ],
+        'edit' => [
+            'title' => 'Cập nhật bộ hồ sơ'
+        ],
+        'delete' => [
+            'title' => 'Xóa bộ hồ sơ'
+        ],
+    ],
+    'dossierItem' => [
+        'index' => [
+            'title' => 'Quản lý giấy tờ trong hồ sơ',
+            'table' => 'Danh sách giấy tờ'
+        ],
+        'create' => [
+            'title' => 'Thêm mới giấy tờ'
+        ],
+        'edit' => [
+            'title' => 'Cập nhật giấy tờ'
+        ],
+        'delete' => [
+            'title' => 'Xóa giấy tờ'
+        ],
+    ],
+    'eligibilityQuestion' => [
+        'index' => [
+            'title' => 'Câu hỏi kiểm tra điều kiện',
+            'table' => 'Bộ câu hỏi kiểm tra điều kiện mua NOXH'
+        ],
+        'create' => [
+            'title' => 'Thêm mới câu hỏi'
+        ],
+        'edit' => [
+            'title' => 'Cập nhật câu hỏi'
+        ],
+        'delete' => [
+            'title' => 'Xóa câu hỏi'
+        ],
+    ],
+    'eligibilityOption' => [
+        'index' => [
+            'title' => 'Đáp án câu hỏi điều kiện',
+            'table' => 'Danh sách đáp án'
+        ],
+        'create' => [
+            'title' => 'Thêm mới đáp án'
+        ],
+        'edit' => [
+            'title' => 'Cập nhật đáp án'
+        ],
+        'delete' => [
+            'title' => 'Xóa đáp án'
+        ],
+    ],
+    'eligibilityCheck' => [
+        'index' => [
+            'title' => 'Kết quả kiểm tra điều kiện',
+            'table' => 'Lượt khách đã kiểm tra điều kiện'
+        ],
+        'create' => [
+            'title' => 'Chi tiết lượt kiểm tra'
+        ],
+        'edit' => [
+            'title' => 'Chi tiết lượt kiểm tra'
+        ],
+        'delete' => [
+            'title' => 'Xóa lượt kiểm tra'
+        ],
+    ],
+    'qaQuestion' => [
+        'index' => [
+            'title' => 'Quản lý hỏi đáp',
+            'table' => 'Câu hỏi bạn đọc gửi về'
+        ],
+        'create' => [
+            'title' => 'Thêm mới câu hỏi'
+        ],
+        'edit' => [
+            'title' => 'Trả lời câu hỏi'
+        ],
+        'delete' => [
+            'title' => 'Xóa câu hỏi'
+        ],
+    ],
+    'projectMilestone' => [
+        'index' => ['title' => 'Tiến độ dự án', 'table' => 'Các mốc tiến độ'],
+        'create' => ['title' => 'Thêm mốc tiến độ'],
+        'edit' => ['title' => 'Cập nhật mốc tiến độ'],
+        'delete' => ['title' => 'Xóa mốc tiến độ'],
+    ],
+    'projectDocument' => [
+        'index' => ['title' => 'Hồ sơ pháp lý dự án', 'table' => 'Danh sách hồ sơ pháp lý'],
+        'create' => ['title' => 'Thêm hồ sơ pháp lý'],
+        'edit' => ['title' => 'Cập nhật hồ sơ pháp lý'],
+        'delete' => ['title' => 'Xóa hồ sơ pháp lý'],
+    ],
+    'projectFaq' => [
+        'index' => ['title' => 'Câu hỏi thường gặp của dự án', 'table' => 'Danh sách câu hỏi'],
+        'create' => ['title' => 'Thêm câu hỏi'],
+        'edit' => ['title' => 'Cập nhật câu hỏi'],
+        'delete' => ['title' => 'Xóa câu hỏi'],
+    ],
 ];

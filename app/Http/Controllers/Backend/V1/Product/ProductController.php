@@ -89,7 +89,7 @@ class ProductController extends Controller
             'config',
             'attributeCatalogue',
             'lecturers'
-        ));
+        ) + $this->duLieuDuAn());
     }
     
     public function store(StoreProductRequest $request)
@@ -127,7 +127,7 @@ class ProductController extends Controller
             'attributeCatalogue',
             'queryUrl',
             'lecturers'
-        ));
+        ) + $this->duLieuDuAn());
     }
 
     public function update($id, UpdateProductRequest $request)
@@ -171,10 +171,26 @@ class ProductController extends Controller
         return redirect()->route('product.index')->with('error','Xóa bản ghi không thành công. Hãy thử lại');
     }
 
+    /**
+     * Du lieu cho khoi "Thong tin du an nha o xa hoi" trong form san pham.
+     */
+    private function duLieuDuAn(): array
+    {
+        return [
+            'chuDauTu' => \App\Models\Investor::where('publish', 2)->orderBy('order')->get(['id', 'name']),
+            'trangThaiDuAn' => \App\Models\Product::TRANG_THAI_DU_AN,
+            'tinhThanh' => \App\Models\Province::select('code', 'name')->orderBy('name')->get(),
+        ];
+    }
+
     private function configData(){
         return [
             'extendJs' => true,
-            'model' => 'Product'
+            'model' => 'Product',
+            // Can them cho khoi du an NOXH: o chon tinh/huyen/xa chay bang ajax.
+            'js' => [
+                'backend/library/location.js',
+            ],
         ];
     }
 

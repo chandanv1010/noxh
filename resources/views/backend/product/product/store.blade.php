@@ -16,6 +16,7 @@
                         @include('backend.product.product.component.content', ['model' => ($product) ?? null])
                     </div>
                 </div>
+                @include('backend.product.product.component.noxh')
                 @include('backend.dashboard.component.album', ['model' => ($product) ?? null])
                 @include('backend.product.product.component.variant')
                 {{-- @include('backend.product.product.component.program') --}}

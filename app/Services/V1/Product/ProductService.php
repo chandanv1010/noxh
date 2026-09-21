@@ -330,6 +330,7 @@ class ProductService extends BaseService
         $payload['variant'] = $this->formatJson($request, 'variant');
         $payload['qrcode'] = $this->qrCode($request);
         $payload['no_offer'] = $request->has('no_offer') ? 1 : 0;
+        $payload = $this->chuanHoaDuAn($payload, $request);
         if (!is_null($sellerId)) {
             $payload['seller_id'] = $sellerId;
         }
@@ -347,6 +348,7 @@ class ProductService extends BaseService
         $payload['combo_price'] = convert_price($payload['combo_price'] ?? 0);
         // $payload['lecturer_id'] = null;
         $payload['no_offer'] = $request->has('no_offer') ? 1 : 0;
+        $payload = $this->chuanHoaDuAn($payload, $request);
 
 
         if (!isset($payload['attribute'])) {
@@ -412,6 +414,37 @@ class ProductService extends BaseService
         ];
     }
 
+    /**
+     * Don cac o rieng cua du an NOXH truoc khi luu.
+     *
+     * O so de trong gui len la chuoi rong, ep vao cot decimal se thanh 0 - gia
+     * tu 0 dong hay dien tich 0 m2 se pha vo ca bo loc. Phai chuyen han sang
+     * null. O tich khong duoc gui len khi bo tich nen cung phai tu dat ve 0.
+     */
+    private function chuanHoaDuAn(array $payload, $request): array
+    {
+        $oSo = [
+            'latitude', 'longitude', 'price_from', 'price_to',
+            'area_from', 'area_to', 'total_units', 'total_land_area', 'investor_id',
+        ];
+
+        foreach ($oSo as $o) {
+            if (!isset($payload[$o]) || $payload[$o] === '') {
+                $payload[$o] = null;
+            }
+        }
+
+        foreach (['start_date', 'handover_date'] as $o) {
+            if (empty($payload[$o])) {
+                $payload[$o] = null;
+            }
+        }
+
+        $payload['is_featured'] = $request->boolean('is_featured') ? 1 : 0;
+
+        return $payload;
+    }
+
     private function payload()
     {
         return [
@@ -438,7 +471,31 @@ class ProductService extends BaseService
             'lession_content',
             'chapter',
             'promotion_content',
-            'no_offer'
+            'no_offer',
+
+            // Cac cot rieng cua du an nha o xa hoi.
+            'province_code',
+            'ward_code',
+            'address',
+            'latitude',
+            'longitude',
+            'status',
+            'price_type',
+            'price_from',
+            'price_to',
+            'area_type',
+            'area_from',
+            'area_to',
+            'total_units',
+            'total_land_area',
+            'scale_description',
+            'apartment_types',
+            'ownership_type',
+            'investor_id',
+            'start_date',
+            'handover_date',
+            'timeline_label',
+            'is_featured',
         ];
     }
 

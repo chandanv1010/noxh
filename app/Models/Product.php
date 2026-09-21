@@ -39,7 +39,31 @@ class Product extends Model
         'chapter',
         'iframe',
         'percent',
-        'ml'
+        'ml',
+
+        // Cac cot rieng cua du an nha o xa hoi.
+        'province_code',
+        'ward_code',
+        'address',
+        'latitude',
+        'longitude',
+        'status',
+        'price_type',
+        'price_from',
+        'price_to',
+        'area_type',
+        'area_from',
+        'area_to',
+        'total_units',
+        'total_land_area',
+        'scale_description',
+        'apartment_types',
+        'ownership_type',
+        'investor_id',
+        'start_date',
+        'handover_date',
+        'timeline_label',
+        'is_featured',
     ];
 
     protected $casts = [
@@ -47,6 +71,17 @@ class Product extends Model
         'chapter' => 'json'
     ];
 
+
+    /**
+     * Trang thai du an nha o xa hoi. Quyet dinh nhan mau tren the du an va
+     * mot trong bon nhom cua bo loc ngoai website.
+     */
+    public const TRANG_THAI_DU_AN = [
+        'receiving' => 'Dang nhan ho so',
+        'upcoming' => 'Sap mo ban',
+        'building' => 'Dang trien khai',
+        'handed' => 'Da ban giao',
+    ];
 
     protected $table = 'products';
 
