@@ -1,0 +1,1613 @@
+// =============================================================================
+// NOXH.vn - cac khoi dung chung o trang trong
+// =============================================================================
+@use 'noxh' as *;
+
+// --- Dau trang trong ---------------------------------------------------------
+.nx-page-head {
+    background: linear-gradient(180deg, #e8f1ff 0%, $nx-bg 100%);
+
+    &__inner {
+        @include nx-container;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 24px;
+        align-items: center;
+        padding-block: 8px 28px;
+
+        @media (max-width: $nx-lg) {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    &__title {
+        margin: 0 0 6px;
+        color: $nx-ink;
+        font-size: 30px;
+        font-weight: 800;
+        line-height: 1.2;
+
+        @media (max-width: $nx-md) {
+            font-size: 23px;
+        }
+    }
+
+    &__description {
+        margin: 0;
+        max-width: 620px;
+        color: $nx-text;
+        font-size: 14px;
+    }
+
+    &__stats {
+        display: grid;
+        grid-template-columns: repeat(4, auto);
+        gap: 22px;
+        padding: 14px 18px;
+        @include nx-card;
+
+        @media (max-width: $nx-md) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+    }
+}
+
+.nx-mini-stat {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    &__value {
+        color: $nx-ink;
+        font-size: 17px;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    &__label {
+        color: $nx-muted;
+        font-size: 12px;
+    }
+
+    svg {
+        color: $nx-blue;
+        flex-shrink: 0;
+    }
+}
+
+// --- Bo cuc ba cot cua trang danh sach du an ---------------------------------
+.nx-listing {
+    @include nx-container;
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr) 280px;
+    gap: 20px;
+    align-items: start;
+    padding-bottom: 40px;
+
+    @media (max-width: 1180px) {
+        grid-template-columns: 230px minmax(0, 1fr);
+
+        &__aside-right {
+            display: none;
+        }
+    }
+
+    @media (max-width: $nx-md) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+// Hai bien the cua bo cuc trang trong. Phai la LOP chu khong phai style
+// inline: style inline thang moi media query nen man hinh hep se khong bao
+// gio gop cot lai duoc, trang bi tran ngang.
+.nx-listing--left {
+    grid-template-columns: 240px minmax(0, 1fr);
+
+    @media (max-width: $nx-md) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.nx-listing--right {
+    grid-template-columns: minmax(0, 1fr) 320px;
+
+    @media (max-width: $nx-lg) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.nx-project-grid--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    @media (max-width: $nx-md) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: $nx-sm) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+// Bang nhieu cot khong the co lai vua man hinh dien thoai - cho cuon ngang
+// RIENG bang thay vi de ca trang bi tran.
+.nx-scroll-x {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    table {
+        min-width: 560px;
+    }
+}
+
+.nx-panel {
+    @include nx-card;
+    padding: 18px;
+    margin-bottom: 18px;
+
+    &__title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin: 0 0 14px;
+        color: $nx-ink;
+        font-size: 15px;
+        font-weight: 700;
+        text-transform: uppercase;
+
+        a {
+            color: $nx-blue;
+            font-size: 12.5px;
+            font-weight: 600;
+            text-transform: none;
+            text-decoration: none;
+        }
+    }
+}
+
+// --- Bo loc ------------------------------------------------------------------
+.nx-filter {
+    &__group {
+        margin-bottom: 18px;
+
+        &:last-of-type {
+            margin-bottom: 14px;
+        }
+    }
+
+    &__legend {
+        margin-bottom: 9px;
+        color: $nx-ink;
+        font-size: 13.5px;
+        font-weight: 700;
+    }
+
+    &__option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 7px;
+        color: $nx-text;
+        font-size: 13.5px;
+        cursor: pointer;
+
+        input {
+            margin: 0;
+            accent-color: $nx-blue;
+        }
+
+        span:last-child {
+            margin-left: auto;
+            color: $nx-muted;
+            font-size: 12.5px;
+        }
+
+        &:hover {
+            color: $nx-blue;
+        }
+    }
+}
+
+// --- Thanh sap xep -----------------------------------------------------------
+.nx-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+
+    &__count {
+        color: $nx-text;
+        font-size: 13.5px;
+
+        strong {
+            color: $nx-ink;
+        }
+    }
+
+    &__sort {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: $nx-text;
+        font-size: 13.5px;
+
+        select {
+            padding: 8px 11px;
+            border: 1px solid $nx-line;
+            border-radius: 8px;
+            background: #fff;
+            font-family: inherit;
+            font-size: 13.5px;
+        }
+    }
+}
+
+// --- O tim kiem tren cung danh sach -----------------------------------------
+.nx-searchbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+
+    input {
+        flex: 1;
+        padding: 12px 15px;
+        border: 1px solid $nx-line;
+        border-radius: 10px;
+        background: #fff;
+        font-family: inherit;
+        font-size: 14px;
+    }
+
+    @media (max-width: $nx-sm) {
+        flex-direction: column;
+    }
+}
+
+// --- The du an dang hang ngang (trang danh sach) -----------------------------
+.nx-project-row {
+    @include nx-card;
+    display: grid;
+    grid-template-columns: 230px minmax(0, 1fr);
+    gap: 16px;
+    padding: 14px;
+    margin-bottom: 14px;
+
+    @media (max-width: $nx-sm) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    &__media {
+        position: relative;
+        display: block;
+        aspect-ratio: 4 / 3;
+        border-radius: 10px;
+        overflow: hidden;
+        background: $nx-blue-soft;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &__badge {
+        position: absolute;
+        top: 9px;
+        left: 9px;
+        background: #fff;
+    }
+
+    &__head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+    }
+
+    &__title {
+        margin: 0 0 5px;
+        font-size: 17px;
+        font-weight: 700;
+
+        a {
+            color: $nx-ink;
+            text-decoration: none;
+
+            &:hover {
+                color: $nx-blue;
+            }
+        }
+    }
+
+    &__price {
+        flex-shrink: 0;
+        text-align: right;
+        color: $nx-green;
+        font-size: 17px;
+        font-weight: 800;
+        line-height: 1.2;
+
+        small {
+            display: block;
+            color: $nx-muted;
+            font-size: 12px;
+            font-weight: 500;
+        }
+    }
+
+    &__place {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 8px;
+        color: $nx-muted;
+        font-size: 13px;
+    }
+
+    &__description {
+        margin: 0 0 12px;
+        color: $nx-text;
+        font-size: 13.5px;
+        line-height: 1.6;
+    }
+
+    &__meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        padding: 10px 0;
+        border-top: 1px solid $nx-line;
+        border-bottom: 1px solid $nx-line;
+        margin-bottom: 12px;
+        color: $nx-text;
+        font-size: 13px;
+
+        div {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        strong {
+            color: $nx-ink;
+            font-weight: 600;
+        }
+
+        svg {
+            color: $nx-blue;
+        }
+    }
+
+    &__foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    &__updated {
+        color: $nx-muted;
+        font-size: 12.5px;
+    }
+}
+
+// --- Chip tinh thanh o cot phai ----------------------------------------------
+.nx-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    a {
+        padding: 7px 12px;
+        border: 1px solid $nx-line;
+        border-radius: 8px;
+        background: #fff;
+        color: $nx-ink;
+        font-size: 12.5px;
+        text-decoration: none;
+
+        &:hover,
+        &.is-active {
+            border-color: $nx-blue;
+            background: $nx-blue-soft;
+            color: $nx-blue;
+        }
+    }
+}
+
+// =============================================================================
+// CHI TIET DU AN
+// =============================================================================
+.nx-detail-hero {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    background: $nx-blue-soft;
+    margin-bottom: 20px;
+
+    &__media {
+        position: absolute;
+        inset: 0;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        &::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg,
+                rgba(255, 255, 255, 0.97) 0%,
+                rgba(255, 255, 255, 0.9) 40%,
+                rgba(255, 255, 255, 0.2) 70%,
+                rgba(255, 255, 255, 0) 88%);
+        }
+
+        @media (max-width: $nx-lg) {
+            position: static;
+
+            img {
+                height: auto;
+                aspect-ratio: 16 / 9;
+            }
+
+            &::after {
+                content: none;
+            }
+        }
+    }
+
+    &__inner {
+        position: relative;
+        z-index: 1;
+        padding: 26px;
+        max-width: 640px;
+
+        @media (max-width: $nx-lg) {
+            max-width: none;
+            padding: 20px;
+        }
+    }
+
+    &__title {
+        margin: 10px 0 8px;
+        color: $nx-ink;
+        font-size: 32px;
+        font-weight: 800;
+        line-height: 1.15;
+        text-transform: uppercase;
+
+        @media (max-width: $nx-md) {
+            font-size: 22px;
+        }
+    }
+
+    &__place {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 12px;
+        color: $nx-text;
+        font-size: 14px;
+    }
+
+    &__description {
+        margin: 0;
+        color: $nx-text;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+}
+
+// Dai thong so nam duoi hero.
+.nx-spec-strip {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 1px;
+    margin-bottom: 22px;
+    background: $nx-line;
+    border: 1px solid $nx-line;
+    border-radius: 12px;
+    overflow: hidden;
+
+    @media (max-width: $nx-lg) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @media (max-width: $nx-sm) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    > div {
+        padding: 13px 15px;
+        background: #fff;
+    }
+
+    dt {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 4px;
+        color: $nx-muted;
+        font-size: 12px;
+    }
+
+    dd {
+        margin: 0;
+        color: $nx-ink;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.35;
+    }
+
+    svg {
+        color: $nx-blue;
+    }
+}
+
+.nx-detail {
+    @include nx-container;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 330px;
+    gap: 20px;
+    align-items: start;
+    padding-bottom: 40px;
+
+    @media (max-width: $nx-lg) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+// Bang thong so tong quan.
+.nx-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+
+    th,
+    td {
+        padding: 9px 0;
+        text-align: left;
+        border-bottom: 1px solid $nx-line;
+        vertical-align: top;
+    }
+
+    th {
+        width: 44%;
+        color: $nx-muted;
+        font-weight: 500;
+    }
+
+    td {
+        color: $nx-ink;
+        font-weight: 600;
+    }
+
+    tr:last-child th,
+    tr:last-child td {
+        border-bottom: 0;
+    }
+}
+
+// Thanh the cua trang chi tiet.
+.nx-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 18px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid $nx-line;
+    overflow-x: auto;
+
+    a {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 11px 14px;
+        color: $nx-text;
+        font-size: 13.5px;
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+        border-bottom: 2px solid transparent;
+
+        &:hover {
+            color: $nx-blue;
+        }
+
+        &.is-active {
+            color: $nx-blue;
+            border-bottom-color: $nx-blue;
+        }
+    }
+}
+
+// Loai can ho.
+.nx-unit-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+
+    @media (max-width: $nx-md) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: $nx-sm) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.nx-unit {
+    @include nx-card;
+    padding: 12px;
+
+    &__media {
+        aspect-ratio: 4 / 3;
+        margin-bottom: 11px;
+        border-radius: 8px;
+        overflow: hidden;
+        background: $nx-blue-soft;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    strong {
+        display: block;
+        margin-bottom: 7px;
+        color: $nx-ink;
+        font-size: 14px;
+        text-transform: uppercase;
+    }
+
+    dl {
+        margin: 0;
+        color: $nx-text;
+        font-size: 13px;
+
+        div {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 4px;
+        }
+
+        dt { color: $nx-muted; }
+        dd { margin: 0; font-weight: 600; color: $nx-ink; }
+    }
+}
+
+// Duong thoi gian tien do.
+.nx-timeline {
+    margin: 0;
+    padding: 0 0 0 26px;
+    list-style: none;
+    position: relative;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 8px;
+        bottom: 8px;
+        left: 7px;
+        width: 2px;
+        background: $nx-line;
+    }
+
+    li {
+        position: relative;
+        margin-bottom: 16px;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: -26px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            background: $nx-line;
+            box-shadow: 0 0 0 1px $nx-line;
+        }
+
+        &.is-done::before {
+            background: $nx-blue;
+            box-shadow: 0 0 0 1px $nx-blue;
+        }
+
+        &.is-doing::before {
+            background: $nx-amber;
+            box-shadow: 0 0 0 1px $nx-amber;
+        }
+    }
+
+    strong {
+        display: block;
+        color: $nx-ink;
+        font-size: 13.5px;
+    }
+
+    span {
+        color: $nx-muted;
+        font-size: 12.5px;
+    }
+}
+
+// The ho so phap ly.
+.nx-doc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 12px;
+}
+
+.nx-doc {
+    @include nx-card;
+    display: flex;
+    gap: 10px;
+    padding: 13px;
+    text-decoration: none;
+
+    &:hover {
+        border-color: $nx-blue;
+    }
+
+    &__icon {
+        flex-shrink: 0;
+        color: $nx-red;
+    }
+
+    strong {
+        display: block;
+        color: $nx-ink;
+        font-size: 13.5px;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    span {
+        display: block;
+        margin-top: 3px;
+        color: $nx-muted;
+        font-size: 12px;
+    }
+}
+
+// Cau hoi thuong gap dang xep gap.
+.nx-faq {
+    @include nx-card;
+    margin-bottom: 10px;
+    overflow: hidden;
+
+    summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 13px 15px;
+        color: $nx-ink;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        list-style: none;
+
+        &::-webkit-details-marker {
+            display: none;
+        }
+
+        &::after {
+            content: '⌄';
+            color: $nx-muted;
+            font-size: 18px;
+            line-height: 1;
+        }
+    }
+
+    &[open] summary::after {
+        content: '⌃';
+    }
+
+    &__body {
+        padding: 0 15px 14px;
+        color: $nx-text;
+        font-size: 13.5px;
+        line-height: 1.7;
+    }
+}
+
+// =============================================================================
+// KIEM TRA DIEU KIEN
+// =============================================================================
+.nx-consent {
+    @include nx-container;
+    max-width: 780px;
+    padding-block: 44px 60px;
+    text-align: center;
+
+    &__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 76px;
+        height: 76px;
+        margin-bottom: 18px;
+        border-radius: 50%;
+        background: $nx-blue-soft;
+        color: $nx-blue;
+    }
+
+    &__title {
+        margin: 0 0 6px;
+        color: $nx-ink;
+        font-size: 34px;
+        font-weight: 800;
+        line-height: 1.15;
+        text-transform: uppercase;
+
+        span {
+            display: block;
+            color: $nx-blue;
+        }
+
+        @media (max-width: $nx-md) {
+            font-size: 24px;
+        }
+    }
+
+    &__description {
+        margin: 14px auto 18px;
+        max-width: 560px;
+        color: $nx-text;
+        font-size: 15px;
+    }
+
+    &__time {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 16px;
+        border-radius: 999px;
+        background: $nx-blue-soft;
+        color: $nx-ink;
+        font-size: 13.5px;
+    }
+
+    &__box {
+        @include nx-card;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 22px;
+        align-items: center;
+        margin: 26px 0 22px;
+        padding: 20px;
+        text-align: left;
+
+        @media (max-width: $nx-md) {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    &__agree {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        color: $nx-ink;
+        font-size: 13.5px;
+        cursor: pointer;
+
+        input {
+            margin: 2px 0 0;
+            width: 18px;
+            height: 18px;
+            accent-color: $nx-blue;
+        }
+    }
+}
+
+// Buoc tren thanh tien trinh.
+.nx-progress {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 22px;
+
+    &__step {
+        flex: 1;
+        text-align: center;
+        color: $nx-muted;
+        font-size: 12.5px;
+
+        span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            margin-bottom: 6px;
+            border-radius: 50%;
+            background: $nx-line;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        &.is-active {
+            color: $nx-ink;
+            font-weight: 600;
+
+            span {
+                background: $nx-blue;
+            }
+        }
+    }
+}
+
+.nx-check {
+    @include nx-container;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 20px;
+    align-items: start;
+    padding-bottom: 40px;
+
+    @media (max-width: $nx-lg) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.nx-question {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) 330px;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid $nx-line;
+
+    &:last-child {
+        border-bottom: 0;
+    }
+
+    @media (max-width: $nx-md) {
+        grid-template-columns: 34px minmax(0, 1fr);
+        row-gap: 10px;
+    }
+
+    &__no {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: $nx-blue;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    &__text {
+        color: $nx-ink;
+        font-size: 14px;
+        line-height: 1.5;
+
+        small {
+            display: block;
+            margin-top: 3px;
+            color: $nx-muted;
+            font-size: 12.5px;
+        }
+    }
+
+    &__answers {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+
+        @media (max-width: $nx-md) {
+            grid-column: 2 / -1;
+        }
+    }
+
+    // O chon dang nut: an radio that di, to mau khi duoc chon.
+    &__option {
+        position: relative;
+
+        input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        span {
+            display: block;
+            padding: 10px 12px;
+            border: 1px solid $nx-line;
+            border-radius: 8px;
+            background: #fff;
+            color: $nx-ink;
+            font-size: 13.5px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        input:checked + span {
+            border-color: $nx-blue;
+            background: $nx-blue-soft;
+            color: $nx-blue;
+            font-weight: 600;
+        }
+
+        input:focus-visible + span {
+            outline: 2px solid rgba(22, 104, 227, 0.4);
+            outline-offset: 2px;
+        }
+    }
+
+    &--wide &__answers {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+// Vong tron ket qua.
+.nx-score {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+
+    &__ring {
+        position: relative;
+        flex-shrink: 0;
+        width: 168px;
+        height: 168px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        text-align: center;
+    }
+
+    &__inner {
+        position: absolute;
+        inset: 14px;
+        border-radius: 50%;
+        background: #fff;
+        display: grid;
+        place-items: center;
+        align-content: center;
+    }
+
+    &__caption {
+        color: $nx-muted;
+        font-size: 12px;
+    }
+
+    &__level {
+        color: $nx-blue;
+        font-size: 30px;
+        font-weight: 800;
+        line-height: 1.1;
+        text-transform: uppercase;
+    }
+
+    &__percent {
+        color: $nx-ink;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    &__text {
+        flex: 1;
+        min-width: 240px;
+    }
+
+    &__title {
+        margin: 0 0 8px;
+        color: $nx-blue;
+        font-size: 22px;
+        font-weight: 800;
+        line-height: 1.3;
+    }
+}
+
+.nx-result-meta {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid $nx-line;
+
+    @media (max-width: $nx-md) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    > div {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    dt {
+        color: $nx-muted;
+        font-size: 12px;
+    }
+
+    dd {
+        margin: 0;
+        color: $nx-ink;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    svg {
+        color: $nx-blue;
+        flex-shrink: 0;
+    }
+}
+
+// Bang tieu chi ket qua.
+.nx-criteria {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+
+    th,
+    td {
+        padding: 11px 10px;
+        text-align: left;
+        border-bottom: 1px solid $nx-line;
+        vertical-align: top;
+    }
+
+    thead th {
+        background: $nx-blue-pale;
+        color: $nx-text;
+        font-size: 12.5px;
+        font-weight: 600;
+    }
+
+    tbody td:first-child {
+        width: 40px;
+    }
+
+    &__no {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: $nx-blue;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    &__verdict {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+
+        &--pass { color: $nx-green; }
+        &--unclear { color: $nx-amber; }
+        &--fail { color: $nx-red; }
+    }
+}
+
+// Cac buoc tiep theo.
+.nx-next-steps {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: buoc;
+
+    li {
+        position: relative;
+        padding: 0 0 18px 42px;
+        counter-increment: buoc;
+
+        &::before {
+            content: counter(buoc);
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: grid;
+            place-items: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: $nx-blue;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        &:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 32px;
+            bottom: 4px;
+            left: 13px;
+            width: 2px;
+            background: $nx-line;
+        }
+    }
+
+    strong {
+        display: block;
+        color: $nx-ink;
+        font-size: 14px;
+    }
+
+    span {
+        color: $nx-text;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+}
+
+// Danh sach co dau tich - dung o nhieu khoi.
+.nx-ticks {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        margin-bottom: 10px;
+        color: $nx-ink;
+        font-size: 13.5px;
+        line-height: 1.55;
+    }
+
+    svg {
+        flex-shrink: 0;
+        margin-top: 2px;
+        color: $nx-blue;
+    }
+
+    &--green svg {
+        color: $nx-green;
+    }
+}
+
+// =============================================================================
+// CAC TRANG NOI DUNG
+// =============================================================================
+.nx-topic-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+
+    @media (max-width: $nx-lg) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @media (max-width: $nx-md) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: $nx-sm) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.nx-article-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+
+    @media (max-width: $nx-lg) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @media (max-width: $nx-md) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: $nx-sm) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.nx-article {
+    @include nx-card;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    &:hover {
+        box-shadow: 0 12px 26px rgba(18, 36, 59, 0.09);
+    }
+
+    &__media {
+        display: block;
+        aspect-ratio: 16 / 10;
+        background: $nx-blue-soft;
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        padding: 13px 14px 14px;
+    }
+
+    &__title {
+        margin: 0 0 7px;
+        font-size: 14.5px;
+        font-weight: 700;
+        line-height: 1.45;
+
+        a {
+            color: $nx-ink;
+            text-decoration: none;
+
+            &:hover {
+                color: $nx-blue;
+            }
+        }
+    }
+
+    &__description {
+        margin: 0 0 11px;
+        color: $nx-text;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    &__meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: auto;
+        color: $nx-muted;
+        font-size: 12px;
+
+        span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    }
+}
+
+// Thu vien van ban phap luat.
+.nx-legal-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding-block: 13px;
+    border-bottom: 1px solid $nx-line;
+
+    &:last-child {
+        border-bottom: 0;
+    }
+
+    &__icon {
+        flex-shrink: 0;
+        color: $nx-red;
+        margin-top: 2px;
+    }
+
+    &__body {
+        flex: 1;
+        min-width: 0;
+    }
+
+    strong {
+        display: block;
+        color: $nx-ink;
+        font-size: 13.5px;
+        font-weight: 700;
+        line-height: 1.4;
+    }
+
+    p {
+        margin: 3px 0 4px;
+        color: $nx-text;
+        font-size: 12.5px;
+        line-height: 1.5;
+    }
+
+    time {
+        color: $nx-muted;
+        font-size: 12px;
+    }
+
+    &__download {
+        flex-shrink: 0;
+        color: $nx-blue;
+        align-self: center;
+    }
+}
+
+// Danh sach giay to trong bo ho so.
+.nx-dossier-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 13px 0;
+    border-bottom: 1px solid $nx-line;
+
+    &:last-child {
+        border-bottom: 0;
+    }
+
+    input[type="checkbox"] {
+        margin: 3px 0 0;
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+        accent-color: $nx-blue;
+    }
+
+    &__body {
+        flex: 1;
+        min-width: 0;
+    }
+
+    strong {
+        display: block;
+        color: $nx-ink;
+        font-size: 14px;
+    }
+
+    p {
+        margin: 3px 0 0;
+        color: $nx-text;
+        font-size: 13px;
+        line-height: 1.55;
+    }
+
+    &__tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 6px;
+        color: $nx-muted;
+        font-size: 12px;
+
+        span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+    }
+}
+
+// Cong cu tinh toan.
+.nx-calc {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 20px;
+    align-items: start;
+
+    @media (max-width: $nx-lg) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    &__result {
+        padding: 20px;
+        border-radius: 12px;
+        background: linear-gradient(140deg, $nx-blue 0%, #2f7ef0 100%);
+        color: #fff;
+    }
+
+    &__big {
+        margin: 6px 0 2px;
+        font-size: 28px;
+        font-weight: 800;
+        line-height: 1.15;
+        font-variant-numeric: tabular-nums;
+    }
+
+    &__row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        padding-block: 9px;
+        border-top: 1px solid rgba(255, 255, 255, 0.24);
+        font-size: 13.5px;
+
+        strong {
+            font-variant-numeric: tabular-nums;
+        }
+    }
+
+    &__note {
+        margin: 14px 0 0;
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 12px;
+        line-height: 1.55;
+    }
+}
+
+.nx-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+
+    @media (max-width: $nx-sm) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+// Noi dung bai viet.
+.nx-prose {
+    color: $nx-text;
+    font-size: 15px;
+    line-height: 1.8;
+
+    h2, h3, h4 {
+        color: $nx-ink;
+        margin: 26px 0 10px;
+        line-height: 1.35;
+    }
+
+    h2 { font-size: 20px; }
+    h3 { font-size: 17px; }
+
+    p {
+        margin: 0 0 14px;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+    }
+
+    ul, ol {
+        margin: 0 0 14px;
+        padding-left: 22px;
+    }
+
+    li {
+        margin-bottom: 7px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 16px;
+
+        th, td {
+            padding: 9px 11px;
+            border: 1px solid $nx-line;
+        }
+
+        th {
+            background: $nx-blue-pale;
+            color: $nx-ink;
+        }
+    }
+
+    blockquote {
+        margin: 0 0 16px;
+        padding: 12px 16px;
+        border-left: 3px solid $nx-blue;
+        background: $nx-blue-pale;
+        color: $nx-ink;
+    }
+}

@@ -794,3 +794,75 @@ if (!function_exists('calculateCourses')) {
         return $chapters;
     }
 }
+/*
+|--------------------------------------------------------------------------
+| Ham dung rieng cho NOXH.vn
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('so_gon')) {
+    /**
+     * In mot so thap phan theo kieu Viet Nam, bo phan le khi bang khong.
+     * 19.55 -> "19,55"   32.00 -> "32"   null -> ""
+     */
+    function so_gon($so): string
+    {
+        if ($so === null || $so === '') {
+            return '';
+        }
+
+        $so = (float) $so;
+        $chuoi = number_format($so, 2, ',', '.');
+
+        return rtrim(rtrim($chuoi, '0'), ',');
+    }
+}
+
+if (!function_exists('khoang_so')) {
+    /**
+     * Gop hai dau thanh mot khoang: "32 - 70 m2".
+     *
+     * Thieu mot dau thi in dau con lai kem tu "Tu"/"Den" chu khong in dau
+     * gach cut lung. Thieu ca hai thi tra ve dau gach - de o trong se lam vo
+     * bo cuc the du an.
+     */
+    function khoang_so($tu, $den, string $donVi = ''): string
+    {
+        $a = so_gon($tu);
+        $b = so_gon($den);
+
+        if ($a !== '' && $b !== '' && $a !== $b) {
+            return $a . ' - ' . $b . $donVi;
+        }
+
+        if ($a !== '') {
+            return $a . $donVi;
+        }
+
+        if ($b !== '') {
+            return $b . $donVi;
+        }
+
+        return '—';
+    }
+}
+
+if (!function_exists('khoang_gia')) {
+    /** Khoang gia ban, khong kem don vi (don vi in rieng cho nho hon). */
+    function khoang_gia($tu, $den): string
+    {
+        return khoang_so($tu, $den);
+    }
+}
+
+if (!function_exists('nx_url')) {
+    /**
+     * Duong dan trong website NOXH. Nhan ca chuoi rong (ve trang chu).
+     */
+    function nx_url(?string $duongDan = ''): string
+    {
+        $duongDan = trim((string) $duongDan, '/');
+
+        return $duongDan === '' ? url('/') : url('/' . $duongDan);
+    }
+}

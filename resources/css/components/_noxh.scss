@@ -1,0 +1,778 @@
+// =============================================================================
+// NOXH.vn - bo style cua frontend
+//
+// Mau lay tu 9 man hinh mo phong: xanh duong lam mau chinh, nen trang, the bo
+// goc mem voi vien rat nhat. Xanh la cho gia, cam cho trang thai "sap mo ban".
+// =============================================================================
+
+$nx-blue: #1668e3;
+$nx-blue-dark: #0f52b8;
+$nx-blue-soft: #eaf2ff;
+$nx-blue-pale: #f4f8ff;
+$nx-ink: #12243b;
+$nx-text: #4a5a70;
+$nx-muted: #8695aa;
+$nx-line: #e3ebf6;
+$nx-bg: #f6f9fe;
+$nx-green: #16a34a;
+$nx-amber: #f59e0b;
+$nx-red: #dc2626;
+
+$nx-container: 1240px;
+
+$nx-lg: 1024px;
+$nx-md: 768px;
+$nx-sm: 480px;
+
+@mixin nx-container {
+    width: 100%;
+    max-width: $nx-container;
+    margin: 0 auto;
+    padding-inline: 16px;
+}
+
+@mixin nx-card {
+    background: #fff;
+    border: 1px solid $nx-line;
+    border-radius: 12px;
+}
+
+// =============================================================================
+// NEN CHUNG
+// =============================================================================
+.nx {
+    color: $nx-ink;
+    font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    background: $nx-bg;
+
+    &__container {
+        @include nx-container;
+    }
+
+    &__section {
+        padding-block: 40px;
+
+        @media (max-width: $nx-md) {
+            padding-block: 28px;
+        }
+    }
+
+    // Tieu de khoi: chu hoa, mau xanh dam - dung nhu ban mo phong.
+    &__heading {
+        margin: 0 0 4px;
+        color: $nx-ink;
+        font-size: 24px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.01em;
+
+        @media (max-width: $nx-md) {
+            font-size: 19px;
+        }
+    }
+
+    &__subheading {
+        margin: 0 0 20px;
+        color: $nx-text;
+        font-size: 14px;
+    }
+
+    &__head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
+
+    &__more {
+        color: $nx-blue;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+
+        &:hover {
+            color: $nx-blue-dark;
+        }
+    }
+}
+
+// =============================================================================
+// NUT
+// =============================================================================
+.nx-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 22px;
+    border: 1px solid $nx-blue;
+    border-radius: 8px;
+    background: $nx-blue;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+
+    &:hover,
+    &:focus-visible {
+        background: $nx-blue-dark;
+        border-color: $nx-blue-dark;
+        color: #fff;
+    }
+
+    // Nut phu: nen trang, vien va chu xanh.
+    &--ghost {
+        background: #fff;
+        color: $nx-blue;
+
+        &:hover,
+        &:focus-visible {
+            background: $nx-blue-soft;
+            border-color: $nx-blue;
+            color: $nx-blue-dark;
+        }
+    }
+
+    &--line {
+        background: transparent;
+        border-color: $nx-line;
+        color: $nx-ink;
+
+        &:hover,
+        &:focus-visible {
+            background: $nx-blue-soft;
+            border-color: $nx-blue;
+            color: $nx-blue;
+        }
+    }
+
+    &--amber {
+        border-color: $nx-amber;
+        background: $nx-amber;
+        color: #12243b;
+
+        &:hover,
+        &:focus-visible {
+            border-color: darken($nx-amber, 8%);
+            background: darken($nx-amber, 8%);
+            color: #12243b;
+        }
+    }
+
+    &--sm {
+        padding: 9px 14px;
+        font-size: 13px;
+        gap: 6px;
+    }
+
+    &--block {
+        width: 100%;
+    }
+
+    // Nut nam tren nen xanh dam thi phai doi thanh nen trang, neu khong chim.
+    &--on-blue {
+        border-color: #fff;
+        background: #fff;
+        color: $nx-blue;
+
+        &:hover,
+        &:focus-visible {
+            border-color: #fff;
+            background: $nx-blue-soft;
+            color: $nx-blue-dark;
+        }
+    }
+}
+
+// =============================================================================
+// NHAN TRANG THAI
+// =============================================================================
+.nx-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.5;
+    background: rgba(22, 163, 74, 0.12);
+    color: $nx-green;
+
+    &--receiving { background: rgba(22, 163, 74, 0.12); color: $nx-green; }
+    &--upcoming  { background: rgba(245, 158, 11, 0.16); color: #b45309; }
+    &--building  { background: rgba(22, 104, 227, 0.12); color: $nx-blue; }
+    &--handed    { background: rgba(134, 149, 170, 0.18); color: #56677e; }
+
+    &--solid {
+        background: $nx-blue;
+        color: #fff;
+    }
+}
+
+// =============================================================================
+// DAU TRANG
+// =============================================================================
+.nx-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #fff;
+    border-bottom: 1px solid $nx-line;
+
+    &__inner {
+        @include nx-container;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        min-height: 68px;
+    }
+
+    &__logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        flex-shrink: 0;
+
+        img {
+            height: 40px;
+            width: auto;
+        }
+    }
+
+    &__brand {
+        color: $nx-blue;
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        line-height: 1.1;
+
+        span {
+            color: $nx-ink;
+        }
+    }
+
+    &__tagline {
+        display: block;
+        color: $nx-muted;
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    &__nav {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        margin-left: auto;
+
+        @media (max-width: $nx-lg) {
+            // Man hinh hep: menu truot tu tren xuong khi bam nut ba gach.
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+            padding: 8px 16px 16px;
+            background: #fff;
+            border-bottom: 1px solid $nx-line;
+            box-shadow: 0 16px 30px rgba(18, 36, 59, 0.08);
+
+            &:not(.is-open) {
+                display: none;
+            }
+        }
+    }
+
+    &__link {
+        position: relative;
+        color: $nx-ink;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        padding-block: 22px;
+        white-space: nowrap;
+
+        &:hover {
+            color: $nx-blue;
+        }
+
+        &.is-active {
+            color: $nx-blue;
+
+            &::after {
+                content: '';
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: 14px;
+                height: 2px;
+                background: $nx-blue;
+            }
+        }
+
+        @media (max-width: $nx-lg) {
+            padding-block: 12px;
+            border-bottom: 1px solid $nx-line;
+
+            &.is-active::after {
+                display: none;
+            }
+        }
+    }
+
+    &__cta {
+        flex-shrink: 0;
+
+        @media (max-width: $nx-lg) {
+            margin-left: auto;
+        }
+
+        @media (max-width: $nx-sm) {
+            display: none;
+        }
+    }
+
+    &__toggle {
+        display: none;
+        width: 40px;
+        height: 36px;
+        padding: 0;
+        border: 1px solid $nx-line;
+        border-radius: 8px;
+        background: #fff;
+        color: $nx-ink;
+        font-size: 18px;
+        cursor: pointer;
+
+        @media (max-width: $nx-lg) {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 8px;
+        }
+    }
+}
+
+// =============================================================================
+// DUONG DAN DIEU HUONG
+// =============================================================================
+.nx-crumb {
+    @include nx-container;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding-block: 14px;
+    color: $nx-muted;
+    font-size: 13px;
+
+    a {
+        color: $nx-muted;
+        text-decoration: none;
+
+        &:hover {
+            color: $nx-blue;
+        }
+    }
+
+    span[aria-hidden] {
+        color: #c4cedd;
+    }
+}
+
+// =============================================================================
+// CHAN TRANG
+// =============================================================================
+.nx-footer {
+    background: $nx-blue;
+    color: rgba(255, 255, 255, 0.86);
+
+    &__inner {
+        @include nx-container;
+        display: grid;
+        grid-template-columns: 1.6fr repeat(3, 1fr);
+        gap: 32px;
+        padding-block: 44px;
+
+        @media (max-width: $nx-lg) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 26px;
+        }
+
+        @media (max-width: $nx-sm) {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    &__brand {
+        color: #fff;
+        font-size: 22px;
+        font-weight: 800;
+        margin-bottom: 4px;
+    }
+
+    &__description {
+        margin: 12px 0 18px;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    &__title {
+        margin: 0 0 14px;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    &__list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        li {
+            margin-bottom: 9px;
+        }
+
+        a {
+            color: rgba(255, 255, 255, 0.86);
+            font-size: 13px;
+            text-decoration: none;
+
+            &:hover {
+                color: #fff;
+            }
+        }
+    }
+
+    &__contact {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        margin-bottom: 11px;
+        font-size: 13px;
+        line-height: 1.55;
+
+        a {
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+
+            &:hover {
+                color: #fff;
+            }
+        }
+
+        svg {
+            flex-shrink: 0;
+            margin-top: 3px;
+            opacity: 0.85;
+        }
+    }
+
+    &__social {
+        display: flex;
+        gap: 10px;
+        margin-top: 4px;
+
+        a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.16);
+            color: #fff;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.28);
+            }
+        }
+    }
+
+    &__bottom {
+        border-top: 1px solid rgba(255, 255, 255, 0.18);
+
+        > div {
+            @include nx-container;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding-block: 16px;
+            font-size: 12.5px;
+        }
+    }
+}
+
+// =============================================================================
+// O NHAP CHUNG
+// =============================================================================
+.nx-field {
+    margin-bottom: 14px;
+
+    label {
+        display: block;
+        margin-bottom: 6px;
+        color: $nx-text;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="email"],
+    input[type="number"],
+    input[type="date"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 11px 13px;
+        border: 1px solid $nx-line;
+        border-radius: 8px;
+        background: #fff;
+        color: $nx-ink;
+        font-family: inherit;
+        font-size: 14px;
+
+        &::placeholder {
+            color: $nx-muted;
+        }
+
+        &:focus {
+            outline: 2px solid rgba(22, 104, 227, 0.35);
+            outline-offset: 1px;
+            border-color: $nx-blue;
+        }
+    }
+
+    textarea {
+        min-height: 110px;
+        resize: vertical;
+    }
+}
+
+.nx-alert {
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    line-height: 1.6;
+
+    &--success {
+        background: rgba(22, 163, 74, 0.1);
+        border: 1px solid rgba(22, 163, 74, 0.3);
+        color: #15803d;
+    }
+
+    &--error {
+        background: rgba(220, 38, 38, 0.08);
+        border: 1px solid rgba(220, 38, 38, 0.28);
+        color: #b91c1c;
+    }
+
+    &--info {
+        background: $nx-blue-soft;
+        border: 1px solid rgba(22, 104, 227, 0.2);
+        color: #1e4b96;
+    }
+
+    ul {
+        margin: 0;
+        padding-left: 18px;
+    }
+}
+
+// =============================================================================
+// THE DU AN
+// =============================================================================
+.nx-project {
+    @include nx-card;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: box-shadow 0.18s ease, transform 0.18s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 30px rgba(18, 36, 59, 0.1);
+    }
+
+    &__media {
+        position: relative;
+        display: block;
+        aspect-ratio: 16 / 10;
+        overflow: hidden;
+        background: $nx-blue-soft;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &__badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: #fff;
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        padding: 14px 15px 15px;
+    }
+
+    &__title {
+        margin: 0 0 6px;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.35;
+
+        a {
+            color: $nx-ink;
+            text-decoration: none;
+
+            &:hover {
+                color: $nx-blue;
+            }
+        }
+    }
+
+    &__place {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 10px;
+        color: $nx-muted;
+        font-size: 13px;
+    }
+
+    &__price {
+        margin-bottom: 8px;
+        color: $nx-green;
+        font-size: 17px;
+        font-weight: 800;
+
+        small {
+            color: $nx-muted;
+            font-size: 12px;
+            font-weight: 500;
+        }
+    }
+
+    &__meta {
+        margin: 0 0 14px;
+        padding: 0;
+        list-style: none;
+        color: $nx-text;
+        font-size: 13px;
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 5px;
+        }
+
+        strong {
+            color: $nx-ink;
+            font-weight: 600;
+        }
+    }
+
+    &__actions {
+        display: flex;
+        gap: 8px;
+        margin-top: auto;
+
+        .nx-btn {
+            flex: 1;
+            padding-inline: 8px;
+            white-space: nowrap;
+        }
+    }
+}
+
+.nx-project-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+
+    @media (max-width: 1100px) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @media (max-width: $nx-md) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    @media (max-width: $nx-sm) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+// =============================================================================
+// PHAN TRANG
+// =============================================================================
+.nx-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 26px;
+    flex-wrap: wrap;
+
+    a,
+    span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+        height: 38px;
+        padding-inline: 10px;
+        border: 1px solid $nx-line;
+        border-radius: 8px;
+        background: #fff;
+        color: $nx-ink;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    a:hover {
+        border-color: $nx-blue;
+        color: $nx-blue;
+    }
+
+    .is-active {
+        border-color: $nx-blue;
+        background: $nx-blue;
+        color: #fff;
+    }
+
+    .is-disabled {
+        color: #c4cedd;
+    }
+}
+
+.nx-empty {
+    @include nx-card;
+    padding: 40px 20px;
+    text-align: center;
+    color: $nx-muted;
+    font-size: 14px;
+}

@@ -32,9 +32,17 @@ require __DIR__ . '/web/custom.route.php';
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+/*
+| Duong dan ngoai website cua NOXH.vn.
+|
+| Phai nap TRUOC nhom route cu ben duoi: nhom do co route bat tat ca
+| {canonical} se nuot moi duong dan chua khai bao. Route '/' cua he thong cu
+| cung bi thay o day - trang chu bay gio la cua NOXH.
+*/
+require __DIR__ . '/web/noxh-frontend.route.php';
+
 /* FRONTEND ROUTES  */
 Route::group(['middleware' => ['locale']], function () {
-    Route::get('/', [HomeController::class, 'index'])->name('home.index');
     Route::get('lien-he.html', [FeContactController::class, 'index'])->name('contact.index');
     Route::get('/sitemap.xml', [App\Http\Controllers\Frontend\SitemapController::class, 'index'])->name('sitemap.xml');
     Route::get('/sitemap', [App\Http\Controllers\Frontend\SitemapController::class, 'index'])->name('sitemap.index');

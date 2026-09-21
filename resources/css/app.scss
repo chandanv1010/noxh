@@ -1,85 +1,48 @@
 @use "sass:math";
-// ================
-// IMPORT VENDORS
-// ================
+
+// =============================================================================
+// Ban dung CSS cua frontend NOXH.vn
+//
+// Toan bo style cua website GPS truoc day (UIkit, library.css, config.css,
+// animate.css, nice-select, font-awesome, toastr va cac khoi giao dien rieng
+// cua truc: hero, header, footer, product_slider, partner, solution...) da
+// duoc go bo. Khong trang NOXH nao dung toi chung, ma chung lai ghi de mau
+// chu cua the tieu de - vi du UIkit dat h1..h6 { color:#222 } khien tieu de
+// tren nen xanh bi chim.
+//
+// Giao dien NOXH nam gon trong components/noxh.
+// =============================================================================
 @use 'variables/variables';
-@use "components/article-overlay-card";
-@use "components/article-left-image-card";
-@use "components/footer";
-@use "components/solution";
-@use "components/product_slider";
-@use "components/featured_project";
-@use "components/font";
-@use "components/partner";
-@use "components/news_video";
-@use "components/about";
-@use "components/product_catalogue";
-@use "components/header";
-@use "components/hero";
-@use "components/product_grid";
+@use "components/noxh";
+@use "components/noxh-home";
+@use "components/noxh-page";
 @use "components/tel-autolink";
 
-@import "../vendor/backend/css/plugins/toastr/toastr.min.css";
-@import "../vendor/frontend/resources/fonts/font-awesome-4.7.0/css/font-awesome.min.css";
-@import "../vendor/frontend/resources/uikit/css/uikit.modify.css";
-@import "../vendor/frontend/resources/library/css/library.css";
-@import "../vendor/frontend/resources/plugins/wow/css/libs/animate.css";
-@import "../vendor/frontend/core/plugins/jquery-nice-select-1.1.0/css/nice-select.css";
-@import "../vendor/frontend/resources/config.css";
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-// ================
-// IMPORT FONTS
-// ================
-
-// VARIABLES
-// ================
-
 
 :root {
-    --primary-color: #051e35;
-    --secondary-color: #83cd20;
-    --third-color: #5f2ded;
-    --four-color: #e7deff;
-    --star-color: #ffcd29;
-    --hover-color: var(--primary-color);
-    --second-font: "Inter";
     --main-font: "Inter";
+    --second-font: "Inter";
 }
 
-// ================
-// BASE STYLES
-// ================
+* {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: var(--second-font), sans-serif;
-    font-weight: normal;
-    font-size: 14px;
-    min-height: 1000px;
+    margin: 0;
+    background: #f6f9fe;
+    color: #12243b;
+    font-family: var(--main-font), "Segoe UI", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+img {
+    max-width: 100%;
 }
 
 a {
-    color: #000;
-}
-
-ul li,
-ol li {
-    list-style: none;
-}
-
-// ================
-// UTILITY / OVERRIDE
-// ================
-@media (min-width: 1220px) {
-    .uk-container {
-        max-width: 1280px;
-        padding: 0;
-    }
-}
-
-// GLOBAL HEADINGS LINE-HEIGHT ON MOBILE
-@media (max-width: 767px) {
-    h1, h2, h3, h4, h5, h6 {
-        line-height: 1.35 !important;
-    }
+    color: #1668e3;
 }

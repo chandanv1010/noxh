@@ -86,6 +86,11 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
+        // Rieng cho cac trang cua NOXH.vn: thanh dieu huong, chan trang va
+        // chuyen vien tu van. Dang ky tach ra vi lop nay khong nhan tham so
+        // language nhu nhom composer ke thua o tren.
+        view()->composer('frontend.noxh.*', \App\Http\ViewComposers\NoxhComposer::class);
+
       
 
      
