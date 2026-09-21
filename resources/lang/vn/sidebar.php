@@ -1,4 +1,17 @@
-<?php   
+<?php
+/*
+|--------------------------------------------------------------------------
+| Thanh menu ben trai cua trang quan tri NOXH.vn
+|--------------------------------------------------------------------------
+|
+| Cac module cua ban clone truc ma NOXH khong dung (don hang, khuyen mai,
+| voucher, nguon khach, nhom khach hang, binh luan, banner/slide, nha phan
+| phoi) da duoc go khoi menu.
+|
+| Ma nguon va bang du lieu cua chung VAN CON - chi la khong hien ra menu nua.
+| Muon bat lai thi them lai muc tuong ung o day.
+|
+*/
 return [
     'module' => [
         [
@@ -8,196 +21,32 @@ return [
             'route' => 'dashboard/index',
             'class' => 'special'
         ],
-        // [
-        //     'title' => 'Báo cáo doanh thu',
-        //     'icon' => 'fa fa-money',
-        //     'name' => ['report'],
-        //     'subModule' => [
-        //         [
-        //             'title' => 'Theo thời gian',
-        //             'route' => 'report/time'
-        //         ],
-        //         [
-        //             'title' => 'Theo sản phẩm',
-        //             'route' => 'report/product'
-        //         ],
-        //         [
-        //             'title' => 'Theo nguồn khách',
-        //             'route' => 'report/customer'
-        //         ],
-        //     ]
-        // ],
+
+        // --- Du an --------------------------------------------------------
+        //
+        // Du an NOXH dung chinh module San pham: bang products da duoc bo sung
+        // cac cot rieng (vi tri, khoang gia, khoang dien tich, quy mo...).
         [
-            'title' => 'QL Sản Phẩm',
+            'title' => 'QL Dự án',
             'icon' => 'fa fa-cube',
-            'name' => ['product','attribute'],
+            'name' => ['product', 'attribute'],
             'subModule' => [
                 [
-                    'title' => 'QL Nhóm Sản Phẩm',
+                    'title' => 'Nhóm dự án',
                     'route' => 'product/catalogue/index'
                 ],
                 [
-                    'title' => 'QL Sản phẩm',
+                    'title' => 'Danh sách dự án',
                     'route' => 'product/index'
                 ],
                 [
-                    'title' => 'QL Loại thuộc tính',
+                    'title' => 'Nhóm thuộc tính (bộ lọc)',
                     'route' => 'attribute/catalogue/index'
                 ],
                 [
-                    'title' => 'QL thuộc tính',
+                    'title' => 'Thuộc tính',
                     'route' => 'attribute/index'
                 ],
-
-            ]
-        ],
-        [
-            'title' => 'QL đơn hàng',
-            'icon' => 'fa fa-shopping-bag',
-            'name' => ['order'],
-            'subModule' => [
-                [
-                    'title' => 'QL Đơn Hàng',
-                    'route' => 'order/index'
-                ],
-            ]
-        ],
-        [
-            'title' => 'QL Nhóm Khách hàng',
-            'icon' => 'fa fa-user',
-            'name' => ['customer'],
-            'subModule' => [
-                [
-                    'title' => 'QL Nhóm Khách hàng',
-                    'route' => asset('customer/catalogue/index')
-                ],
-                [
-                    'title' => 'QL Khách hàng',
-                    'route' => 'customer/index'
-                ],
-            ]
-        ],
-        [
-            'title' => 'QL Marketing',
-            'icon' => 'fa fa-money',
-            'name' => ['promotion', 'source'],
-            'subModule' => [
-                [
-                    'title' => 'QL Khuyến mại',
-                    'route' => 'promotion/index'
-                ],
-                [
-                    'title' => 'QL Voucher',
-                    'route' => 'voucher/index'
-                ],
-                [
-                    'title' => 'QL nguồn khách',
-                    'route' => 'source/index'
-                ],
-            ]
-        ],
-        [
-            'title' => 'QL Bài viết',
-            'icon' => 'fa fa-file',
-            'name' => ['post'],
-            'subModule' => [
-                [
-                    'title' => 'QL Nhóm Bài Viết',
-                    'route' => 'post/catalogue/index'
-                ],
-                [
-                    'title' => 'QL Bài Viết',
-                    'route' => 'post/index'
-                ]
-            ]
-        ],
-        [
-            'title' => 'QL Bình Luận',
-            'icon' => 'fa fa-comment',
-            'name' => ['reviews'],
-            'subModule' => [
-                [
-                    'title' => 'QL Bình Luận',
-                    'route' => 'review/index'
-                ]
-            ]
-        ],
-        [
-            'title' => 'QL Liên Hệ',
-            'icon' => 'fa fa-github',
-            'name' => ['contacts'],
-            'subModule' => [
-                [
-                    'title' => 'QL Liên Hệ',
-                    'route' => 'contact/index'
-                ]
-            ]
-        ],
-        [
-            'title' => 'QL Nhóm Thành Viên',
-            'icon' => 'fa fa-user',
-            'name' => ['user','permission'],
-            'subModule' => [
-                [
-                    'title' => 'QL Nhóm Thành Viên',
-                    'route' => 'user/catalogue/index'
-                ],
-                [
-                    'title' => 'QL Thành Viên',
-                    'route' => 'user/index'
-                ],
-                [
-                    'title' => 'QL Quyền',
-                    'route' => 'permission/index'
-                ]
-            ]
-        ],
-        [
-            'title' => 'QL Banner & Slide',
-            'icon' => 'fa fa-picture-o',
-            'name' => ['slide'],
-            'subModule' => [
-                [
-                    'title' => 'Cài đặt Slide',
-                    'route' => 'slide/index'
-                ],
-            ]
-        ],
-        [
-            'title' => 'QL Menu',
-            'icon' => 'fa fa-bars',
-            'name' => ['menu'],
-            'subModule' => [
-                [
-                    'title' => 'Cài đặt Menu',
-                    'route' => 'menu/index'
-                ],
-            ]
-        ],
-        [
-            'title' => 'QL Phân phối',
-            'icon' => 'fa fa-map-marker',
-            'name' => ['distribution'],
-            'subModule' => [
-                [
-                    'title' => 'QL Nhà phân phối',
-                    'route' => 'distribution/index'
-                ],
-                [
-                    'title' => 'Khu vực phân phối',
-                    'route' => 'distribution/area/index'
-                ],
-            ]
-        ],
-        [
-            'title' => 'Quản lý Giới thiệu',
-            'icon' => 'fa fa-info-circle',
-            'name' => ['introduce'],
-            'subModule' => [
-                [
-                    'title' => 'Quản lý Giới thiệu',
-                    'route' => 'introduce/index'
-                ]
             ]
         ],
         [
@@ -223,6 +72,8 @@ return [
                 ],
             ]
         ],
+
+        // --- Cac module rieng cua NOXH ------------------------------------
         [
             'title' => 'QL Kiểm tra điều kiện',
             'icon' => 'fa fa-check-square-o',
@@ -294,23 +145,90 @@ return [
                 ],
             ]
         ],
+
+        // --- Noi dung -----------------------------------------------------
         [
-            'title' => 'Cấu hình chung',
-            'icon' => 'fa fa-file',
-            'name' => ['language', 'generate', 'system', 'widget'],
+            'title' => 'QL Tin tức',
+            'icon' => 'fa fa-newspaper-o',
+            'name' => ['post'],
             'subModule' => [
                 [
-                    'title' => 'QL Ngôn ngữ',
-                    'route' => 'language/index'
+                    'title' => 'Chuyên mục',
+                    'route' => 'post/catalogue/index'
                 ],
+                [
+                    'title' => 'Bài viết',
+                    'route' => 'post/index'
+                ],
+            ]
+        ],
+        [
+            'title' => 'Nội dung trang',
+            'icon' => 'fa fa-info-circle',
+            'name' => ['introduce'],
+            'subModule' => [
+                [
+                    'title' => 'Chữ trên trang chủ & trang trong',
+                    'route' => 'introduce/index'
+                ]
+            ]
+        ],
+        [
+            'title' => 'QL Liên hệ',
+            'icon' => 'fa fa-envelope-o',
+            'name' => ['contact'],
+            'subModule' => [
+                [
+                    'title' => 'Thông tin khách để lại',
+                    'route' => 'contact/index'
+                ],
+            ]
+        ],
+
+        // --- He thong -----------------------------------------------------
+        [
+            'title' => 'QL Menu',
+            'icon' => 'fa fa-bars',
+            'name' => ['menu'],
+            'subModule' => [
+                [
+                    'title' => 'Cài đặt Menu',
+                    'route' => 'menu/index'
+                ],
+            ]
+        ],
+        [
+            'title' => 'QL Thành viên',
+            'icon' => 'fa fa-users',
+            'name' => ['user', 'permission'],
+            'subModule' => [
+                [
+                    'title' => 'Nhóm thành viên',
+                    'route' => 'user/catalogue/index'
+                ],
+                [
+                    'title' => 'Thành viên',
+                    'route' => 'user/index'
+                ],
+                [
+                    'title' => 'Quyền',
+                    'route' => 'permission/index'
+                ],
+            ]
+        ],
+        [
+            'title' => 'Cấu hình chung',
+            'icon' => 'fa fa-cog',
+            'name' => ['language', 'generate', 'system', 'widget'],
+            'subModule' => [
                 [
                     'title' => 'Cấu hình hệ thống',
                     'route' => 'system/index'
                 ],
                 [
-                    'title' => 'Quản lý Widget',
-                    'route' => 'widget/index'
-                ]
+                    'title' => 'QL Ngôn ngữ',
+                    'route' => 'language/index'
+                ],
             ]
         ]
     ],

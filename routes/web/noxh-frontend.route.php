@@ -10,6 +10,7 @@ use App\Http\Controllers\Frontend\Noxh\DossierController;
 use App\Http\Controllers\Frontend\Noxh\FinanceController;
 use App\Http\Controllers\Frontend\Noxh\QaController;
 use App\Http\Controllers\Frontend\Noxh\NewsController;
+use App\Http\Controllers\Frontend\Noxh\PageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,4 +69,13 @@ Route::name('noxh.')->group(function () {
 
     // --- Form de lai thong tin ------------------------------------------------
     Route::post('de-lai-thong-tin', [LeadController::class, 'store'])->name('lead.store');
+    // --- Trang tinh -----------------------------------------------------------
+    //
+    // Khai bao CUOI CUNG trong nhom: route {duongDan} tuy da gioi han bang
+    // whereIn nhung van la mau bat chung, dat truoc se che cac route cu the.
+    Route::get('cong-hoa/tu-van', [PageController::class, 'advise'])->name('page.advise');
+    Route::get('lien-he', [PageController::class, 'contact'])->name('page.contact');
+    Route::get('{duongDan}', [PageController::class, 'show'])
+        ->whereIn('duongDan', ['gioi-thieu', 'chinh-sach-bao-mat', 'dieu-khoan-su-dung'])
+        ->name('page.show');
 });

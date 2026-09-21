@@ -51,28 +51,8 @@ Route::group(['middleware' => ['admin', 'locale', 'backend_default_locale']], fu
 });
 
 Route::group(['middleware' => ['locale']], function () {
-    Route::get('ajax/dashboard/findProduct', [AjaxDashboardController::class, 'findProduct'])->name('ajax.dashboard.findProduct');
-    Route::get('ajax/dashboard/findProductObject', [AjaxDashboardController::class, 'findProductObject'])->name('ajax.findProductObject');
-    Route::post('ajax/cart/pay', [AjaxCartController::class, 'pay'])->name('ajax.cart.pay');
-
-    Route::post('ajax/contact/saveContact', [ContactController::class, 'create'])->name('ajax.cart.pay');
-    Route::post('ajax/contact/advise', [ContactController::class, 'advise'])->name('ajax.contact.advise');
-    Route::post('ajax/order/buy/now', [ContactController::class, 'buyNow'])->name('ajax.buy.now');
-
-    Route::post('ajax/review/create', [AjaxReviewController::class, 'create'])->name('ajax.review.create');
-    Route::get('ajax/product/loadVariant', [AjaxProductController::class, 'loadVariant'])->name('ajax.loadVariant');
-    Route::get('ajax/product/filter', [AjaxProductController::class, 'filter'])->name('ajax.filter');
-    Route::post('ajax/cart/create', [AjaxCartController::class, 'create'])->name('ajax.cart.create');
-    Route::post('ajax/cart/update', [AjaxCartController::class, 'update'])->name('ajax.cart.update');
-    Route::post('ajax/cart/delete', [AjaxCartController::class, 'delete'])->name('ajax.cart.delete');
-    Route::get('ajax/cart/applyCartVoucher', [AjaxCartController::class, 'applyCartVoucher'])->name('ajax.cart.applyCartVoucher');
-    Route::get('ajax/cart/unUseVoucher', [AjaxCartController::class, 'unUseVoucher'])->name('ajax.cart.unUseVoucher');
+    // Chi con mot duong dan ajax: o chon Tinh/Huyen/Xa trong cac form quan tri
+    // nap danh sach qua day. Cac duong dan cu (gio hang, so sanh, yeu thich,
+    // danh gia, loc san pham) da go cung phan frontend cua truc.
     Route::get('ajax/location/getLocation', [LocationController::class, 'getLocation'])->name('ajax.location.index');
-    Route::get('ajax/post/video', [AjaxPostController::class, 'video'])->name('post.video');
-    Route::post('ajax/product/wishlist', [AjaxProductController::class, 'wishlist'])->name('product.wishlist');
-    Route::post('ajax/product/unwishlist', [AjaxProductController::class, 'unWishlist'])->name('product.unwishlist');
-    Route::get('ajax/product/compare/search', [AjaxProductController::class, 'compareSearch'])->name('product.compare.search');
-    Route::post('ajax/product/compare/add', [AjaxProductController::class, 'compareAdd'])->name('product.compare.add');
-    Route::post('ajax/product/compare/remove', [AjaxProductController::class, 'compareRemove'])->name('product.compare.remove');
-    Route::get('ajax/product/compare/list', [AjaxProductController::class, 'compareList'])->name('product.compare.list');
 });

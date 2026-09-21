@@ -71,20 +71,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
 
-        view()->composer(['frontend.*', 'mobile.*'], function($view) use ($language){
-            $composerClasses = [
-                MenuComposer::class,
-                CartComposer::class,
-                \App\Http\ViewComposers\SystemComposer::class,
-                \App\Http\ViewComposers\LanguageComposer::class,
-                \App\Http\ViewComposers\CategoryComposer::class,
-            ];
-
-            foreach($composerClasses as $key => $val){
-                $composer = app()->make($val, ['language' => $language->id]);
-                $composer->compose($view);
-            }
-        });
+        // Nhom composer cu (MenuComposer, CartComposer, CategoryComposer...)
+        // da duoc go: chung phuc vu giao dien cua truc, ma toan bo giao dien
+        // do khong con. Cac trang NOXH lay du lieu dung chung tu NoxhComposer
+        // ben duoi - nhe hon han vi khong nap gio hang va cay danh muc.
 
         // Rieng cho cac trang cua NOXH.vn: thanh dieu huong, chan trang va
         // chuyen vien tu van. Dang ky tach ra vi lop nay khong nhan tham so
