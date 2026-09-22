@@ -1,8 +1,44 @@
 <script>
 // =============================================================================
-// JS dung chung cua NOXH.vn. Viet thuan, khong keo them thu vien nao: toan bo
-// tuong tac o day chi la mo/dong menu va dem so.
+// JS dung chung cua NOXH.vn. Viet thuan, khong keo them thu vien nao.
 // =============================================================================
+
+// Doi so tien ra chu, doi xung voi ham tien_viet() ben PHP. Hai ban phai cho
+// ra cung mot chuoi: cung mot con tien co the duoc in san tu may chu (bang
+// gia du an) hoac tinh ngay tren trinh duyet (may tinh khoan vay).
+window.NX = window.NX || {};
+
+window.NX.tienViet = function (dong) {
+    if (dong === null || dong === undefined || !isFinite(dong)) return '—';
+
+    var am = dong < 0;
+    dong = Math.abs(dong);
+
+    var chia = 1, donVi = 'đồng', soLe = 0;
+
+    if (dong >= 1e9) { chia = 1e9; donVi = 'tỷ'; soLe = 2; }
+    else if (dong >= 1e6) { chia = 1e6; donVi = 'triệu'; soLe = 1; }
+    else if (dong >= 1e3) { chia = 1e3; donVi = 'nghìn'; soLe = 0; }
+
+    var so = new Intl.NumberFormat('vi-VN', {
+        minimumFractionDigits: soLe,
+        maximumFractionDigits: soLe,
+    }).format(dong / chia);
+
+    // Bo phan thap phan bang 0. Chi lam khi thuc su co dau phay, khong thi
+    // 850.000 se thanh "85 nghin".
+    if (so.indexOf(',') >= 0) {
+        so = so.replace(/0+$/, '').replace(/,$/, '');
+    }
+
+    return (am ? '-' : '') + so + ' ' + donVi;
+};
+
+// Nhieu o nhap tren trang tai chinh dung don vi TRIEU cho de go.
+window.NX.tienTuTrieu = function (trieu) {
+    return window.NX.tienViet(trieu * 1e6);
+};
+
 (function () {
     // --- Menu tren man hinh hep ---------------------------------------------
     var nut = document.querySelector('[data-nx-nav-toggle]');

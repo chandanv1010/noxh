@@ -887,6 +887,127 @@ if (!function_exists('khoang_gia')) {
     }
 }
 
+if (!function_exists('tien_viet')) {
+    /**
+     * Doi mot so tien (don vi dong) ra cach viet quen thuoc.
+     *
+     *     20000000    -> "20 trieu"
+     *     25500000    -> "25,5 trieu"
+     *     1250000000  -> "1,25 ty"
+     *     850000      -> "850 nghin"
+     *
+     * Du an bat dong san co con so rat lon, viet day du chu so thi nguoi doc
+     * phai dem hang moi biet la bao nhieu. Nguoc lai lam tron qua tay thi
+     * 1,04 ty va 1,4 ty trong giong nhau - nen giu toi hai chu so thap phan
+     * voi ty va mot voi trieu.
+     *
+     * @param  float|int|string|null  $dong    So tien, don vi dong
+     * @param  bool                   $ngan    true thi viet tat: "25tr", "1,2ty"
+     */
+    function tien_viet($dong, bool $ngan = false): string
+    {
+        if ($dong === null || $dong === '') {
+            return '';
+        }
+
+        $dong = (float) $dong;
+        $am = $dong < 0;
+        $dong = abs($dong);
+
+        [$chia, $donVi, $soLe] = match (true) {
+            $dong >= 1000000000 => [1000000000, $ngan ? 'ty' : 'tỷ', 2],
+            $dong >= 1000000 => [1000000, $ngan ? 'tr' : 'triệu', 1],
+            $dong >= 1000 => [1000, $ngan ? 'k' : 'nghìn', 0],
+            default => [1, 'đồng', 0],
+        };
+
+        $giaTri = $dong / $chia;
+
+        $so = number_format($giaTri, $soLe, ',', '.');
+
+        // Bo phan thap phan bang 0: "20,0 trieu" doc nang ne hon "20 trieu".
+        // Chi lam khi thuc su CO dau phay - khong thi 850.000 se thanh
+        // "85 nghin" vi so 0 cuoi cua phan nguyen cung bi cat.
+        if (str_contains($so, ',')) {
+            $so = rtrim(rtrim($so, '0'), ',');
+        }
+
+        // "dong" khong co dang viet tat, giu nguyen ca khoang trang.
+        $vietTat = $ngan && $donVi !== 'đồng';
+
+        return ($am ? '-' : '') . $so . ($vietTat ? '' : ' ') . $donVi;
+    }
+}
+
+if (!function_exists('khoang_tien')) {
+    /**
+     * Mot khoang tien: 1075000000 va 1180000000 -> "1,08 - 1,18 ty".
+     *
+     * Chi in don vi mot lan o cuoi khi hai dau cung don vi - "1,08 ty - 1,18
+     * ty" dai ma khong ro hon.
+     */
+    function khoang_tien($tu, $den): string
+    {
+        $tu = ($tu === null || $tu === '') ? null : (float) $tu;
+        $den = ($den === null || $den === '') ? null : (float) $den;
+
+        if ($tu === null && $den === null) {
+            return '';
+        }
+
+        if ($tu === null || $den === null || abs($tu - (float) $den) < 0.01) {
+            return tien_viet($tu ?? $den);
+        }
+
+        $chuTu = tien_viet($tu);
+        $chuDen = tien_viet($den);
+
+        $donViTu = trim(strrchr($chuTu, ' ') ?: '');
+        $donViDen = trim(strrchr($chuDen, ' ') ?: '');
+
+        if ($donViTu === $donViDen) {
+            return trim(str_replace(' ' . $donViTu, '', $chuTu)) . ' - ' . $chuDen;
+        }
+
+        return $chuTu . ' - ' . $chuDen;
+    }
+}
+
+if (!function_exists('dung_luong')) {
+    /**
+     * Doi so byte ra chu: 1536000 -> "1,5 MB".
+     *
+     * Dung cho file van ban tai len - nguoi dung can biet file nang bao nhieu
+     * truoc khi bam tai ve, nhat la khi dung 3G.
+     */
+    function dung_luong($byte): string
+    {
+        $byte = (float) $byte;
+
+        if ($byte <= 0) {
+            return '';
+        }
+
+        $donVi = ['B', 'KB', 'MB', 'GB'];
+        $i = 0;
+
+        while ($byte >= 1024 && $i < count($donVi) - 1) {
+            $byte /= 1024;
+            $i++;
+        }
+
+        $soLe = $i === 0 ? 0 : 1;
+        $so = number_format($byte, $soLe, ',', '.');
+
+        // Chi cat so 0 thua khi co dau phay - khong thi 120 B thanh "12 B".
+        if (str_contains($so, ',')) {
+            $so = rtrim(rtrim($so, '0'), ',');
+        }
+
+        return $so . ' ' . $donVi[$i];
+    }
+}
+
 if (!function_exists('nx_url')) {
     /**
      * Duong dan trong website NOXH. Nhan ca chuoi rong (ve trang chu).

@@ -67,7 +67,7 @@
     var o = function (id) { return document.getElementById(id); };
     var dd = function (t) {
         if (!isFinite(t) || t < 0) return '—';
-        return new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 0 }).format(t) + ' triệu';
+        return window.NX.tienTuTrieu(t);
     };
 
     var tinh = function () {

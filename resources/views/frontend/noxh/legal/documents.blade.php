@@ -51,8 +51,17 @@
                             <p>{{ \Illuminate\Support\Str::words(strip_tags($vb->summary), 30, '…') }}</p>
                         @endif
                         <time>
-                            {{ $vb->effective_date ? 'Hiệu lực từ ' . $vb->effective_date->format('d/m/Y') : '' }}
-                            @if($vb->download_count) · {{ number_format($vb->download_count, 0, ',', '.') }} lượt tải @endif
+                            @php
+                                $moc = [];
+                                if ($vb->issued_date) { $moc[] = 'Ban hành ' . $vb->issued_date->format('d/m/Y'); }
+                                if ($vb->effective_date) { $moc[] = 'Hiệu lực từ ' . $vb->effective_date->format('d/m/Y'); }
+                                // Nguoi dung can biet file nang bao nhieu va dinh dang gi
+                                // TRUOC khi bam tai - nhat la khi dung 3G.
+                                if ($vb->file_type) { $moc[] = strtoupper($vb->file_type); }
+                                if ($vb->file_size) { $moc[] = dung_luong($vb->file_size); }
+                                if ($vb->download_count) { $moc[] = number_format($vb->download_count, 0, ',', '.') . ' lượt tải'; }
+                            @endphp
+                            {{ implode(' · ', $moc) }}
                         </time>
                     </div>
                     @if($vb->file)

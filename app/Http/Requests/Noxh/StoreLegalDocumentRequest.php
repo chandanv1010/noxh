@@ -21,6 +21,11 @@ class StoreLegalDocumentRequest extends FormRequest
             'issued_date' => 'nullable|date',
             'effective_date' => 'nullable|date',
             'summary' => 'nullable|string|max:20000',
+
+            // Chi nhan cac dinh dang tai lieu thuong gap. Chan theo DUOI file
+            // chu khong theo kieu MIME trinh duyet khai: trinh duyet khai kieu
+            // cho .docx khong dong nhat giua Windows va macOS.
+            'tep_tai_len' => 'nullable|file|max:20480|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,rtf,txt,csv,zip,rar',
         ];
     }
 
@@ -29,6 +34,8 @@ class StoreLegalDocumentRequest extends FormRequest
         return [
             'title.required' => 'Bạn chưa nhập tên văn bản.',
             'doc_type.required' => 'Bạn chưa nhập loại văn bản.',
+            'tep_tai_len.max' => 'File không được lớn hơn 20MB.',
+            'tep_tai_len.mimes' => 'Chỉ nhận file PDF, Word, Excel, PowerPoint, văn bản thuần, CSV hoặc file nén.',
         ];
     }
 }

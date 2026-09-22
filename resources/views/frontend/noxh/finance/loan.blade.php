@@ -124,9 +124,10 @@
 <script>
 (function () {
     var o = function (id) { return document.getElementById(id); };
+    // O nhap dung don vi trieu; khoan vay mua nha thuong len toi hang ty nen
+    // de nguyen "1.200 trieu" thi nguoi doc phai tu quy doi.
     var dinhDang = function (trieu) {
-        if (!isFinite(trieu)) return '—';
-        return new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 1 }).format(trieu) + ' triệu';
+        return window.NX.tienTuTrieu(trieu);
     };
 
     // Cong thuc tra gop deu: mot ky han lai suat r, n ky.

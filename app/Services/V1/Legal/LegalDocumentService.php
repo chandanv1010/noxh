@@ -6,6 +6,7 @@ use App\Repositories\Noxh\LegalDocumentRepository;
 use App\Services\V1\BaseService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
  * Lop nay PHAI nam trong App\Services\V1\Legal: cong tac bat/tat hien thi
@@ -14,6 +15,9 @@ use Illuminate\Support\Facades\Log;
  */
 class LegalDocumentService extends BaseService
 {
+    /** Noi cat file van ban, tinh tu thu muc public. */
+    public const THU_MUC = 'uploads/van-ban';
+
     protected $documentRepository;
 
     public function __construct(
@@ -98,7 +102,7 @@ class LegalDocumentService extends BaseService
 
     private function duLieu($request): array
     {
-        $payload = $request->except(['_token', 'send']);
+        $payload = $request->except(['_token', 'send', 'tep_tai_len']);
 
         $payload['issued_date'] = empty($payload['issued_date']) ? null : $payload['issued_date'];
         $payload['effective_date'] = empty($payload['effective_date']) ? null : $payload['effective_date'];
@@ -106,6 +110,46 @@ class LegalDocumentService extends BaseService
         $payload['is_featured'] = $request->boolean('is_featured') ? 1 : 0;
         $payload['order'] = $request->integer('order');
         $payload['publish'] = $request->integer('publish') ?: 2;
+
+        $payload = $this->nhanTep($payload, $request);
+
+        return $payload;
+    }
+
+    /**
+     * Nhan file van ban tai truc tiep tu form.
+     *
+     * Quan tri co hai duong: go duong dan vao o "File tai ve", hoac chon file
+     * tu may. Co file tai len thi no thang - nguoc lai giu nguyen duong dan cu,
+     * KHONG ghi de bang chuoi rong (form sua khong gui lai file da co).
+     */
+    private function nhanTep(array $payload, $request): array
+    {
+        $tep = $request->file('tep_tai_len');
+
+        if (!$tep || !$tep->isValid()) {
+            if (($payload['file'] ?? '') === '') {
+                unset($payload['file'], $payload['file_type'], $payload['file_size']);
+            }
+
+            return $payload;
+        }
+
+        $duoi = strtolower($tep->getClientOriginalExtension());
+        // Phai lay dung luong TRUOC khi move(): sau khi chuyen, doi tuong
+        // UploadedFile khong con tro toi file nao nua.
+        $coLon = $tep->getSize();
+
+        // Ten file giu phan goc cho de nhan ra trong kho, them ma thoi gian de
+        // hai van ban trung ten khong de len nhau.
+        $ten = Str::slug(pathinfo($tep->getClientOriginalName(), PATHINFO_FILENAME));
+        $ten = ($ten ?: 'van-ban') . '-' . now()->format('YmdHis') . '.' . $duoi;
+
+        $tep->move(public_path(self::THU_MUC), $ten);
+
+        $payload['file'] = '/' . self::THU_MUC . '/' . $ten;
+        $payload['file_type'] = $duoi;
+        $payload['file_size'] = $coLon ?: null;
 
         return $payload;
     }

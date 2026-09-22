@@ -7,7 +7,8 @@
         : route('legal.document.update', $document->id);
 @endphp
 
-<form action="{{ $url }}" method="post" class="box">
+{{-- enctype bat buoc phai co, khong thi o chon file gui len chuoi rong. --}}
+<form action="{{ $url }}" method="post" class="box" enctype="multipart/form-data">
     @csrf
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
@@ -79,11 +80,32 @@
                         <div class="row mb15">
                             <div class="col-lg-12">
                                 <div class="form-row">
-                                    <label class="control-label text-left mb10">File tải về</label>
-                                    <input type="text" name="file" value="{{ old('file', ($document->file) ?? '') }}"
-                                           class="form-control upload-image" data-type="Files" autocomplete="off"
-                                           placeholder="Bấm để chọn file">
-                                    <small class="text-muted">Bấm vào ô để mở kho file. Nên dùng PDF.</small>
+                                    <label class="control-label text-left mb10">File văn bản</label>
+
+                                    @if(!empty($document->file))
+                                        <div class="alert alert-info" style="padding:8px 10px;margin-bottom:10px">
+                                            <i class="fa fa-file-o"></i>
+                                            <a href="{{ $document->file }}" target="_blank">{{ basename($document->file) }}</a>
+                                            @if($document->file_size)
+                                                <span class="text-muted">({{ dung_luong($document->file_size) }})</span>
+                                            @endif
+                                        </div>
+                                    @endif
+
+                                    <input type="file" name="tep_tai_len" class="form-control"
+                                           accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.rtf,.txt,.csv,.zip,.rar">
+                                    <small class="text-muted">
+                                        PDF, Word, Excel, PowerPoint, TXT, CSV hoặc file nén. Tối đa 20MB.
+                                        @if(!empty($document->file)) Chọn file mới để thay file đang có. @endif
+                                    </small>
+
+                                    <div class="form-row mt15">
+                                        <label class="control-label text-left mb10">Hoặc dán đường dẫn có sẵn</label>
+                                        <input type="text" name="file" value="{{ old('file', ($document->file) ?? '') }}"
+                                               class="form-control" autocomplete="off"
+                                               placeholder="https://...">
+                                        <small class="text-muted">Dùng khi file đã nằm ở nơi khác. Tải file lên sẽ ghi đè ô này.</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
