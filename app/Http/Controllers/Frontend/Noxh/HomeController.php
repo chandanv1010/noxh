@@ -4,18 +4,28 @@ namespace App\Http\Controllers\Frontend\Noxh;
 
 use App\Http\Controllers\FrontendController;
 use App\Models\Post;
-use App\Models\QaQuestion;
+use App\Models\User;
 use App\Repositories\Noxh\ProjectQuery;
 
 /**
  * Trang chu NOXH.vn.
  *
  * Moi doan chu deu doc tu bang introduces (module Gioi thieu trong quan tri),
- * du an doc tu bang products, cau hoi tu qa_questions, tin tuc tu posts -
+ * du an doc tu bang products, tin tuc tu posts, tu van vien tu users -
  * khong co chu nao ghi cung trong ma nguon.
  */
 class HomeController extends FrontendController
 {
+    /**
+     * So du an nap cho khoi "Du an noi bat".
+     *
+     * Nap du 12 roi loc bang JS theo the tinh/thanh, thay vi moi lan bam the
+     * lai goi may chu - danh sach nho nen tai het mot lan van nhe hon.
+     */
+    private const SO_DU_AN_NOI_BAT = 12;
+
+    private const SO_TU_VAN_VIEN = 12;
+
     protected $projectQuery;
 
     public function __construct(ProjectQuery $projectQuery)
@@ -37,14 +47,10 @@ class HomeController extends FrontendController
                 'meta_image' => $system['seo_meta_images'] ?? '',
                 'canonical' => url('/'),
             ],
-            'duAnNoiBat' => $this->projectQuery->noiBat(4),
+            'duAnNoiBat' => $this->projectQuery->noiBat(self::SO_DU_AN_NOI_BAT),
             'tinhThanh' => $this->projectQuery->tinhCoDuAn(),
-            'cauHoi' => QaQuestion::where('publish', 2)
-                ->orderByDesc('is_featured')
-                ->orderByDesc('id')
-                ->limit(3)
-                ->get(),
             'tinTuc' => $this->tinMoi(),
+            'nhanVien' => $this->tuVanVien(),
         ]);
     }
 
@@ -61,7 +67,23 @@ class HomeController extends FrontendController
             ->where('posts.publish', 2)
             ->whereNull('posts.deleted_at')
             ->orderByDesc('posts.id')
-            ->limit(3)
+            ->limit(4)
             ->get(['posts.id', 'posts.image', 'posts.created_at', 'pl.name', 'pl.canonical', 'pl.description']);
+    }
+
+    /**
+     * Doi tu van ho so hien o khoi "Tu van ho so tai khu vuc cua ban".
+     *
+     * Lay chinh nhung nguoi trong nhom nhan vien kinh doanh - khong co bang
+     * rieng, nen ho tu cap nhat anh va chuc danh trong bang dieu khien /sale
+     * la ngoai website doi theo.
+     */
+    private function tuVanVien()
+    {
+        return User::whereHas('user_catalogues', fn ($q) => $q->where('is_sale', 1))
+            ->where('publish', 2)
+            ->orderBy('name')
+            ->limit(self::SO_TU_VAN_VIEN)
+            ->get(['id', 'name', 'title', 'image', 'address', 'phone']);
     }
 }

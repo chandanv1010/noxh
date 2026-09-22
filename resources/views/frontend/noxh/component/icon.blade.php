@@ -33,6 +33,8 @@
         'calculator' => '<rect x="4.5" y="2.8" width="15" height="18.4" rx="2"/><path d="M8 7h8M8 11.5h1.5M11.5 11.5H13M15 11.5h1.5M8 15.5h1.5M11.5 15.5H13M15 15.5h1.5"/>',
         'bank' => '<path d="M3 9.5 12 4l9 5.5M4.5 9.5V19M9 9.5V19M15 9.5V19M19.5 9.5V19M2.5 19.5h19"/>',
         'question' => '<circle cx="12" cy="12" r="9.2"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .9-1 1.6v.4"/><circle cx="12" cy="17" r=".9" fill="currentColor" stroke="none"/>',
+        // May bay giay - nut "Lien he" o the nhan vien tu van.
+        'send' => '<path d="M21.5 2.5 2.8 9.7c-.8.3-.8 1.4 0 1.7l7.4 2.6 2.6 7.4c.3.8 1.4.8 1.7 0l7.2-18.7c.2-.6-.4-1.2-1-1z"/><path d="M10.2 14 21.5 2.5"/>',
         'search' => '<circle cx="11" cy="11" r="6.8"/><path d="m16.2 16.2 4.3 4.3"/>',
         'arrow-right' => '<path d="M4.5 12h14M13 6.5l5.5 5.5L13 17.5"/>',
         'arrow-left' => '<path d="M19.5 12h-14M11 6.5 5.5 12 11 17.5"/>',

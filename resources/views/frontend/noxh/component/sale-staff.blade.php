@@ -58,6 +58,14 @@
                                 </a>
                             @endif
                         </div>
+
+                        {{-- Nut mo popup xin tu van. Popup do component
+                             advisor-modal lo, chi in mot lan cho ca trang. --}}
+                        <button type="button" class="nx-btn nx-btn--sm nx-staff__nut"
+                                data-nx-lien-he="{{ $nv->id }}" data-nx-ten="{{ $nv->name }}">
+                            @include('frontend.noxh.component.icon', ['name' => 'send', 'size' => 14])
+                            Liên hệ
+                        </button>
                     </div>
                 </li>
             @endforeach

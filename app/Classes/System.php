@@ -41,6 +41,23 @@ class System{
             ]
         ];
 
+        $data['telegram'] = [
+            'label' => 'Thông báo Telegram',
+            'description' => 'Mỗi khi có khách để lại thông tin, hệ thống gửi ngay một tin vào Telegram. Để trống hai ô này thì tính năng tắt, thông tin vẫn lưu đầy đủ trong mục Quản lý liên hệ.',
+            'value' => [
+                'bot_token' => [
+                    'type' => 'text',
+                    'label' => 'Bot token',
+                    'title' => 'Nhắn @BotFather trên Telegram, gõ /newbot, làm theo hướng dẫn rồi dán chuỗi token nhận được vào đây.',
+                ],
+                'chat_id' => [
+                    'type' => 'text',
+                    'label' => 'Chat ID nhận thông báo',
+                    'title' => 'ID cá nhân hoặc ID nhóm. Lấy bằng cách nhắn @userinfobot, hoặc thêm bot vào nhóm rồi nhắn @RawDataBot. ID nhóm thường bắt đầu bằng dấu trừ.',
+                ],
+            ]
+        ];
+
         $data['sale'] = [
             'label' => 'Nhân viên kinh doanh',
             'description' => 'Quy định nội dung do nhân viên kinh doanh tạo ra có phải chờ quản trị duyệt hay không. Đổi lúc nào cũng được, không ảnh hưởng tới bản ghi đã lưu trước đó.',

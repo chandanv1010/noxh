@@ -1,0 +1,403 @@
+// =============================================================================
+// NOXH.vn - cac khoi trang chu dung theo ban thiet ke moi
+// =============================================================================
+@use 'noxh' as *;
+
+// --- Banner: chu ben trai, bon con so ben phai -------------------------------
+.nx-hero {
+    // Ban thiet ke moi bo o tim trong banner ra thanh mot thanh rieng ben duoi,
+    // nen cot phai chi con bang so lieu - hep hon o tim cu.
+    //
+    // Chi ap dung tu man hinh rong tro len. File nay nap SAU _noxh-home.scss
+    // nen mot luat khong dieu kien o day se de len ca luat mobile ben do -
+    // hai cot 1fr + 320px tren man hinh 375px lam chu bi xe tung tu.
+    &__inner {
+        @media (min-width: #{$nx-lg + 1px}) {
+            grid-template-columns: minmax(0, 1fr) 320px;
+            align-items: center;
+        }
+    }
+
+    &__chu {
+        min-width: 0;
+    }
+
+    &__gach {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 22px;
+        margin: 0 0 22px;
+        padding: 0;
+        list-style: none;
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: $nx-ink;
+            font-size: 14.5px;
+            font-weight: 600;
+        }
+
+        svg {
+            flex-shrink: 0;
+            color: $nx-blue;
+        }
+    }
+
+    &__nut {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    &__so {
+        display: grid;
+        gap: 2px;
+        padding: 6px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 14px 36px rgba(11, 40, 80, 0.12);
+
+        // Man hinh hep: bon o thanh luoi 2x2 cho do cao, khong xep doc thanh
+        // mot cot dai lam nguoi dung phai cuon qua truoc khi thay noi dung.
+        @media (max-width: $nx-lg) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 6px;
+        }
+
+        @media (max-width: $nx-sm) {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+}
+
+.nx-so-the {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 12px 14px;
+    border-radius: 10px;
+
+    &:hover {
+        background: $nx-blue-pale;
+    }
+
+    &__icon {
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: $nx-blue-soft;
+        color: $nx-blue;
+    }
+
+    > span:last-child {
+        min-width: 0;
+    }
+
+    strong {
+        display: block;
+        color: $nx-ink;
+        font-size: 21px;
+        font-weight: 800;
+        line-height: 1.15;
+    }
+
+    span {
+        display: block;
+        color: $nx-text;
+        font-size: 12.5px;
+    }
+}
+
+// --- Thanh tim du an ---------------------------------------------------------
+.nx-tim {
+    @include nx-card;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) repeat(3, minmax(0, 1fr)) auto;
+    gap: 14px;
+    align-items: end;
+    margin-top: -26px;
+    padding: 18px;
+    box-shadow: 0 16px 40px rgba(11, 40, 80, 0.1);
+
+    @media (max-width: $nx-lg) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin-top: 18px;
+    }
+
+    @media (max-width: $nx-sm) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    &__nhan {
+        strong {
+            display: block;
+            color: $nx-ink;
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        span {
+            display: block;
+            margin-top: 2px;
+            color: $nx-text;
+            font-size: 12.5px;
+        }
+    }
+
+    &__o {
+        min-width: 0;
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: $nx-muted;
+            font-size: 12px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid $nx-line;
+            border-radius: 9px;
+            background: #fff;
+            color: $nx-ink;
+            font-family: inherit;
+            font-size: 14px;
+        }
+    }
+
+    .nx-btn {
+        justify-content: center;
+
+        @media (max-width: $nx-sm) {
+            width: 100%;
+        }
+    }
+}
+
+// --- Dai moi kiem tra dieu kien ----------------------------------------------
+.nx-moi-kiem-tra {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 22px;
+    margin-top: 24px;
+    padding: 18px 22px;
+    border-radius: 14px;
+    background: linear-gradient(100deg, $nx-blue 0%, $nx-blue-dark 100%);
+    color: #fff;
+
+    &__icon {
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 58px;
+        height: 58px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.18);
+        color: #fff;
+    }
+
+    // flex: 1 1 260px - khoi chu gian ra chiem cho con lai, nhung xuong dong
+    // khi khong con du 260px thay vi bop chu lai thanh cot hep.
+    &__chu {
+        flex: 1 1 260px;
+        min-width: 0;
+
+        strong {
+            display: block;
+            font-size: 19px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        span {
+            display: block;
+            margin-top: 3px;
+            font-size: 13.5px;
+            opacity: 0.9;
+        }
+    }
+
+    &__gach {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 18px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            opacity: 0.95;
+        }
+
+        svg {
+            flex-shrink: 0;
+        }
+
+        @media (max-width: $nx-md) {
+            display: none;
+        }
+    }
+}
+
+// Nut cam tren nen xanh - mau nhan manh duy nhat cua trang chu.
+.nx-btn--cam {
+    border-color: $nx-amber;
+    background: $nx-amber;
+    color: #1f2937;
+
+    &:hover,
+    &:focus-visible {
+        border-color: darken($nx-amber, 7%);
+        background: darken($nx-amber, 7%);
+        color: #1f2937;
+    }
+}
+
+// --- The tinh/thanh tren khoi du an noi bat ----------------------------------
+.nx-the-tinh {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+
+    button {
+        padding: 7px 14px;
+        border: 1px solid $nx-line;
+        border-radius: 999px;
+        background: #fff;
+        color: $nx-text;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+
+        &:hover {
+            border-color: $nx-blue;
+            color: $nx-blue;
+        }
+
+        &.is-chon {
+            border-color: $nx-blue;
+            background: $nx-blue;
+            color: #fff;
+        }
+    }
+
+    @media (max-width: $nx-md) {
+        // Nhieu the thi cho cuon ngang thay vi xuong bon nam dong.
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 4px;
+
+        button {
+            flex: none;
+        }
+    }
+}
+
+.nx-project-grid--4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+
+    @media (max-width: 1100px) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: $nx-sm) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+// --- Hai cot: thong tin huu ich + tin tuc ------------------------------------
+.nx-hai-cot {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+
+    @media (max-width: $nx-lg) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.nx-o-huu-ich {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+
+    @media (max-width: $nx-sm) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    &__the {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 9px;
+        padding: 16px 10px;
+        border: 1px solid $nx-line;
+        border-radius: 12px;
+        color: $nx-ink;
+        text-align: center;
+        text-decoration: none;
+        transition: border-color 0.15s ease, transform 0.15s ease;
+
+        &:hover {
+            border-color: $nx-blue;
+            transform: translateY(-2px);
+        }
+
+        > span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: $nx-blue-soft;
+            color: $nx-blue;
+        }
+
+        strong {
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.35;
+        }
+    }
+}
+
+// --- O chon khu vuc cua doi tu van -------------------------------------------
+.nx-chon-khu-vuc {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    label {
+        color: $nx-text;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    select {
+        padding: 8px 12px;
+        border: 1px solid $nx-line;
+        border-radius: 9px;
+        background: #fff;
+        color: $nx-ink;
+        font-family: inherit;
+        font-size: 13.5px;
+    }
+}

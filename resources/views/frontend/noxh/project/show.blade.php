@@ -234,4 +234,6 @@
         </div>
     </aside>
 </div>
+
+@include('frontend.noxh.component.advisor-modal', ['duAnId' => $duAn->id])
 @endsection

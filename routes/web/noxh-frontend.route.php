@@ -69,6 +69,9 @@ Route::name('noxh.')->group(function () {
 
     // --- Form de lai thong tin ------------------------------------------------
     Route::post('de-lai-thong-tin', [LeadController::class, 'store'])->name('lead.store');
+    // Nut "Lien he" o tung nhan vien kinh doanh - popup gui bang fetch.
+    Route::post('lien-he-tu-van', [LeadController::class, 'advisor'])
+        ->name('lead.advisor');
     // --- Trang tinh -----------------------------------------------------------
     //
     // Khai bao CUOI CUNG trong nhom: route {duongDan} tuy da gioi han bang
