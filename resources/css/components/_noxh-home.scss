@@ -521,6 +521,105 @@
     }
 }
 
+// --- Nhan vien kinh doanh phu trach du an ------------------------------------
+//
+// Nam ngay tren khoi chuyen gia o cot phai trang chi tiet du an. Khac khoi
+// chuyen gia o cho day la danh sach: mot du an co the co vai nguoi phu trach.
+.nx-staff {
+    &__list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    &__item {
+        display: flex;
+        gap: 12px;
+        padding: 14px 0;
+        border-top: 1px solid $nx-line;
+
+        &:first-child {
+            padding-top: 4px;
+            border-top: 0;
+        }
+    }
+
+    &__avatar {
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        overflow: hidden;
+        border-radius: 50%;
+        background: $nx-blue-soft;
+        color: $nx-blue;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    // min-width: 0 de ten hoac email dai bi cat bot thay vi day rong o cha:
+    // mac dinh mot o flex khong co thu lai duoi be ngang noi dung cua no.
+    &__body {
+        min-width: 0;
+    }
+
+    &__name {
+        margin: 0;
+        color: $nx-ink;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    &__role {
+        margin: 2px 0 0;
+        color: $nx-blue;
+        font-size: 12.5px;
+        font-weight: 600;
+    }
+
+    &__note {
+        margin: 6px 0 0;
+        color: $nx-text;
+        font-size: 12.5px;
+        line-height: 1.5;
+    }
+
+    &__links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 14px;
+        margin-top: 8px;
+    }
+
+    &__link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        max-width: 100%;
+        overflow: hidden;
+        color: $nx-blue;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        &:hover {
+            text-decoration: underline;
+        }
+
+        svg {
+            flex-shrink: 0;
+        }
+    }
+}
+
 // --- Khoi chuyen gia ---------------------------------------------------------
 .nx-expert {
     position: relative;

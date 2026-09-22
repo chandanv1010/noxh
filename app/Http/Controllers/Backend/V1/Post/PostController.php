@@ -12,6 +12,7 @@ use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Classes\Nestedsetbie;
 use App\Models\Language;
+use App\Models\Post;
 
 class PostController extends Controller
 {
@@ -131,6 +132,25 @@ class PostController extends Controller
             ->with('error', 'Cập nhật bản ghi không thành công. Hãy thử lại');
     }
 
+
+    /**
+     * Duyet mot bai do nhan vien kinh doanh gui len: danh dau da duyet va bat
+     * hien thi ra website trong cung mot thao tac.
+     *
+     * Dung chung quyen post.update chu khong them quyen moi - ai sua duoc bai
+     * thi duyet duoc bai.
+     */
+    public function approve($id)
+    {
+        $this->authorize('modules', 'post.update');
+
+        Post::where('id', $id)->update([
+            'approval_status' => 'approved',
+            'publish' => 2,
+        ]);
+
+        return redirect()->back()->with('success', 'Đã duyệt và hiển thị bài viết');
+    }
 
     public function delete($id){
         $this->authorize('modules', 'post.destroy');

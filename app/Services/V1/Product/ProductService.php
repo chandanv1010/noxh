@@ -153,6 +153,7 @@ class ProductService extends BaseService
             if ($product->id > 0) {
                 $this->updateLanguageForProduct($product, $request, $languageId);
                 $this->updateCatalogueForProduct($product, $request);
+                $this->capNhatNhanVienKinhDoanh($product, $request);
                 $this->createRouter($product, $request, $this->controllerName, $languageId);
                 if ($request->input('attribute')) {
                     $this->createVariant($product, $request, $languageId);
@@ -179,6 +180,7 @@ class ProductService extends BaseService
             if ($product) {
                 $this->updateLanguageForProduct($product, $request, $languageId);
                 $this->updateCatalogueForProduct($product, $request);
+                $this->capNhatNhanVienKinhDoanh($product, $request);
                 $this->updateRouter(
                     $product,
                     $request,
@@ -344,7 +346,9 @@ class ProductService extends BaseService
         $payload = $request->only($this->payload());
         $payload['stock'] = max(0, (int) ($payload['stock'] ?? 0));
         $payload['album'] = $this->formatAlbum($request);
-        $payload['price'] = convert_price($payload['price']);
+        // Co form khong gui len o gia (bang dieu khien /sale chi sua thong tin
+        // du an). Khong chan truoc thi convert_price() nhan khoa khong ton tai.
+        $payload['price'] = convert_price($payload['price'] ?? 0);
         $payload['combo_price'] = convert_price($payload['combo_price'] ?? 0);
         // $payload['lecturer_id'] = null;
         $payload['no_offer'] = $request->has('no_offer') ? 1 : 0;
@@ -370,6 +374,35 @@ class ProductService extends BaseService
     private function updateCatalogueForProduct($product, $request)
     {
         $product->product_catalogues()->sync($this->catalogue($request));
+    }
+
+    /**
+     * Gan nhan vien kinh doanh phu trach du an.
+     *
+     * Chi hai form co o nay: form du an cua quan tri. Form ben /sale thi khong,
+     * va do la co y - nhan vien khong tu them minh vao du an nguoi khac duoc.
+     *
+     * Vi the phai co o an lam dau (co_gan_nhan_vien) chu khong the chi kiem tra
+     * $request->has('nhan_vien_kinh_doanh'): trinh duyet khong gui o chon nhieu
+     * khi khong chon gi ca, nen bo het nguoi ra khoi du an se thanh khong luu
+     * duoc - danh sach cu nam nguyen do.
+     */
+    private function capNhatNhanVienKinhDoanh($product, $request): void
+    {
+        if (!$request->boolean('co_gan_nhan_vien')) {
+            return;
+        }
+
+        $danhSach = array_values(array_filter(
+            (array) $request->input('nhan_vien_kinh_doanh', [])
+        ));
+
+        $duLieu = [];
+        foreach ($danhSach as $thuTu => $id) {
+            $duLieu[(int) $id] = ['order' => $thuTu];
+        }
+
+        $product->nhanVienKinhDoanh()->sync($duLieu);
     }
 
     private function formatLanguagePayload($payload, $productId, $languageId)

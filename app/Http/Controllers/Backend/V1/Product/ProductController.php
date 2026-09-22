@@ -180,7 +180,25 @@ class ProductController extends Controller
             'chuDauTu' => \App\Models\Investor::where('publish', 2)->orderBy('order')->get(['id', 'name']),
             'trangThaiDuAn' => \App\Models\Product::TRANG_THAI_DU_AN,
             'tinhThanh' => \App\Models\Province::select('code', 'name')->orderBy('name')->get(),
+            'nhanVienKinhDoanh' => $this->nhanVienKinhDoanh(),
         ];
+    }
+
+    /**
+     * Nhung nguoi co the duoc gan vao du an: thanh vien dang hoat dong thuoc
+     * mot nhom co danh dau is_sale.
+     *
+     * Doc theo co chu khong theo id nhom - quan tri tao them mot nhom sale thu
+     * hai la nhom do tu dong co mat o day.
+     */
+    private function nhanVienKinhDoanh()
+    {
+        return \App\Models\User::whereHas('user_catalogues', function ($q) {
+                $q->where('is_sale', 1);
+            })
+            ->where('publish', 2)
+            ->orderBy('name')
+            ->get(['id', 'name', 'title', 'phone']);
     }
 
     private function configData(){

@@ -53,6 +53,10 @@ class UserCatalogueService extends BaseService
         DB::beginTransaction();
         try{
             $payload = $request->except(['_token','send']);
+            // O tick khong duoc chon thi trinh duyet khong gui gi ca - khong ep
+            // ve 0 o day thi mot nhom da bat "nhan vien kinh doanh" se khong
+            // bao gio tat duoc nua.
+            $payload['is_sale'] = $request->boolean('is_sale') ? 1 : 0;
             $user = $this->userCatalogueRepository->create($payload);
             DB::commit();
             return true;
@@ -70,6 +74,7 @@ class UserCatalogueService extends BaseService
         try{
 
             $payload = $request->except(['_token','send']);
+            $payload['is_sale'] = $request->boolean('is_sale') ? 1 : 0;
             $user = $this->userCatalogueRepository->update($id, $payload);
             DB::commit();
             return true;

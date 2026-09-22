@@ -20,6 +20,9 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'title',
+        'zalo',
+        'public_email',
         'email',
         'password',
         'phone',
@@ -63,6 +66,33 @@ class User extends Authenticatable
 
     public function hasPermission($permissionCanonical){
         return $this->user_catalogues->permissions->contains('canonical', $permissionCanonical);
+    }
+
+    /**
+     * Cac du an nguoi nay duoc quan tri giao phu trach.
+     *
+     * Khac voi cot products.user_id (nguoi TAO ban ghi): mot du an do quan tri
+     * tao van co the giao cho vai nhan vien, va mot nhan vien co the phu trach
+     * nhieu du an.
+     */
+    public function duAnPhuTrach()
+    {
+        return $this->belongsToMany(Product::class, 'product_user', 'user_id', 'product_id')
+            ->withPivot('order')
+            ->withTimestamps();
+    }
+
+    /**
+     * Nguoi nay co phai nhan vien kinh doanh khong.
+     *
+     * Doc co is_sale tren nhom thanh vien chu khong so id nhom: quan tri doi
+     * ten nhom hay tao nhom sale thu hai thi ma nguon van dung.
+     */
+    public function laNhanVienKinhDoanh(): bool
+    {
+        // optional() vi tai khoan co the chua duoc xep nhom nao - doc thang
+        // thuoc tinh tren null se sinh canh bao.
+        return (bool) optional($this->user_catalogues)->is_sale;
     }
 
 

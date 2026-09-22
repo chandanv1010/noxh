@@ -223,6 +223,8 @@
             </div>
         @endif
 
+        @include('frontend.noxh.component.sale-staff')
+
         @include('frontend.noxh.component.expert-box')
 
         <div class="nx-panel">

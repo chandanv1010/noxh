@@ -24,6 +24,8 @@ Route::group(['middleware' => ['admin','locale','backend_default_locale']], func
         Route::post('store', [PostController::class, 'store'])->name('post.store');
         Route::get('{id}/edit', [PostController::class, 'edit'])->where(['id' => '[0-9]+'])->name('post.edit');
         Route::post('{id}/update', [PostController::class, 'update'])->where(['id' => '[0-9]+'])->name('post.update');
+        Route::get('{id}/approve', [PostController::class, 'approve'])
+            ->where(['id' => '[0-9]+'])->name('post.approve');
         Route::get('{id}/delete', [PostController::class, 'delete'])->where(['id' => '[0-9]+'])->name('post.delete');
         Route::delete('{id}/destroy', [PostController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('post.destroy');
     });

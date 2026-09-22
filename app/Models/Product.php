@@ -148,4 +148,37 @@ class Product extends Model
     {
         return $this->belongsTo(Lecturer::class, 'lecturer_id', 'id');
     }
+
+    /**
+     * Gioi han danh sach du an ve dung pham vi cua mot nhan vien kinh doanh:
+     * du an TU HO TAO ra, cong voi du an duoc quan tri giao phu trach.
+     *
+     * Dung chung cho ca man hinh danh sach lan cac thao tac sua/xoa. Man hinh
+     * danh sach ma loc dung nhung sua thi khong kiem tra lai la ho doi so tren
+     * thanh dia chi se vao duoc du an cua nguoi khac.
+     */
+    public function scopeCuaNhanVien($query, $userId)
+    {
+        return $query->where(function ($q) use ($userId) {
+            $q->where('products.user_id', $userId)
+              ->orWhereExists(function ($sub) use ($userId) {
+                  $sub->selectRaw(1)
+                      ->from('product_user')
+                      ->whereColumn('product_user.product_id', 'products.id')
+                      ->where('product_user.user_id', $userId);
+              });
+        });
+    }
+
+    /**
+     * Nhan vien kinh doanh phu trach du an nay - vua la danh sach hien ra
+     * trang chi tiet du an, vua la can cu phan quyen cho bang dieu khien /sale.
+     */
+    public function nhanVienKinhDoanh()
+    {
+        return $this->belongsToMany(User::class, 'product_user', 'product_id', 'user_id')
+            ->withPivot('order')
+            ->withTimestamps()
+            ->orderBy('product_user.order');
+    }
 }

@@ -8,6 +8,7 @@
         <th>{{ __('messages.tableName') }}</th>
         @include('backend.dashboard.component.languageTh')
         <th style="width:80px;" class="text-center">{{ __('messages.tableOrder') }}</th>
+        <th class="text-center" style="width:120px;">Duyệt</th>
         <th class="text-center" style="width:100px;">{{ __('messages.tableStatus') }}</th>
         <th class="text-center" style="width:100px;">{{ __('messages.tableAction') }}</th>
     </tr>
@@ -41,6 +42,19 @@
                 @include('backend.dashboard.component.languageTd', ['model' => $post, 'modeling' => 'Post'])
                 <td>
                     <input type="text" name="order" value="{{ $post->order }}" class="form-control sort-order text-right" data-id="{{ $post->id }}" data-model="{{ $config['model'] }}">
+                </td>
+                {{-- Bai do nhan vien kinh doanh gui len nam o trang thai cho duyet.
+                     Bai cu cua quan tri co gia tri mac dinh 'approved' nen o nay
+                     khong hien gi them. --}}
+                <td class="text-center">
+                    @if($post->approval_status === 'pending')
+                        <a href="{{ route('post.approve', $post->id) }}" class="btn btn-xs btn-warning"
+                           title="Duyệt và hiển thị bài này">
+                            <i class="fa fa-check"></i> Chờ duyệt
+                        </a>
+                    @elseif($post->approval_status === 'rejected')
+                        <span class="label label-danger">Bị từ chối</span>
+                    @endif
                 </td>
                 <td class="text-center js-switch-{{ $post->id }}"> 
                     <input type="checkbox" value="{{ $post->publish }}" class="js-switch status " data-field="publish" data-model="{{ $config['model'] }}" {{ ($post->publish == 2) ? 'checked' : '' }} data-modelId="{{ $post->id }}" />

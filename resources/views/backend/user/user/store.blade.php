@@ -198,6 +198,50 @@
                                 </div>
                             </div>
                         </div>
+                        {{-- Ba o duoi day chi dung cho nhan vien kinh doanh: chung hien ra
+                             ngoai website o muc "Nhan vien kinh doanh phu trach" cua tung
+                             du an. Thanh vien thuong bo trong cung khong sao. --}}
+                        <div class="row mb15">
+                            <div class="col-lg-4">
+                                <div class="form-row">
+                                    <label for="" class="control-label text-left">Chức danh</label>
+                                    <input
+                                        type="text"
+                                        name="title"
+                                        value="{{ old('title', ($user->title) ?? '') }}"
+                                        class="form-control"
+                                        placeholder="Ví dụ: Chuyên viên tư vấn"
+                                        autocomplete="off"
+                                    >
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-row">
+                                    <label for="" class="control-label text-left">Zalo</label>
+                                    <input
+                                        type="text"
+                                        name="zalo"
+                                        value="{{ old('zalo', ($user->zalo) ?? '') }}"
+                                        class="form-control"
+                                        placeholder="Để trống nếu trùng số điện thoại"
+                                        autocomplete="off"
+                                    >
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-row">
+                                    <label for="" class="control-label text-left">Email hiển thị</label>
+                                    <input
+                                        type="text"
+                                        name="public_email"
+                                        value="{{ old('public_email', ($user->public_email) ?? '') }}"
+                                        class="form-control"
+                                        placeholder="Khác với email đăng nhập"
+                                        autocomplete="off"
+                                    >
+                                </div>
+                            </div>
+                        </div>
                         <div class="row mb15">
                             <div class="col-lg-6">
                                 <div class="form-row">

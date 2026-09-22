@@ -55,6 +55,7 @@ class Kernel extends HttpKernel
     protected $middlewareAliases = [
         'login' => \App\Http\Middleware\LoginMiddleware::class,
         'admin' => \App\Http\Middleware\AuthenticateMiddleware::class,
+        'sale' => \App\Http\Middleware\SaleMiddleware::class,
         'customer_auth' => \App\Http\Middleware\CustomerAuth::class,
         'locale' => \App\Http\Middleware\SetLocale::class,
         'backend_default_locale' => \App\Http\Middleware\SetDefaultLocale::class,

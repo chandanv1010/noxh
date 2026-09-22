@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProjectDocument;
 use App\Models\ProjectFaq;
 use App\Models\ProjectMilestone;
+use App\Models\User;
 use App\Models\Province;
 use App\Repositories\Noxh\ProjectQuery;
 use Illuminate\Http\Request;
@@ -90,7 +91,24 @@ class ProjectController extends FrontendController
             'hoSo' => ProjectDocument::where('product_id', $duAn->id)->where('publish', 2)->orderBy('order')->get(),
             'faq' => ProjectFaq::where('product_id', $duAn->id)->where('publish', 2)->orderBy('order')->get(),
             'tuongTu' => $this->projectQuery->tuongTu($duAn, 3),
+            'nhanVien' => $this->nhanVienPhuTrach($duAn->id),
         ]);
+    }
+
+    /**
+     * Nhan vien kinh doanh phu trach mot du an.
+     *
+     * Chi lay nguoi con hieu luc (publish == 2): nhan vien nghi viec bi khoa
+     * tai khoan la tu bien khoi moi trang du an, khong phai vao go tay tung cai.
+     */
+    private function nhanVienPhuTrach(int $duAnId)
+    {
+        return User::whereHas('duAnPhuTrach', function ($q) use ($duAnId) {
+                $q->where('products.id', $duAnId);
+            })
+            ->where('users.publish', 2)
+            ->orderBy('users.name')
+            ->get();
     }
 
     /** Trang "Theo tinh/thanh" - moi tinh mot the, lam trang dich SEO. */

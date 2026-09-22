@@ -55,6 +55,24 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                {{-- Co nay quyet dinh nhom co duoc vao bang dieu khien /sale hay
+                                     khong, va co hien ra o chon "nhan vien phu trach" cua form du
+                                     an hay khong. Ma nguon doc theo co chu khong theo id nhom. --}}
+                                <div class="form-row">
+                                    <label style="font-weight:normal;cursor:pointer;display:flex;align-items:center;gap:8px">
+                                        <input type="checkbox" name="is_sale" value="1"
+                                            {{ old('is_sale', ($userCatalogue->is_sale) ?? 0) == 1 ? 'checked' : '' }}>
+                                        <strong>Là nhóm nhân viên kinh doanh</strong>
+                                    </label>
+                                    <small class="text-muted">
+                                        Thành viên thuộc nhóm này đăng nhập ở <code>/sale</code> thay vì trang quản trị,
+                                        chỉ thấy dự án được giao và bài viết của chính mình.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

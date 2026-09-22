@@ -25,6 +25,9 @@ require __DIR__ . '/web/auth.route.php';
 require __DIR__ . '/web/ajax.route.php';
 require __DIR__ . '/web/noxh.route.php';
 
+// Bang dieu khien rieng cua nhan vien kinh doanh
+require __DIR__ . '/web/sale.route.php';
+
 // Tien ich dung chung cho ca hai phia
 Route::group(['middleware' => ['locale']], function () {
     Route::get('/sitemap.xml', [App\Http\Controllers\Frontend\SitemapController::class, 'index'])->name('sitemap.xml');

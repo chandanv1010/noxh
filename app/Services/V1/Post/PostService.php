@@ -228,6 +228,10 @@ class PostService extends BaseService
         return [
             'follow',
             'publish',
+            // Bang dieu khien /sale ep cot nay ve 'pending' o phia may chu.
+            // Form cua quan tri khong gui khoa nay nen $request->only() bo qua,
+            // cot giu nguyen gia tri cu - hanh vi cu khong doi.
+            'approval_status',
             'image',
             'album',
             'post_catalogue_id',

@@ -176,6 +176,8 @@
 </div>
 
 
+@include('backend.product.product.component.nhan-vien')
+
 @include('backend.dashboard.component.publish', ['model' => $product ?? null, 'hideImage' => false])
 
 @if (!empty($product->qrcode))
