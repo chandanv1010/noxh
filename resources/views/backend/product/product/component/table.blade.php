@@ -12,6 +12,7 @@
             @include('backend.dashboard.component.languageTh')
             <th style="width:110px;" class="text-center">{{ __('messages.product.stock') }}</th>
             <th style="width:80px;" class="text-center">{{ __('messages.tableOrder') }}</th>
+            <th class="text-center" style="width:120px;">Duyệt</th>
             <th class="text-center" style="width:100px;">{{ __('messages.tableStatus') }}</th>
             <th class="text-center" style="width:100px;">{{ __('messages.tableAction') }}</th>
         </tr>
@@ -63,6 +64,18 @@
                         <input type="text" name="order" value="{{ $product->order }}"
                             class="form-control sort-order text-right" data-id="{{ $product->id }}"
                             data-model="{{ $config['model'] }}">
+                    </td>
+                    {{-- Chi du an do nhan vien kinh doanh tu them moi roi vao trang thai
+                         cho duyet, va chi khi quan tri bat che do do trong Cau hinh he
+                         thong. Du an quan tri tao co gia tri mac dinh 'approved' nen o
+                         nay de trong. --}}
+                    <td class="text-center">
+                        @if(($product->approval_status ?? 'approved') === 'pending')
+                            <a href="{{ route('product.approve', $product->id) }}" class="btn btn-xs btn-warning"
+                               title="Duyệt và hiển thị dự án này">
+                                <i class="fa fa-check"></i> Chờ duyệt
+                            </a>
+                        @endif
                     </td>
                     <td class="text-center js-switch-{{ $product->id }}">
                         <input type="checkbox" value="{{ $product->publish }}" class="js-switch status "

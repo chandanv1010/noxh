@@ -15,9 +15,15 @@
         </div>
     </div>
     <div class="ibox-content">
+        {{-- Quan tri bat/tat che do duyet trong Cau hinh he thong. Loi nhac o
+             day phai doi theo, khong thi no noi sai. --}}
         <p class="text-muted" style="font-size:13px">
-            Bài viết bạn gửi lên sẽ được quản trị duyệt trước khi hiển thị ra website.
-            Mỗi lần sửa lại bài, bài sẽ quay về trạng thái chờ duyệt.
+            @if(cai_dat('sale_post_approval', 'on') === 'off')
+                Bài viết bạn gửi lên sẽ hiển thị ngay ra website.
+            @else
+                Bài viết bạn gửi lên sẽ được quản trị duyệt trước khi hiển thị ra website.
+                Mỗi lần sửa lại bài, bài sẽ quay về trạng thái chờ duyệt.
+            @endif
         </p>
 
         <form method="get" class="form-inline" style="margin-bottom:16px">

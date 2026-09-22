@@ -152,6 +152,25 @@ class ProductController extends Controller
     }
 
 
+    /**
+     * Duyet mot du an do nhan vien kinh doanh tu them: danh dau da duyet va bat
+     * hien thi trong cung mot thao tac.
+     *
+     * Dung chung quyen product.update chu khong them quyen moi - ai sua duoc
+     * du an thi duyet duoc du an.
+     */
+    public function approve($id)
+    {
+        $this->authorize('modules', 'product.update');
+
+        \App\Models\Product::where('id', $id)->update([
+            'approval_status' => 'approved',
+            'publish' => 2,
+        ]);
+
+        return redirect()->back()->with('success', 'Đã duyệt và hiển thị dự án');
+    }
+
     public function delete($id){
         $this->authorize('modules', 'product.destroy');
         $config['seo'] = __('messages.product');

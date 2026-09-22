@@ -55,7 +55,11 @@
                 <div class="ibox-content">
                     <p class="text-muted" style="font-size:13px;margin:0">
                         <i class="fa fa-info-circle"></i>
-                        Bài sẽ ở trạng thái <strong>chờ duyệt</strong> cho tới khi quản trị bật hiển thị.
+                        @if(cai_dat('sale_post_approval', 'on') === 'off')
+                            Bài sẽ <strong>hiển thị ngay</strong> sau khi lưu.
+                        @else
+                            Bài sẽ ở trạng thái <strong>chờ duyệt</strong> cho tới khi quản trị bật hiển thị.
+                        @endif
                     </p>
                 </div>
             </div>
@@ -64,6 +68,8 @@
 
     <div class="text-right mb15 fixed-bottom">
         <a href="{{ route('sale.post.index') }}" class="btn btn-white">Quay lại</a>
-        <button class="btn btn-primary" type="submit">Gửi bài</button>
+        <button class="btn btn-primary" type="submit">
+            {{ cai_dat('sale_post_approval', 'on') === 'off' ? 'Đăng bài' : 'Gửi bài' }}
+        </button>
     </div>
 </form>

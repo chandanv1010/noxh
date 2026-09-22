@@ -69,6 +69,20 @@
 
             @include('backend.dashboard.component.publish', ['model' => $product, 'hideImage' => false])
 
+            {{-- Chi hien khi quan tri bat che do duyet, va chi o man hinh them moi:
+                 du an duoc giao thi khong bao gio roi vao trang thai cho duyet. --}}
+            @if($cachLam === 'create' && cai_dat('sale_project_approval', 'off') === 'on')
+                <div class="ibox">
+                    <div class="ibox-content">
+                        <p class="text-muted" style="font-size:13px;margin:0">
+                            <i class="fa fa-info-circle"></i>
+                            Dự án bạn tự thêm sẽ ở trạng thái <strong>chờ duyệt</strong>
+                            cho tới khi quản trị bật hiển thị.
+                        </p>
+                    </div>
+                </div>
+            @endif
+
             {{--
                 "Dự án nổi bật" là quyết định biên tập của quản trị, không mở cho
                 nhân viên. Nhưng vẫn phải gửi lên giá trị hiện tại: service đọc

@@ -90,11 +90,19 @@ class ProjectController extends SaleController
 
     public function store(StoreProductRequest $request)
     {
+        $phaiDuyet = $this->phaiDuyet();
+
+        if ($phaiDuyet) {
+            $request->merge(['publish' => 1, 'approval_status' => 'pending']);
+        }
+
         // ProductService::create() tu gan products.user_id = Auth::id(), nen du
         // an vua tao mac nhien thuoc ve nguoi dang nhap.
         if ($this->productService->create($request, $this->language)) {
-            return redirect()->route('sale.project.index')
-                ->with('success', 'Thêm dự án thành công');
+            return redirect()->route('sale.project.index')->with(
+                'success',
+                $phaiDuyet ? 'Đã gửi dự án, chờ quản trị duyệt' : 'Thêm dự án thành công'
+            );
         }
 
         return redirect()->back()->withInput()
@@ -119,6 +127,13 @@ class ProjectController extends SaleController
     {
         $this->laiDuAnCuaToi($id);
 
+        // Che do duyet chi ap dung cho du an nhan vien TU THEM. Du an quan tri
+        // giao cho ho thi khong: quan tri da chu dong giao, sua mot dong chu
+        // ma du an bi go khoi website thi vo ly.
+        if ($this->phaiDuyet() && $this->laDuAnToiTuTao($id)) {
+            $request->merge(['publish' => 1, 'approval_status' => 'pending']);
+        }
+
         if ($this->productService->update($id, $request, $this->language)) {
             return redirect()->route('sale.project.index')
                 ->with('success', 'Cập nhật dự án thành công');
@@ -126,6 +141,17 @@ class ProjectController extends SaleController
 
         return redirect()->back()->withInput()
             ->with('error', 'Cập nhật dự án không thành công. Hãy thử lại');
+    }
+
+    /** Quan tri co bat che do duyet du an khong. Mac dinh la khong. */
+    private function phaiDuyet(): bool
+    {
+        return cai_dat('sale_project_approval', 'off') === 'on';
+    }
+
+    private function laDuAnToiTuTao($id): bool
+    {
+        return Product::where('id', $id)->where('user_id', $this->toiLaAi())->exists();
     }
 
     /**

@@ -41,6 +41,31 @@ class System{
             ]
         ];
 
+        $data['sale'] = [
+            'label' => 'Nhân viên kinh doanh',
+            'description' => 'Quy định nội dung do nhân viên kinh doanh tạo ra có phải chờ quản trị duyệt hay không. Đổi lúc nào cũng được, không ảnh hưởng tới bản ghi đã lưu trước đó.',
+            'value' => [
+                'post_approval' => [
+                    'type' => 'select',
+                    'label' => 'Bài viết của nhân viên kinh doanh',
+                    'title' => 'Chọn "Phải chờ duyệt" thì mỗi lần nhân viên lưu bài, bài sẽ bị ẩn đi cho tới khi quản trị bấm Duyệt trong danh sách bài viết.',
+                    'option' => [
+                        'on' => 'Phải chờ quản trị duyệt',
+                        'off' => 'Hiển thị ngay, không cần duyệt',
+                    ],
+                ],
+                'project_approval' => [
+                    'type' => 'select',
+                    'label' => 'Dự án nhân viên tự thêm',
+                    'title' => 'Chỉ áp dụng cho dự án do nhân viên TỰ THÊM. Dự án quản trị giao cho họ thì không bị ẩn đi.',
+                    'option' => [
+                        'off' => 'Hiển thị ngay, không cần duyệt',
+                        'on' => 'Phải chờ quản trị duyệt',
+                    ],
+                ],
+            ]
+        ];
+
         $data['contact'] = [
             'label' => 'Thông tin liên hệ',
             'description' => 'Cài đặt thông tin liên hệ của website ví dụ: Địa chỉ công ty, Văn phòng giao dịch, Hotline, Bản đồ, vv...',

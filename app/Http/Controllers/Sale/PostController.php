@@ -92,7 +92,7 @@ class PostController extends SaleController
 
         if ($this->postService->create($request, $this->language)) {
             return redirect()->route('sale.post.index')
-                ->with('success', 'Đã gửi bài, chờ quản trị duyệt');
+                ->with('success', $this->loiNhan('Đã gửi bài, chờ quản trị duyệt', 'Đã đăng bài'));
         }
 
         return redirect()->back()->withInput()
@@ -119,7 +119,7 @@ class PostController extends SaleController
 
         if ($this->postService->update($id, $request, $this->language)) {
             return redirect()->route('sale.post.index')
-                ->with('success', 'Đã lưu, bài chờ quản trị duyệt lại');
+                ->with('success', $this->loiNhan('Đã lưu, bài chờ quản trị duyệt lại', 'Đã lưu bài viết'));
         }
 
         return redirect()->back()->withInput()
@@ -127,14 +127,28 @@ class PostController extends SaleController
     }
 
     /**
-     * Bai viet sua xong phai duyet lai tu dau.
+     * Trang thai cua bai sau khi nhan vien bam luu.
      *
-     * Khong giu nguyen trang thai da duyet: nguoi dung co the gui mot bai hien
-     * lanh de duoc duyet roi sua lai thanh noi dung khac han.
+     * Quan tri chon che do o Cau hinh he thong -> Nhan vien kinh doanh. Mac
+     * dinh la phai duyet.
+     *
+     * Khi bat duyet thi MOI lan luu deu quay ve cho duyet, ke ca bai da duyet
+     * truoc do: neu khong, nguoi dung co the gui mot bai hien lanh de duoc
+     * duyet roi sua lai thanh noi dung khac han.
      */
     private function trangThaiChoDuyet(): array
     {
+        if (cai_dat('sale_post_approval', 'on') === 'off') {
+            return ['publish' => 2, 'approval_status' => 'approved'];
+        }
+
         return ['publish' => 1, 'approval_status' => 'pending'];
+    }
+
+    /** Cau thong bao sau khi luu, doi theo che do duyet dang bat. */
+    private function loiNhan(string $khiDuyet, string $khiKhongDuyet): string
+    {
+        return cai_dat('sale_post_approval', 'on') === 'off' ? $khiKhongDuyet : $khiDuyet;
     }
 
     private function laiBaiCuaToi($id): void

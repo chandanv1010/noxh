@@ -428,6 +428,9 @@ class ProductService extends BaseService
         return [
             'products.id',
             'products.publish',
+            // Khong chon cot nay thi nut "Cho duyet" trong bang khong bao gio
+            // hien ra, du ban ghi dang thuc su cho duyet.
+            'products.approval_status',
             'products.image',
             'products.order',
             'products.price',
@@ -483,6 +486,10 @@ class ProductService extends BaseService
         return [
             'follow',
             'publish',
+            // Bang dieu khien /sale ep cot nay o phia may chu khi quan tri bat
+            // che do duyet. Form cua quan tri khong gui khoa nay len nen
+            // $request->only() bo qua, cot giu nguyen gia tri cu.
+            'approval_status',
             'image',
             'album',
             'price',

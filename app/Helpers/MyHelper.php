@@ -271,6 +271,38 @@ if(!function_exists('renderSystemSelect')){
     }
 }
 
+if(!function_exists('cai_dat')){
+    /**
+     * Doc mot gia tri trong muc Cau hinh he thong.
+     *
+     * Bang systems luu theo tung ngon ngu. Nhung cai dat kieu bat/tat thi
+     * khong phu thuoc ngon ngu, ma form quan tri lai luu no duoi ngon ngu
+     * dang mo - nen doc ngon ngu hien tai truoc, khong thay thi lay bat ky
+     * ngon ngu nao co khoa do.
+     *
+     * Khong nho ket qua lai: ham nay chi duoc goi mot hai lan moi request (luc
+     * luu bai hoac luu du an), nho lai khong tiet kiem duoc gi ma lai lam ket
+     * qua phu thuoc vao thu tu goi - quan tri vua doi cai dat xong van con doc
+     * ra gia tri cu.
+     */
+    function cai_dat(string $keyword, $macDinh = null){
+        try {
+            $ngonNgu = \App\Models\Language::where('canonical', app()->getLocale())->value('id');
+
+            $giaTri = \Illuminate\Support\Facades\DB::table('systems')
+                ->where('keyword', $keyword)
+                ->orderByRaw('language_id = ? DESC', [(int) $ngonNgu])
+                ->value('content');
+        } catch (\Throwable $e) {
+            // Chua chay migration hoac mat ket noi CSDL thi tra ve mac dinh,
+            // khong lam vo ca trang chi vi mot o cai dat.
+            $giaTri = null;
+        }
+
+        return ($giaTri === null || $giaTri === '') ? $macDinh : $giaTri;
+    }
+}
+
 if(!function_exists('write_url')){
     function write_url($canonical = null, bool $fullDomain = true, $suffix = true){
         $canonical = ($canonical) ?? '';

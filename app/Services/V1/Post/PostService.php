@@ -210,6 +210,9 @@ class PostService extends BaseService
         return [
             'posts.id', 
             'posts.publish',
+            // Khong chon cot nay thi nut "Cho duyet" trong bang khong bao gio
+            // hien ra, du ban ghi dang thuc su cho duyet.
+            'posts.approval_status',
             'posts.image',
             'posts.order',
             'posts.created_at',
