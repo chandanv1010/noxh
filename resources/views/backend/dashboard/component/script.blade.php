@@ -16,14 +16,8 @@
 <script src="{{ asset('vendor/backend/library/finder.js') }}"></script>
 <script src="{{ asset('vendor/backend/library/location.js') }}"></script>
 <script src="{{ asset('vendor/backend/library/menu.js') }}"></script>
-<script src="{{ asset('vendor/backend/library/order.js') }}"></script>
-<script src="{{ asset('vendor/backend/library/promotion.js') }}"></script>
-<script src="{{ asset('vendor/backend/library/report.js') }}"></script>
 <script src="{{ asset('vendor/backend/library/seo.js') }}"></script>
-<script src="{{ asset('vendor/backend/library/slide.js') }}"></script>
 <script src="{{ asset('vendor/backend/library/variant.js') }}"></script>
-<script src="{{ asset('vendor/backend/library/voucher.js') }}"></script>
-<script src="{{ asset('vendor/backend/library/widget.js') }}"></script>
 <script src="{{ asset('vendor/backend/library/library.js') }}"></script>
 
 <!-- Plugin -->

@@ -1,26 +1,12 @@
 <?php  
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Backend\V1\Promotion\PromotionController;
 use App\Http\Controllers\Backend\V1\Product\ProductCatalogueController;
 use App\Http\Controllers\Backend\V1\Product\ProductController;
 use App\Http\Controllers\Backend\V1\Attribute\AttributeCatalogueController;
 use App\Http\Controllers\Backend\V1\Attribute\AttributeController;
-use App\Http\Controllers\Backend\V1\OrderController;
-use App\Http\Controllers\Backend\V1\VoucherController;
-
 
 Route::group(['middleware' => ['admin','locale','backend_default_locale']], function () {
     
-    Route::group(['prefix' => 'promotion'], function () {
-        Route::get('index', [PromotionController::class, 'index'])->name('promotion.index');
-        Route::get('create', [PromotionController::class, 'create'])->name('promotion.create');
-        Route::post('store', [PromotionController::class, 'store'])->name('promotion.store');
-        Route::get('{id}/edit', [PromotionController::class, 'edit'])->where(['id' => '[0-9]+'])->name('promotion.edit');
-        Route::post('{id}/update', [PromotionController::class, 'update'])->where(['id' => '[0-9]+'])->name('promotion.update');
-        Route::get('{id}/delete', [PromotionController::class, 'delete'])->where(['id' => '[0-9]+'])->name('promotion.delete');
-        Route::delete('{id}/destroy', [PromotionController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('promotion.destroy');
-    });
-
     Route::group(['prefix' => 'product/catalogue'], function () {
         Route::get('index', [ProductCatalogueController::class, 'index'])->name('product.catalogue.index');
         Route::get('create', [ProductCatalogueController::class, 'create'])->name('product.catalogue.create');
@@ -63,18 +49,4 @@ Route::group(['middleware' => ['admin','locale','backend_default_locale']], func
         Route::delete('{id}/destroy', [AttributeController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('attribute.destroy');
     });
 
-    Route::group(['prefix' => 'order'], function () {
-        Route::get('index', [OrderController::class, 'index'])->name('order.index');
-        Route::get('{id}/detail', [OrderController::class, 'detail'])->where(['id' => '[0-9]+'])->name('order.detail');
-    });
-
-    Route::group(['prefix' => 'voucher'], function () {
-        Route::get('index', [VoucherController::class, 'index'])->name('voucher.index');
-        Route::get('create', [VoucherController::class, 'create'])->name('voucher.create');
-        Route::post('store', [VoucherController::class, 'store'])->name('voucher.store');
-        Route::get('{id}/edit', [VoucherController::class, 'edit'])->where(['id' => '[0-9]+'])->name('voucher.edit');
-        Route::post('{id}/update', [VoucherController::class, 'update'])->where(['id' => '[0-9]+'])->name('voucher.update');
-        Route::get('{id}/delete', [VoucherController::class, 'delete'])->where(['id' => '[0-9]+'])->name('voucher.delete');
-        Route::delete('{id}/destroy', [VoucherController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('voucher.destroy');
-    });
 });

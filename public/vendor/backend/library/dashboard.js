@@ -66,7 +66,6 @@ HT.createChart = (label, data) => {
 
 HT.changeChart = () => {
 
-    console.log(1234);
     
 
     if($('.chartButton').length){

@@ -18,7 +18,11 @@ $nx-green: #16a34a;
 $nx-amber: #f59e0b;
 $nx-red: #dc2626;
 
-$nx-container: 1240px;
+// Trang chu rong hon cac trang con - dung theo ban thiet ke. De o bien CSS
+// chu khong phai bien SCSS vi tri so doi theo tung trang, ma bien SCSS thi
+// duoc thay ngay luc bien dich, khong doi duoc theo lop tren the <body>.
+$nx-container: 1280px;
+$nx-container-home: 1400px;
 
 $nx-lg: 1024px;
 $nx-md: 768px;
@@ -26,7 +30,7 @@ $nx-sm: 480px;
 
 @mixin nx-container {
     width: 100%;
-    max-width: $nx-container;
+    max-width: var(--nx-container, #{$nx-container});
     margin: 0 auto;
     padding-inline: 16px;
 }
@@ -41,6 +45,14 @@ $nx-sm: 480px;
 // NEN CHUNG
 // =============================================================================
 .nx {
+    --nx-container: #{$nx-container};
+
+    // Trang chu noi khung ra 1400px. Moi khoi ben trong deu dung chung mixin
+    // nx-container nen chi can doi mot bien o day.
+    &--home {
+        --nx-container: #{$nx-container-home};
+    }
+
     color: $nx-ink;
     font-family: "Inter", "Segoe UI", system-ui, sans-serif;
     font-size: 15px;

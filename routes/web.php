@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Route;
 
 // Quan tri
 require __DIR__ . '/web/user.route.php';
-require __DIR__ . '/web/customer.route.php';
 require __DIR__ . '/web/core.route.php';
 require __DIR__ . '/web/product.route.php';
 require __DIR__ . '/web/post.route.php';

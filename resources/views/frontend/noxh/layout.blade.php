@@ -28,7 +28,8 @@
 </head>
 <body>
 
-<div class="nx">
+{{-- Trang chu dung khung rong 1400px, cac trang con 1280px. --}}
+<div class="nx {{ request()->is('/') ? 'nx--home' : '' }}">
     @include('frontend.noxh.component.header')
 
     @yield('content')
