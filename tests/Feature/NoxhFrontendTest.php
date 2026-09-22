@@ -54,6 +54,23 @@ class NoxhFrontendTest extends TestCase
         $this->assertStringContainsString('data-nx-dem', $html);
     }
 
+    public function test_banner_trang_chu_co_hai_ban_anh(): void
+    {
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $mobile = DB::table('introduces')->where('keyword', 'hero_image_mobile')->value('content');
+
+        if (!$mobile) {
+            $this->markTestSkipped('Chưa cấu hình ảnh banner bản điện thoại.');
+        }
+
+        // Dung <picture> nen trinh duyet chi tai DUNG mot anh no can. Hai the
+        // <img> an/hien bang CSS thi tai ca hai.
+        $this->assertStringContainsString('<picture>', $html);
+        $this->assertStringContainsString('media="(max-width: 1024px)"', $html);
+        $this->assertStringContainsString($mobile, $html, 'Thiếu ảnh banner bản điện thoại');
+    }
+
     public function test_chi_tiet_du_an_hien_tien_do_va_phap_ly(): void
     {
         $html = $this->get('/du-an/noxh-tuc-duyen')->assertOk()->getContent();

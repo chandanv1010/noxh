@@ -40,9 +40,20 @@
 {{-- 1. BANNER ------------------------------------------------------------- --}}
 <section class="nx-hero">
     @if(!empty($intro['hero_image']))
+        {{-- Hai ban anh banner: ban ngang cho man hinh rong, ban DOC cho dien
+             thoai. Anh ngang dat doc tren dien thoai thi toa nha chi con mot
+             dai mong, khong du cho de dat cac dong chu len tren.
+
+             Dung <picture> chu khong phai hai the <img> an/hien: trinh duyet
+             chi tai DUNG mot anh no can, cach kia tai ca hai. --}}
         <div class="nx-hero__bg">
-            <img src="{{ $intro['hero_image'] }}" alt="{{ $intro['hero_title'] ?? '' }}"
-                 fetchpriority="high" decoding="async">
+            <picture>
+                @if(!empty($intro['hero_image_mobile']))
+                    <source media="(max-width: 1024px)" srcset="{{ $intro['hero_image_mobile'] }}">
+                @endif
+                <img src="{{ $intro['hero_image'] }}" alt="{{ $intro['hero_title'] ?? '' }}"
+                     fetchpriority="high" decoding="async">
+            </picture>
         </div>
     @endif
 

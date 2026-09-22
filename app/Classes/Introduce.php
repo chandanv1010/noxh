@@ -26,7 +26,16 @@ class Introduce
             'label' => 'Khối 1: Banner trang chủ',
             'description' => 'Chữ và ảnh nền của khối lớn nhất ở đầu trang chủ',
             'value' => [
-                'hero_image' => ['type' => 'images', 'label' => 'Ảnh nền banner'],
+                'hero_image' => [
+                    'type' => 'images',
+                    'label' => 'Ảnh nền banner (máy tính)',
+                    'title' => 'Ảnh NGANG. Dùng cho màn hình rộng, chữ nằm bên trái ảnh.',
+                ],
+                'hero_image_mobile' => [
+                    'type' => 'images',
+                    'label' => 'Ảnh nền banner (điện thoại)',
+                    'title' => 'Ảnh DỌC, nên khoảng 900x1900. Trên điện thoại chữ nằm đè lên ảnh nên ảnh ngang sẽ không đủ chỗ. Để trống thì dùng luôn ảnh máy tính.',
+                ],
                 'hero_label' => ['type' => 'text', 'label' => 'Dòng chữ nhỏ phía trên (VD: Cổng thông tin)'],
                 'hero_title' => ['type' => 'text', 'label' => 'Tiêu đề lớn (VD: Nhà ở xã hội)'],
                 'hero_slogan' => ['type' => 'text', 'label' => 'Khẩu hiệu dưới tiêu đề'],
