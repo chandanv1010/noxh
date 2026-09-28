@@ -30,3 +30,10 @@ RUN printf '%s\n' \
     > /usr/local/etc/php/conf.d/zz-app.ini
 
 WORKDIR /var/www/html
+
+# vendor/ nam tren o dia cua container (xem docker-compose.yml). Entrypoint tu
+# chay composer install khi thu muc do con rong.
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["entrypoint.sh"]
+CMD ["apache2-foreground"]

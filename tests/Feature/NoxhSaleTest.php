@@ -54,6 +54,14 @@ class NoxhSaleTest extends TestCase
 
         foreach ([$this->sale, $this->saleKhac] as $u) {
             if ($u) {
+                // Xoa ca dong duong dan cua bai: xoa moi bai thi bang `routers`
+                // con lai dong tro vao bai khong con ton tai, moi lan chay kiem
+                // tra lai bo them vai dong rac.
+                DB::table('routers')
+                    ->whereIn('module_id', Post::where('user_id', $u->id)->pluck('id'))
+                    ->where('controllers', 'App\Http\Controllers\Frontend\PostController')
+                    ->delete();
+
                 Post::where('user_id', $u->id)->forceDelete();
                 DB::table('product_user')->where('user_id', $u->id)->delete();
                 DB::table('users')->where('id', $u->id)->delete();

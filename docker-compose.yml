@@ -6,6 +6,16 @@ services:
       - "8004:80"
     volumes:
       - .:/var/www/html
+      # vendor/ de tren o dia CUA CONTAINER, khong doc qua thu muc chia se voi
+      # Windows. Doc mot file qua thu muc chia se cham hon khoang 90 lan, ma
+      # moi lan mo trang Laravel doc chung 660 file trong vendor - de nguyen
+      # thi moi trang mat 8-9 giay, tach ra con chua den mot giay.
+      #
+      # Doi lai: cai them thu vien thi phai chay TRONG container
+      #     docker exec noxh-app composer require <ten-goi>
+      # roi dong bo ra ngoai cho trinh soan thao doc duoc:
+      #     docker cp noxh-app:/var/www/html/vendor ./
+      - vendor-data:/var/www/html/vendor
     depends_on:
       db:
         condition: service_healthy
@@ -46,3 +56,4 @@ services:
 
 volumes:
   db-data:
+  vendor-data:
