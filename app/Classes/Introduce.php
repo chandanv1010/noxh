@@ -282,9 +282,15 @@ class Introduce
             ],
         ];
 
+        // --- Trang Phong phap ly ----------------------------------------------
+        $data['legal'] = [
+            'label' => 'Trang Pháp lý',
+            'description' => 'Toàn bộ chữ trên trang Phòng pháp lý NOXH',
+            'value' => $this->oPhapLy($icon),
+        ];
+
         // --- Chu o cac trang trong ---------------------------------------------
         foreach ([
-            'legal' => 'Pháp lý',
             'dossier' => 'Hồ sơ',
             'finance' => 'Tài chính',
             'qa' => 'Hỏi đáp',
@@ -343,6 +349,102 @@ class Introduce
         'handover' => 'Dự kiến bàn giao',
         'status' => 'Trạng thái',
     ];
+
+    /**
+     * Cac o chu cua trang Phong phap ly NOXH (ban ve plxh fix.jpg).
+     *
+     * Bon o chip o dai dau trang, nam khoi chu de, bon o cam ket cuoi trang
+     * deu la so luong CO DINH theo ban ve nen khai thang o day; con danh
+     * sach van ban va bai viet thi lay tu CSDL.
+     */
+    private function oPhapLy(array $icon): array
+    {
+        $o = [
+            'heading' => ['type' => 'text', 'label' => 'Dải đầu trang - tiêu đề lớn'],
+            'description' => ['type' => 'text', 'label' => 'Dải đầu trang - dòng dưới tiêu đề'],
+            'intro' => ['type' => 'textarea', 'label' => 'Dải đầu trang - đoạn giới thiệu'],
+            'hero_icon' => ['type' => 'select', 'label' => 'Dải đầu trang - hình bên trái tiêu đề', 'option' => $icon],
+            'hero_bg' => [
+                'type' => 'images',
+                'label' => 'Dải đầu trang - ảnh nền',
+                'title' => 'Ảnh NGANG làm nền cho dải đầu trang. Để trống thì dùng nền xanh vẽ sẵn.',
+            ],
+            'hero_banner' => [
+                'type' => 'images',
+                'label' => 'Dải đầu trang - ảnh minh hoạ bên phải',
+                'title' => 'Ảnh đặt ở mép phải phần giới thiệu (toà nhà, cân công lý...). Để trống thì không hiện.',
+            ],
+        ];
+
+        // Bon o chip nho duoi doan gioi thieu.
+        for ($i = 1; $i <= 4; $i++) {
+            $o["chip_{$i}_text"] = ['type' => 'text', 'label' => "Dải đầu trang - ô nhỏ {$i}, chữ"];
+            $o["chip_{$i}_icon"] = ['type' => 'select', 'label' => "Dải đầu trang - ô nhỏ {$i}, hình", 'option' => $icon];
+        }
+
+        $o += [
+            // Ten, anh, loi cam ket va so dien thoai lay tu chuyen vien tu van
+            // mac dinh (man hinh "Chuyên gia"), o day chi khai phan chu chung.
+            'help_heading' => ['type' => 'text', 'label' => 'Thẻ hỗ trợ - tiêu đề'],
+            'help_image' => [
+                'type' => 'images',
+                'label' => 'Thẻ hỗ trợ - ảnh người tư vấn',
+                'title' => 'Ảnh ĐỨNG đã tách nền, đặt ở góc phải thẻ. Để trống thì lấy ảnh của chuyên viên tư vấn mặc định.',
+            ],
+            'help_bullet_icon' => ['type' => 'select', 'label' => 'Thẻ hỗ trợ - hình đầu dòng cam kết', 'option' => $icon],
+            'help_button' => ['type' => 'text', 'label' => 'Thẻ hỗ trợ - chữ trên nút'],
+            'help_button_icon' => ['type' => 'select', 'label' => 'Thẻ hỗ trợ - hình trên nút', 'option' => $icon],
+            'help_button_link' => ['type' => 'text', 'label' => 'Thẻ hỗ trợ - đường dẫn của nút'],
+            'help_phone_note' => ['type' => 'text', 'label' => 'Thẻ hỗ trợ - ghi chú cạnh số điện thoại'],
+
+            'topic_heading' => ['type' => 'text', 'label' => 'Khối Chủ đề - tiêu đề'],
+        ];
+
+        // Nam o chu de, dung so luong ban ve.
+        for ($i = 1; $i <= 5; $i++) {
+            $o["topic_{$i}_title"] = ['type' => 'text', 'label' => "Chủ đề {$i} - tên"];
+            $o["topic_{$i}_description"] = ['type' => 'textarea', 'label' => "Chủ đề {$i} - mô tả"];
+            $o["topic_{$i}_icon"] = ['type' => 'select', 'label' => "Chủ đề {$i} - hình", 'option' => $icon];
+            $o["topic_{$i}_link"] = ['type' => 'text', 'label' => "Chủ đề {$i} - đường dẫn"];
+        }
+
+        $o += [
+            'post_heading' => ['type' => 'text', 'label' => 'Khối Bài viết - tiêu đề'],
+            'post_all_text' => ['type' => 'text', 'label' => 'Khối Bài viết - chữ liên kết góc phải'],
+            'post_hot_text' => ['type' => 'text', 'label' => 'Khối Bài viết - nhãn trên ảnh bài đầu tiên'],
+            'post_view_text' => [
+                'type' => 'text',
+                'label' => 'Khối Bài viết - chữ sau số lượt xem',
+                'title' => 'Ví dụ: lượt xem',
+            ],
+            'post_empty' => ['type' => 'text', 'label' => 'Khối Bài viết - chữ khi chưa có bài nào'],
+
+            'cta_title' => ['type' => 'text', 'label' => 'Dải cam kết - dòng trên'],
+            'cta_description' => ['type' => 'text', 'label' => 'Dải cam kết - dòng dưới'],
+            'cta_icon' => ['type' => 'select', 'label' => 'Dải cam kết - hình bên trái', 'option' => $icon],
+            'cta_button' => ['type' => 'text', 'label' => 'Dải cam kết - chữ trên nút'],
+            'cta_link' => ['type' => 'text', 'label' => 'Dải cam kết - đường dẫn của nút'],
+
+            'doc_heading' => ['type' => 'text', 'label' => 'Cột phải - tiêu đề khối văn bản'],
+            'doc_all_text' => ['type' => 'text', 'label' => 'Cột phải - chữ liên kết góc phải'],
+            'doc_empty' => ['type' => 'text', 'label' => 'Cột phải - chữ khi chưa có văn bản nào'],
+            'doc_download_title' => ['type' => 'text', 'label' => 'Cột phải - chú thích nút tải về'],
+            'doc_effective_text' => [
+                'type' => 'text',
+                'label' => 'Cột phải - dòng ngày khi văn bản chưa có tóm tắt',
+                'title' => 'Gõ {ngay} để thay bằng ngày hiệu lực. Ví dụ: Có hiệu lực từ {ngay}',
+            ],
+        ];
+
+        // Bon o cam ket o dai cuoi trang.
+        for ($i = 1; $i <= 4; $i++) {
+            $o["trust_{$i}_title"] = ['type' => 'text', 'label' => "Dải cuối trang - ô {$i}, dòng trên"];
+            $o["trust_{$i}_sub"] = ['type' => 'text', 'label' => "Dải cuối trang - ô {$i}, dòng dưới"];
+            $o["trust_{$i}_icon"] = ['type' => 'select', 'label' => "Dải cuối trang - ô {$i}, hình", 'option' => $icon];
+        }
+
+        return $o;
+    }
 
     /**
      * Cac o chu cua phan chinh trang chi tiet du an.

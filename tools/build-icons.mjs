@@ -130,9 +130,36 @@ const BANG = {
     'tab-doc': 'description',              // to tai lieu co dong ke
     'tab-faq': 'help:net',                 // vong tron co dau hoi
 
+    // --- trang Phong phap ly NOXH (plxh fix.jpg) ---
+    'book': 'menu_book:net',         // sach mo co dong ke - "Kien thuc phap ly"
+    'doc-line': 'description:net',   // to giay gap goc - "Ho tro ho so"
+    'people': 'group:net',           // hai nguoi - "Tu van boi ..."
+    'home-door': 'house:net',        // nha co cua so va cua ra vao - "Mua ban"
+    'doc-pen': 'contract_edit:net',  // to giay co dong ke kem but - "Hop dong"
+    'clipboard-check': 'assignment_turned_in:net', // bang kep co dau tich
+    'sms': 'sms:net',                // bong chat ba cham - nut "Tu van mien phi"
+    // Bon hinh o dai cuoi trang deu la MOT HINH KEM MOT HUY HIEU nho goc duoi
+    // phai - ghep o bang GHEP ben duoi vi Material khong co san kieu nay.
+    'trust-doc': 'nx_doc_shield',
+    'trust-live': 'nx_clock_fast',
+    'trust-chat': 'nx_chat_check',
+    'trust-lock': 'nx_board_check',
+
     'bullet': 'expand_circle_down',        // tron dac co mui nhon - gach dau dong the can ho
     'gallery': 'photo_library:net',        // chong anh - nut xem album
     'video': 'smart_display',              // man hinh co nut phat - nut xem video
+};
+
+// Hinh GHEP: mot hinh nen o goc tren trai kem mot huy hieu nho o goc duoi
+// phai, dung nhu bon hinh dai cuoi trang phap ly.
+//
+// Giua hai hinh co mot KHE TRANG (dia mau trang ve truoc huy hieu) dung nhu
+// ban ve, nen chi dat cac hinh nay tren nen trang.
+const GHEP = {
+    'nx_doc_shield': ['description', 'verified_user'],   // to giay + khien tich
+    'nx_clock_fast': ['update', 'nx_vach_toc'],          // dong ho + vach toc do
+    'nx_chat_check': ['chat_bubble', 'check_circle'],    // bong chat + tich tron
+    'nx_board_check': ['assignment', 'check_circle'],    // bang kep + tich tron
 };
 
 // Hinh khong co trong Material Symbols thi ve tay theo dung ban thiet ke.
@@ -142,12 +169,19 @@ const VE_TAY = {
     // (dung fill-rule evenodd de khoet ruot), giua la mot hinh thoi dac.
     'nx_diamond': '<path fill-rule="evenodd" d="M480-872 872-480 480-88 88-480 480-872Zm0 116L204-480l276 276 276-276-276-276Z"/>'
         + '<path d="M480-616 616-480 480-344 344-480 480-616Z"/>',
+
+    // Ba vach toc do ben trai dong ho "Cap nhat lien tuc". Day khong phai huy
+    // hieu goc duoi phai nen ham ghep khong thu nho, khong chen khe trang.
+    'nx_vach_toc': '<rect x="110" y="-620" width="140" height="54" rx="27"/>'
+        + '<rect x="20" y="-507" width="230" height="54" rx="27"/>'
+        + '<rect x="110" y="-394" width="140" height="54" rx="27"/>',
 };
 
 // Ten co the kem hau to ":day" - lay ban net day (weight 700). Va hau to ":net" - lay ban VE VIEN thay vi ban to dac. Ban
 // thiet ke trang danh sach du an dung hinh net manh cho dai so lieu va bo
 // loc, de hinh to dac vao thi nang han so voi ban ve.
 function doc(ten) {
+    if (GHEP[ten]) return ghep(...GHEP[ten]);
     if (VE_TAY[ten]) return `<svg viewBox="0 -960 960 960">${VE_TAY[ten]}</svg>`;
 
     const day = ten.endsWith(':day');
@@ -164,6 +198,29 @@ function doc(ten) {
     }
 
     throw new Error(`Khong tim thay icon "${goc}" trong ${thuMuc}`);
+}
+
+/**
+ * Dat `nen` thu nho o goc tren trai, `huy` thu nho o goc duoi phai, giua hai
+ * hinh chen mot dia trang de con thay duong vien - dung nhu ban ve.
+ *
+ * Rieng vach toc do khong phai huy hieu: no ve san dung cho ben trai nen giu
+ * nguyen toa do, chi day hinh nen sang phai cho du cho.
+ */
+function ghep(nen, huy) {
+    const a = ruot(doc(`${nen}:net`));
+
+    if (huy.startsWith('nx_')) {
+        return `<svg viewBox="0 -960 960 960">`
+            + `<g transform="translate(230,-102) scale(0.79)">${a}</g>`
+            + `${ruot(doc(huy))}</svg>`;
+    }
+
+    return `<svg viewBox="0 -960 960 960">`
+        + `<g transform="translate(0,-150) scale(0.84)">${a}</g>`
+        + `<circle cx="700" cy="-262" r="272" fill="#fff"/>`
+        + `<g transform="translate(450,-12) scale(0.52)">${ruot(doc(`${huy}:net`))}</g>`
+        + `</svg>`;
 }
 
 function ruot(svg) {

@@ -364,9 +364,56 @@ def tai_lieu():
         print(ten)
 
 
+def van_ban_word():
+    """
+    Mot ban Word mau, de xem duoc the giay to mau XANH (DOC) ben canh cac the
+    mau do (PDF) - ban thiet ke co ca hai loai.
+
+    Tu dong goi file .docx chu khong dung thu vien ngoai: mot .docx chi la
+    mot file zip chua vai file XML.
+    """
+    import zipfile
+
+    ten = 'van-ban-mau.docx'
+    dong = [
+        'VĂN BẢN HƯỚNG DẪN (BẢN MẪU)',
+        '',
+        'Đây là bản mẫu do tools/ve-anh-mau.py sinh ra để chạy thử giao diện.',
+        'Quản trị tải văn bản thật lên để thay thế.',
+    ]
+
+    doan = ''.join(
+        '<w:p><w:r><w:t xml:space="preserve">%s</w:t></w:r></w:p>' % t.replace('&', '&amp;')
+        for t in dong
+    )
+
+    os.makedirs(DICH, exist_ok=True)
+
+    with zipfile.ZipFile(os.path.join(DICH, ten), 'w', zipfile.ZIP_DEFLATED) as z:
+        z.writestr('[Content_Types].xml',
+                   '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+                   '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+                   '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+                   '<Default Extension="xml" ContentType="application/xml"/>'
+                   '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>'
+                   '</Types>')
+        z.writestr('_rels/.rels',
+                   '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+                   '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+                   '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>'
+                   '</Relationships>')
+        z.writestr('word/document.xml',
+                   '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+                   '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+                   '<w:body>' + doan + '</w:body></w:document>')
+
+    print(ten)
+
+
 if __name__ == '__main__':
     mat_bang()
     tong_the()
     ban_do()
     nen_dau_trang()
     tai_lieu()
+    van_ban_word()

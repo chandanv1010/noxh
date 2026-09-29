@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Frontend\Noxh;
 use App\Http\Controllers\FrontendController;
 use App\Models\LegalDocument;
 use App\Models\Post;
-use App\Models\QaQuestion;
 use Illuminate\Http\Request;
 
 /**
@@ -13,18 +12,21 @@ use Illuminate\Http\Request;
  */
 class LegalController extends FrontendController
 {
+    /** So the tren mot hang theo ban ve plxh fix.jpg. */
+    private const SO_BAI_VIET = 4;
+    private const SO_VAN_BAN = 4;
+
     public function index()
     {
         return view('frontend.noxh.legal.index', [
             'system' => $this->system,
             'seo' => $this->seo('Phòng pháp lý NOXH', url('/phap-ly-noxh')),
-            'baiViet' => $this->baiViet(4),
+            'baiViet' => $this->baiViet(self::SO_BAI_VIET),
             'vanBan' => LegalDocument::where('publish', 2)
                 ->orderByDesc('is_featured')
                 ->orderByRaw('effective_date IS NULL, effective_date DESC')
-                ->limit(4)
+                ->limit(self::SO_VAN_BAN)
                 ->get(),
-            'cauHoi' => QaQuestion::where('publish', 2)->orderByDesc('id')->limit(4)->get(),
         ]);
     }
 
@@ -89,7 +91,10 @@ class LegalController extends FrontendController
             ->whereNull('posts.deleted_at')
             ->orderByDesc('posts.id')
             ->limit($soLuong)
-            ->get(['posts.id', 'posts.image', 'posts.created_at', 'pl.name', 'pl.canonical', 'pl.description']);
+            ->get([
+                'posts.id', 'posts.image', 'posts.created_at', 'posts.viewed', 'posts.recommend',
+                'pl.name', 'pl.canonical', 'pl.description',
+            ]);
     }
 
     private function seo(string $tieuDe, string $canonical, string $moTa = ''): array

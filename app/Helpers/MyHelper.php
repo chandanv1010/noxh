@@ -1320,3 +1320,22 @@ if (!function_exists('nx_quy_nam')) {
         return 'Quý ' . $so . '/' . $d->year;
     }
 }
+
+if (!function_exists('so_rut_gon')) {
+    /**
+     * Rut gon so luot xem theo kieu ban thiet ke: 5200 -> "5,2K", 1200000 ->
+     * "1,2M". Duoi mot nghin thi in nguyen so, vi "0,8K" kho doc hon "800".
+     */
+    function so_rut_gon($so): string
+    {
+        $so = (int) $so;
+
+        foreach ([1000000 => 'M', 1000 => 'K'] as $moc => $chu) {
+            if ($so >= $moc) {
+                return rtrim(rtrim(number_format($so / $moc, 1, ',', '.'), '0'), ',') . $chu;
+            }
+        }
+
+        return number_format($so, 0, ',', '.');
+    }
+}

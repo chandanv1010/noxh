@@ -297,11 +297,17 @@ class NoxhFrontendContentSeeder extends Seeder
 
     private function napVanBan(): void
     {
+        // Cot cuoi la tom tat rieng cua tung van ban. Van ban dau khong co tom
+        // tat: trang ngoai se in "Co hieu luc tu ..." thay cho tom tat, dung
+        // nhu ban ve plxh fix.jpg.
         foreach ([
-            ['Luật Nhà ở số 27/2023/QH15', '27/2023/QH15', 'luat', '2024-08-01', 'Quốc hội'],
-            ['Nghị định 100/2024/NĐ-CP', '100/2024/NĐ-CP', 'nghi_dinh', '2024-07-26', 'Chính phủ'],
-            ['Thông tư 05/2024/TT-BXD', '05/2024/TT-BXD', 'thong_tu', '2024-07-15', 'Bộ Xây dựng'],
-            ['Công văn 2145/BXD-QLN', '2145/BXD-QLN', 'cong_van', '2024-07-10', 'Bộ Xây dựng'],
+            ['Luật Nhà ở số 27/2023/QH15', '27/2023/QH15', 'luat', '2024-08-01', 'Quốc hội', null],
+            ['Nghị định 100/2024/NĐ-CP', '100/2024/NĐ-CP', 'nghi_dinh', '2024-07-26', 'Chính phủ',
+                'Quy định chi tiết một số điều của Luật Nhà ở về phát triển và quản lý NOXH'],
+            ['Thông tư 05/2024/TT-BXD', '05/2024/TT-BXD', 'thong_tu', '2024-07-15', 'Bộ Xây dựng',
+                'Hướng dẫn một số điều của Nghị định 100/2024/NĐ-CP'],
+            ['Công văn 2145/BXD-QLN', '2145/BXD-QLN', 'cong_van', '2024-07-10', 'Bộ Xây dựng',
+                'Hướng dẫn xác nhận điều kiện về nhà ở khi mua NOXH'],
         ] as $i => $vb) {
             if (DB::table('legal_documents')->where('doc_number', $vb[1])->exists()) {
                 continue;
@@ -314,7 +320,14 @@ class NoxhFrontendContentSeeder extends Seeder
                 'effective_date' => $vb[3],
                 'issued_date' => $vb[3],
                 'issuer' => $vb[4],
-                'summary' => 'Quy định chi tiết một số điều của Luật Nhà ở về phát triển và quản lý nhà ở xã hội.',
+                'summary' => $vb[5],
+                // Ban mau do tools/ve-anh-mau.py sinh ra, de nut tai ve co
+                // thu ma mo. Quan tri up van ban that thi de len. Thong tu
+                // dung ban Word cho thay duoc ca hai kieu the giay to.
+                'file' => $vb[2] === 'thong_tu'
+                    ? '/uploads/noxh/van-ban-mau.docx'
+                    : '/uploads/noxh/van-ban-mau.pdf',
+                'file_type' => $vb[2] === 'thong_tu' ? 'docx' : 'pdf',
                 'is_featured' => $i < 2 ? 1 : 0,
                 'publish' => 2,
                 'order' => $i,

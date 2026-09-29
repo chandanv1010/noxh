@@ -3592,3 +3592,715 @@
         color: $nx-ink;
     }
 }
+
+// =============================================================================
+// -----------------------------------------------------------------------------
+// TRANG PHONG PHAP LY NOXH - noxh_image/plxh fix.jpg
+//
+// Ban ve rong 1536 diem anh cho mot bo cuc rong 1280, nen moi so do tren ban
+// ve phai NHAN 0,855 truoc khi dung o day.
+//
+// Cot phai tren ban ve rong 410 diem => 350 diem o day.
+// -----------------------------------------------------------------------------
+.nx-pl {
+    // Ban ve cho noi dung chay het 95% be ngang (1460/1536) nen khung 1280
+    // hep hon ban ve mot quang. Trang nay noi ra 1400 nhu trang chu.
+    --nx-container: #{$nx-container-home};
+
+    position: relative;
+    padding-bottom: 40px;
+
+    // --- Dai anh nen --------------------------------------------------------
+    //
+    // Chi la NEN nen dat ra ngoai luong: the ho tro o cot phai cao hon phan
+    // gioi thieu ben trai va phai trum xuong duoi dai, dung nhu ban ve. Neu
+    // de dai bao quanh noi dung thi no bi keo cao theo the, hut mot khoang
+    // trong lon ben trai.
+    //
+    // Cao 330px = 390 diem tren ban ve nhan 0,855.
+    &__nen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 330px;
+        background: linear-gradient(180deg, #cfe8ff 0%, #eaf4ff 46%, $nx-bg 100%);
+
+        &.co-nen {
+            background-image:
+                linear-gradient(180deg, rgba(207, 232, 255, 0.4) 0%, rgba(244, 248, 253, 0.9) 82%, $nx-bg 100%),
+                var(--nx-nen);
+            background-repeat: no-repeat;
+            background-position: center top;
+            background-size: cover;
+        }
+    }
+
+    &__khung {
+        position: relative;
+        z-index: 1;
+
+        .nx-crumb {
+            padding-top: 14px;
+        }
+    }
+
+    &__luoi {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 350px;
+        gap: 22px;
+        align-items: start;
+
+        @media (max-width: $nx-lg) {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    // Phan gioi thieu o dau cot trai - chua tren dai anh nen.
+    &__gioi {
+        position: relative;
+        padding-bottom: 16px;
+    }
+
+    // Anh toa nha kem can cong ly, dat sat mep phai cot trai va nam DUOI cac
+    // o chip - dung nhu ban ve: o chip thu tu de len anh.
+    &__dai-anh {
+        position: absolute;
+        top: -10px;
+        right: -6px;
+        z-index: -1;
+        width: 47%;
+        max-width: 470px;
+        height: auto;
+        pointer-events: none;
+
+        // Anh cat tu ban ve la mot hinh chu nhat; tan dan hai mep phai va
+        // duoi thi no moi hoa vao nen troi thay vi lo ra mot canh thang.
+        mask-image:
+            linear-gradient(to left, transparent 0, #000 13%),
+            linear-gradient(to top, transparent 0, #000 14%);
+        mask-composite: intersect;
+        -webkit-mask-image:
+            linear-gradient(to left, transparent 0, #000 13%),
+            linear-gradient(to top, transparent 0, #000 14%);
+        -webkit-mask-composite: source-in;
+
+        @media (max-width: $nx-md) {
+            display: none;
+        }
+    }
+
+    &__ben {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    // Ten trang: hinh can cong ly dat ben trai, tieu de va khau hieu ben phai.
+    &__ten {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-top: 6px;
+
+        h1 {
+            margin: 0;
+            color: $nx-navy;
+            font-size: 38px;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+
+            @media (max-width: $nx-sm) {
+                font-size: 27px;
+            }
+        }
+    }
+
+    &__ten-icon {
+        flex: none;
+        display: flex;
+        color: $nx-blue;
+    }
+
+    &__khau-hieu {
+        margin: 4px 0 0;
+        color: $nx-ink;
+        font-size: 16px;
+    }
+
+    // Chu khong duoc tran sang phan anh minh hoa: ban ve cho doan nay dung
+    // lai o khoang nua cot trai.
+    &__mo-ta {
+        max-width: 480px;
+        margin: 14px 0 0;
+        color: $nx-text;
+        font-size: 15px;
+        line-height: 1.55;
+    }
+
+    // Bon o nho: dan deu mot hang, xuong hai hang khi khung hep.
+    &__chips {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+
+        @media (max-width: 900px) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    &__chinh {
+        margin-bottom: 0;
+    }
+
+    // Cot phai tut xuong duoi thi the ho tro khong con nam tren dai nen nua.
+    @media (max-width: $nx-lg) {
+        &__ben { margin-top: 16px; }
+    }
+
+    &__van-ban {
+        margin-bottom: 0;
+        padding-bottom: 4px;
+
+        // Cot phai chi rong 350px: de nguyen co chu 19px thi tieu de va chu
+        // "Xem tat ca" khong du cho, phai xuong dong.
+        .nx-pl__tieude {
+            font-size: 16.5px;
+
+            a { font-size: 12px; }
+        }
+    }
+
+    // Tieu de khoi: chu HOA, lien ket ben phai giu chu thuong.
+    &__tieude {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 0 0 13px;
+        // Do tai (218,409) tren ban ve ra xanh tham chu khong phai xanh sang
+        // cua nut bam.
+        color: $nx-navy;
+        font-size: 19px;
+        font-weight: 800;
+        text-transform: uppercase;
+
+        &:not(:first-child) {
+            margin-top: 22px;
+        }
+
+        a {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            color: $nx-blue;
+            font-size: 13.5px;
+            font-weight: 600;
+            text-transform: none;
+            text-decoration: none;
+            white-space: nowrap;
+
+            &:hover { text-decoration: underline; }
+        }
+    }
+
+    &__trong {
+        margin: 0;
+        color: $nx-muted;
+        font-size: 14px;
+    }
+}
+
+// --- O nho o dai dau trang --------------------------------------------------
+.nx-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 14px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.86);
+    box-shadow: 0 2px 10px rgba(16, 45, 90, 0.08);
+    color: $nx-ink;
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.35;
+
+    .nx-ico {
+        flex: none;
+        color: $nx-blue;
+    }
+}
+
+// --- The "Can ho tro phap ly?" ----------------------------------------------
+.nx-lh {
+    position: relative;
+    overflow: hidden;
+    @include nx-card;
+    padding: 18px 20px 16px;
+    box-shadow: 0 4px 18px rgba(16, 45, 90, 0.1);
+
+    // Anh nguoi tu van dat de o cot phai, nen phan chu chi chiem khoang 63%
+    // be ngang de khong de len mat nguoi - dung nhu ban ve. Chua up anh thi
+    // chu tran het the, khong de mot khoang trong vo co.
+    &__chu {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+    }
+
+    // Chi doan mo ta va danh sach cam ket phai tranh anh; tieu de va nut van
+    // tran het be ngang - dung nhu ban ve.
+    &.co-anh &__mo-ta,
+    &.co-anh &__list,
+    &.co-anh &__nut {
+        width: 63%;
+
+        @media (max-width: $nx-lg) {
+            width: 100%;
+        }
+    }
+
+    &__tieude {
+        margin: 0 0 8px;
+        color: $nx-heading;
+        font-size: 19px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    &__mo-ta {
+        margin: 0 0 12px;
+        color: $nx-ink;
+        font-size: 14.5px;
+        line-height: 1.45;
+    }
+
+    &__list {
+        margin: 0 0 14px;
+        padding: 0;
+        list-style: none;
+
+        li {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 9px;
+            color: $nx-ink;
+            font-size: 14px;
+            line-height: 1.35;
+        }
+
+        .nx-ico {
+            flex: none;
+            margin-top: 1px;
+            color: $nx-blue;
+        }
+    }
+
+    &__nut {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        height: 46px;
+        border-radius: 9px;
+        background: $nx-blue;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+        text-decoration: none;
+
+        &:hover { background: $nx-blue-dark; }
+    }
+
+    // Dong so dien thoai nam duoi cung, tren ban ve no tran het be ngang the.
+    // To nen trang de chan anh nguoi tu van lai: tren ban ve anh dung dung o
+    // duong ke nay chu khong chay qua.
+    &__goi {
+        position: relative;
+        z-index: 1;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 4px 10px;
+        margin-top: 14px;
+        padding-top: 13px;
+        border-top: 1px solid $nx-line;
+
+        a {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            color: $nx-blue;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+            text-decoration: none;
+        }
+
+        span {
+            color: $nx-text;
+            font-size: 14px;
+        }
+    }
+
+    // Anh nguoi tu van la NEN cua the: dung day sat mep phai, chan anh cham
+    // dung dong ke tren so dien thoai - dung nhu ban ve.
+    &__anh {
+        position: absolute;
+        right: 0;
+        bottom: 58px;
+        z-index: 0;
+        width: 44%;
+        pointer-events: none;
+
+        img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        @media (max-width: $nx-lg) {
+            display: none;
+        }
+    }
+}
+
+// --- The chu de phap ly -----------------------------------------------------
+.nx-pl-topics {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+
+    @media (max-width: 1100px) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @media (max-width: $nx-sm) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.nx-topic {
+    @include nx-card;
+    display: block;
+    padding: 14px 8px 13px;
+    text-align: center;
+    text-decoration: none;
+    transition: border-color .15s, box-shadow .15s;
+
+    &:hover {
+        border-color: $nx-blue;
+        box-shadow: 0 4px 14px rgba(16, 45, 90, 0.08);
+    }
+
+    &__icon {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 9px;
+        color: $nx-blue;
+    }
+
+    // Ban ve viet ten chu de vua mot dong; co chu 14px thi "Doi tuong &
+    // dieu kien" bi vat xuong hai dong.
+    strong {
+        display: block;
+        margin-bottom: 5px;
+        color: $nx-ink;
+        font-size: 12.5px;
+        font-weight: 700;
+        line-height: 1.3;
+    }
+
+    p {
+        margin: 0;
+        color: $nx-text;
+        font-size: 12px;
+        line-height: 1.45;
+    }
+}
+
+// --- The bai viet phap ly ---------------------------------------------------
+.nx-pl-posts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+
+    @media (max-width: 1100px) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: $nx-sm) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.nx-lpost {
+    &__anh {
+        position: relative;
+        display: block;
+        margin-bottom: 9px;
+        border-radius: 9px;
+        overflow: hidden;
+        background: $nx-blue-soft;
+        aspect-ratio: 16 / 10;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &__nhan {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        padding: 3px 9px;
+        border-radius: 5px;
+        background: $nx-blue;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+
+    &__ten {
+        margin: 0 0 6px;
+        font-size: 14.5px;
+        font-weight: 700;
+        line-height: 1.35;
+
+        a {
+            color: $nx-ink;
+            text-decoration: none;
+
+            &:hover { color: $nx-blue; }
+        }
+    }
+
+    &__mo-ta {
+        margin: 0 0 8px;
+        color: $nx-text;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    &__chan {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 14px;
+        color: $nx-muted;
+        font-size: 12px;
+
+        span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+    }
+}
+
+// --- Dai cam ket cuoi khoi trai ---------------------------------------------
+.nx-pl-cta {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-top: 20px;
+    padding: 14px 16px;
+    border: 1px solid $nx-line;
+    border-radius: 10px;
+    background: $nx-blue-pale;
+
+    @media (max-width: $nx-md) {
+        flex-wrap: wrap;
+    }
+
+    &__icon {
+        flex: none;
+        display: flex;
+        color: $nx-blue;
+    }
+
+    &__chu {
+        flex: 1 1 auto;
+        min-width: 0;
+
+        strong {
+            display: block;
+            color: $nx-ink;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        span {
+            display: block;
+            margin-top: 2px;
+            color: $nx-text;
+            font-size: 13px;
+        }
+    }
+
+    &__nut {
+        flex: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 18px;
+        border: 1px solid $nx-blue;
+        border-radius: 8px;
+        background: #fff;
+        color: $nx-blue;
+        font-size: 13.5px;
+        font-weight: 700;
+        text-decoration: none;
+
+        &:hover {
+            background: $nx-blue;
+            color: #fff;
+        }
+    }
+}
+
+// --- Mot dong van ban phap luat ---------------------------------------------
+.nx-vb {
+    display: flex;
+    gap: 11px;
+    padding: 13px 0;
+    border-bottom: 1px solid #eef2f7;
+
+    &:last-child { border-bottom: 0; }
+
+    // To giay gap goc phai tren: cat goc bang clip-path chu khong dan them
+    // mot manh anh, de con doi mau theo dinh dang file.
+    &__icon {
+        flex: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1px;
+        width: 33px;
+        height: 39px;
+        clip-path: polygon(0 0, 70% 0, 100% 24%, 100% 100%, 0 100%);
+        background: $nx-muted;
+        color: #fff;
+
+        i {
+            font-size: 9px;
+            font-style: normal;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+        }
+
+        &--pdf { background: #e03131; }
+        &--doc { background: #1c6ee0; }
+        &--xls { background: #1e9e54; }
+    }
+
+    &__chu {
+        flex: 1 1 auto;
+        min-width: 0;
+
+        strong {
+            display: block;
+            color: $nx-navy;
+            font-size: 13.5px;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        p {
+            margin: 3px 0 0;
+            color: $nx-text;
+            font-size: 12.5px;
+            line-height: 1.45;
+        }
+
+        time {
+            display: block;
+            margin-top: 4px;
+            color: $nx-muted;
+            font-size: 12.5px;
+
+            // Van ban chua co tom tat thi dong ngay dung THAY CHO tom tat,
+            // nen no phai to va dam mau bang mot dong mo ta.
+            &.la-mo-ta {
+                margin-top: 3px;
+                color: $nx-text;
+                font-size: 13px;
+            }
+        }
+    }
+
+    &__tai {
+        flex: none;
+        align-self: center;
+        display: flex;
+        padding: 6px;
+        border-radius: 7px;
+        color: $nx-blue;
+
+        &:hover { background: $nx-blue-soft; }
+    }
+}
+
+// --- Dai cam ket cuoi trang -------------------------------------------------
+.nx-pl-trust {
+    @include nx-card;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-top: 18px;
+    padding: 14px 6px;
+
+    @media (max-width: 1100px) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px 0;
+    }
+
+    @media (max-width: $nx-sm) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    &__o {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 2px 16px;
+
+        // Vach ngan giua bon o, o dau tien khong co.
+        & + & {
+            border-left: 1px solid $nx-line;
+
+            @media (max-width: 1100px) {
+                border-left: 0;
+            }
+        }
+
+        .nx-ico {
+            flex: none;
+            color: $nx-blue;
+        }
+
+        strong {
+            display: block;
+            color: $nx-navy;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        em {
+            display: block;
+            margin-top: 1px;
+            color: $nx-text;
+            font-size: 13px;
+            font-style: normal;
+            line-height: 1.35;
+        }
+    }
+}

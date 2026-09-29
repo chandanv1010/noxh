@@ -1,112 +1,208 @@
 @extends('frontend.noxh.layout')
 
+@php
+    // Ban ve: noxh_image/plxh fix.jpg
+    //
+    // Khong mot chuoi nao duoc viet cung o day - tat ca doc tu bang
+    // introduces (nhom "Trang Pháp lý"), mac dinh chi la phao cuu sinh khi
+    // quan tri xoa trang mot o.
+    $anhNen = trim((string) ($intro['legal_hero_bg'] ?? ''));
+    $anhDai = trim((string) ($intro['legal_hero_banner'] ?? ''));
+
+    // Bon o chip: o nao chua dien chu thi bo han, khong de mot o trong.
+    $chip = [];
+
+    for ($i = 1; $i <= 4; $i++) {
+        $chu = trim((string) ($intro["legal_chip_{$i}_text"] ?? ''));
+
+        if ($chu !== '') {
+            $chip[] = ['chu' => $chu, 'icon' => $intro["legal_chip_{$i}_icon"] ?? 'check-circle'];
+        }
+    }
+
+    // Nam the chu de, cung quy tac: thieu ten thi khong ve the.
+    $chuDe = [];
+
+    for ($i = 1; $i <= 5; $i++) {
+        $ten = trim((string) ($intro["legal_topic_{$i}_title"] ?? ''));
+
+        if ($ten !== '') {
+            $chuDe[] = [
+                'ten' => $ten,
+                'mo_ta' => $intro["legal_topic_{$i}_description"] ?? '',
+                'icon' => $intro["legal_topic_{$i}_icon"] ?? 'scale',
+                'link' => trim((string) ($intro["legal_topic_{$i}_link"] ?? '')) ?: '/phap-ly-noxh',
+            ];
+        }
+    }
+
+    // Bon o cam ket cuoi trang.
+    $camKet = [];
+
+    for ($i = 1; $i <= 4; $i++) {
+        $ten = trim((string) ($intro["legal_trust_{$i}_title"] ?? ''));
+
+        if ($ten !== '') {
+            $camKet[] = [
+                'ten' => $ten,
+                'phu' => $intro["legal_trust_{$i}_sub"] ?? '',
+                'icon' => $intro["legal_trust_{$i}_icon"] ?? 'shield-check',
+            ];
+        }
+    }
+@endphp
+
 @section('content')
-@include('frontend.noxh.component.page-head', [
-    'crumbs' => ['Pháp lý NOXH' => ''],
-    'tieuDe' => $intro['legal_heading'] ?? 'Phòng pháp lý NOXH',
-    'moTa' => $intro['legal_description'] ?? 'Giải đáp pháp lý – Hỗ trợ hồ sơ – An tâm mua nhà ở xã hội.',
-])
+<div class="nx-pl">
 
-<div class="nx-listing nx-listing--right">
-    <div>
-        <div class="nx-panel">
-            <h2 class="nx-panel__title">Chủ đề pháp lý NOXH</h2>
-            <div class="nx-topic-grid">
-                @foreach([
-                    ['users', 'Đối tượng & điều kiện', 'Ai được mua NOXH? Điều kiện về nhà ở, thu nhập, cư trú, hộ khẩu...', '/phap-ly-noxh'],
-                    ['home', 'Mua bán & chuyển nhượng', 'Quy định mua bán NOXH, thời hạn chuyển nhượng, tặng cho, thừa kế...', '/phap-ly-noxh'],
-                    ['file-text', 'Hợp đồng & thanh toán', 'Hợp đồng mua bán, đặt cọc, tiến độ thanh toán, vay vốn ưu đãi...', '/phap-ly-noxh'],
-                    ['clipboard', 'Hồ sơ & thủ tục', 'Hồ sơ cần chuẩn bị, quy trình nộp hồ sơ, thẩm định và xét duyệt...', '/ho-so'],
-                    ['scale', 'Chính sách & văn bản', 'Văn bản pháp luật, nghị định, thông tư, công văn hướng dẫn mới nhất...', '/phap-ly-noxh/van-ban'],
-                ] as $o)
-                    <a href="{{ url($o[3]) }}" class="nx-useful-card">
-                        <span class="nx-useful-card__icon">
-                            @include('frontend.noxh.component.icon', ['name' => $o[0], 'size' => 24])
+    {{-- Dải ảnh nền chỉ là NỀN: tách khỏi luồng nội dung thì thẻ hỗ trợ ở cột
+         phải mới trườn được xuống dưới dải, đúng như bản vẽ. --}}
+    <div class="nx-pl__nen{{ $anhNen !== '' ? ' co-nen' : '' }}"
+         @if($anhNen !== '') style="--nx-nen: url('{{ e($anhNen) }}')" @endif
+         aria-hidden="true"></div>
+
+    <div class="nx__container nx-pl__khung">
+        @include('frontend.noxh.component.crumb', ['crumbs' => ['Pháp lý NOXH' => '']])
+
+        {{-- Hai cột chạy liền từ đầu trang xuống thân: cột trái là phần giới
+             thiệu rồi khối nội dung, cột phải là thẻ hỗ trợ rồi khối văn bản. --}}
+        <div class="nx-pl__luoi">
+            <div>
+                <div class="nx-pl__gioi">
+                    @if($anhDai !== '')
+                        <img src="{{ $anhDai }}" alt="" class="nx-pl__dai-anh" aria-hidden="true">
+                    @endif
+
+                    <div class="nx-pl__ten">
+                        @if(!empty($intro['legal_hero_icon']))
+                            <span class="nx-pl__ten-icon">
+                                @include('frontend.noxh.component.icon', [
+                                    'name' => $intro['legal_hero_icon'], 'size' => 58,
+                                ])
+                            </span>
+                        @endif
+                        <span>
+                            <h1>{{ $intro['legal_heading'] ?? 'PHÒNG PHÁP LÝ NOXH' }}</h1>
+                            @if(!empty($intro['legal_description']))
+                                <p class="nx-pl__khau-hieu">{{ $intro['legal_description'] }}</p>
+                            @endif
                         </span>
-                        <strong>{{ $o[1] }}</strong>
-                        <p>{{ $o[2] }}</p>
-                    </a>
-                @endforeach
-            </div>
-        </div>
+                    </div>
 
-        @if($baiViet->count())
-            <div class="nx-panel">
-                <h2 class="nx-panel__title">
-                    Bài viết pháp lý mới nhất
-                    <a href="{{ url('/tin-tuc') }}">Xem tất cả</a>
-                </h2>
-                <div class="nx-article-grid">
-                    @foreach($baiViet as $bai)
-                        <article class="nx-article">
-                            <a href="{{ url('/tin-tuc/' . $bai->canonical) }}" class="nx-article__media">
-                                @if($bai->image)<img src="{{ $bai->image }}" alt="{{ $bai->name }}" loading="lazy">@endif
-                            </a>
-                            <div class="nx-article__body">
-                                <h3 class="nx-article__title"><a href="{{ url('/tin-tuc/' . $bai->canonical) }}">{{ $bai->name }}</a></h3>
-                                <p class="nx-article__description">{{ \Illuminate\Support\Str::words(strip_tags($bai->description), 20, '…') }}</p>
-                                <div class="nx-article__meta">
-                                    <span>@include('frontend.noxh.component.icon', ['name' => 'calendar', 'size' => 13]) {{ \Illuminate\Support\Carbon::parse($bai->created_at)->format('d/m/Y') }}</span>
+                    @if(!empty($intro['legal_intro']))
+                        <p class="nx-pl__mo-ta">{!! nl2br(e($intro['legal_intro'])) !!}</p>
+                    @endif
+
+                    @if(count($chip))
+                        <div class="nx-pl__chips">
+                            @foreach($chip as $c)
+                                <div class="nx-chip">
+                                    @include('frontend.noxh.component.icon', ['name' => $c['icon'], 'size' => 30])
+                                    <span>{!! nl2br(e($c['chu'])) !!}</span>
                                 </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+
+                <div class="nx-panel nx-pl__chinh">
+                    @if(count($chuDe))
+                        <h2 class="nx-pl__tieude">
+                            {{ $intro['legal_topic_heading'] ?? 'CHỦ ĐỀ PHÁP LÝ NOXH' }}
+                        </h2>
+
+                        <div class="nx-pl-topics">
+                            @foreach($chuDe as $cd)
+                                <a href="{{ url($cd['link']) }}" class="nx-topic">
+                                    <span class="nx-topic__icon">
+                                        @include('frontend.noxh.component.icon', ['name' => $cd['icon'], 'size' => 36])
+                                    </span>
+                                    <strong>{{ $cd['ten'] }}</strong>
+                                    @if($cd['mo_ta'])<p>{{ $cd['mo_ta'] }}</p>@endif
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <h2 class="nx-pl__tieude">
+                        {{ $intro['legal_post_heading'] ?? 'BÀI VIẾT PHÁP LÝ MỚI NHẤT' }}
+                        <a href="{{ url('/tin-tuc') }}">{{ $intro['legal_post_all_text'] ?? 'Xem tất cả' }}</a>
+                    </h2>
+
+                    @if($baiViet->count())
+                        <div class="nx-pl-posts">
+                            @foreach($baiViet as $bai)
+                                @include('frontend.noxh.component.legal-post', ['bai' => $bai])
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="nx-pl__trong">{{ $intro['legal_post_empty'] ?? 'Chưa có bài viết nào.' }}</p>
+                    @endif
+
+                    @if(!empty($intro['legal_cta_title']))
+                        <div class="nx-pl-cta">
+                            @if(!empty($intro['legal_cta_icon']))
+                                <span class="nx-pl-cta__icon">
+                                    @include('frontend.noxh.component.icon', [
+                                        'name' => $intro['legal_cta_icon'], 'size' => 28,
+                                    ])
+                                </span>
+                            @endif
+
+                            <div class="nx-pl-cta__chu">
+                                <strong>{{ $intro['legal_cta_title'] }}</strong>
+                                @if(!empty($intro['legal_cta_description']))
+                                    <span>{{ $intro['legal_cta_description'] }}</span>
+                                @endif
                             </div>
-                        </article>
-                    @endforeach
+
+                            @if(!empty($intro['legal_cta_button']))
+                                <a href="{{ url(trim((string) ($intro['legal_cta_link'] ?? '')) ?: '/hoi-dap') }}"
+                                   class="nx-pl-cta__nut">
+                                    {{ $intro['legal_cta_button'] }}
+                                    @include('frontend.noxh.component.icon', ['name' => 'arrow-right', 'size' => 17])
+                                </a>
+                            @endif
+                        </div>
+                    @endif
                 </div>
             </div>
-        @endif
 
-        @if($cauHoi->count())
-            <div class="nx-panel">
-                <h2 class="nx-panel__title">
-                    Hỏi đáp pháp lý
-                    <a href="{{ url('/hoi-dap') }}">Xem tất cả</a>
-                </h2>
-                @foreach($cauHoi as $ch)
-                    <div class="nx-qa-item">
-                        <span class="nx-qa-item__avatar">{{ mb_substr($ch->asker_name ?: 'K', 0, 1) }}</span>
-                        <div>
-                            <h3 class="nx-qa-item__title"><a href="{{ url('/hoi-dap/' . $ch->id) }}">{{ $ch->title }}</a></h3>
-                            <div class="nx-qa-item__meta">
-                                <span>{{ $ch->asker_name ?: 'Bạn đọc' }}</span>
-                                <span>{{ $ch->created_at?->diffForHumans() }}</span>
-                            </div>
-                        </div>
+            <aside class="nx-pl__ben">
+                @include('frontend.noxh.component.legal-help')
+
+                <div class="nx-panel nx-pl__van-ban">
+                    <h2 class="nx-pl__tieude">
+                        {{ $intro['legal_doc_heading'] ?? 'VĂN BẢN PHÁP LUẬT MỚI' }}
+                        <a href="{{ url('/phap-ly-noxh/van-ban') }}">
+                            {{ $intro['legal_doc_all_text'] ?? 'Xem tất cả' }}
+                            @include('frontend.noxh.component.icon', ['name' => 'arrow-right', 'size' => 14])
+                        </a>
+                    </h2>
+
+                    @forelse($vanBan as $vb)
+                        @include('frontend.noxh.component.legal-doc-item', ['vb' => $vb])
+                    @empty
+                        <p class="nx-pl__trong">{{ $intro['legal_doc_empty'] ?? 'Chưa có văn bản nào.' }}</p>
+                    @endforelse
+                </div>
+            </aside>
+        </div>
+
+        {{-- DẢI CAM KẾT CUỐI TRANG --}}
+        @if(count($camKet))
+            <div class="nx-pl-trust">
+                @foreach($camKet as $ck)
+                    <div class="nx-pl-trust__o">
+                        @include('frontend.noxh.component.icon', ['name' => $ck['icon'], 'size' => 34])
+                        <span>
+                            <strong>{{ $ck['ten'] }}</strong>
+                            @if($ck['phu'])<em>{{ $ck['phu'] }}</em>@endif
+                        </span>
                     </div>
                 @endforeach
             </div>
         @endif
     </div>
-
-    <aside>
-        @include('frontend.noxh.component.expert-box')
-
-        <div class="nx-panel">
-            <h2 class="nx-panel__title">
-                Văn bản pháp luật mới
-                <a href="{{ url('/phap-ly-noxh/van-ban') }}">Xem tất cả</a>
-            </h2>
-
-            @forelse($vanBan as $vb)
-                <div class="nx-legal-item">
-                    <span class="nx-legal-item__icon">
-                        @include('frontend.noxh.component.icon', ['name' => 'file-text', 'size' => 22])
-                    </span>
-                    <div class="nx-legal-item__body">
-                        <strong>{{ $vb->doc_number ? $vb->doc_number . ' — ' : '' }}{{ $vb->title }}</strong>
-                        @if($vb->effective_date)
-                            <time>Có hiệu lực từ {{ $vb->effective_date->format('d/m/Y') }}</time>
-                        @endif
-                    </div>
-                    @if($vb->file)
-                        <a href="{{ route('noxh.legal.download', $vb->id) }}" class="nx-legal-item__download" title="Tải về">
-                            @include('frontend.noxh.component.icon', ['name' => 'download', 'size' => 18])
-                        </a>
-                    @endif
-                </div>
-            @empty
-                <p class="nx__subheading" style="margin:0">Chưa có văn bản nào.</p>
-            @endforelse
-        </div>
-    </aside>
 </div>
 @endsection

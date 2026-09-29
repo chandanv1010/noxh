@@ -75,6 +75,19 @@ class NoxhIcon
         'directions' => 'Biển chỉ đường',
         'floor-plan' => 'Mặt bằng tầng',
         'door' => 'Cửa mở (căn hộ)',
+
+        // Trang Phòng pháp lý
+        'book' => 'Sách mở',
+        'doc-line' => 'Tờ giấy có dòng kẻ',
+        'people' => 'Hai người (nét viền)',
+        'home-door' => 'Nhà có cửa sổ và cửa ra vào',
+        'doc-pen' => 'Tờ giấy kèm bút',
+        'clipboard-check' => 'Bảng kẹp có dấu tích',
+        'sms' => 'Bong bóng chat ba chấm',
+        'trust-doc' => 'Tờ giấy kèm khiên tích',
+        'trust-live' => 'Đồng hồ có vạch tốc độ',
+        'trust-chat' => 'Bong bóng chat kèm dấu tích',
+        'trust-lock' => 'Bảng kẹp kèm dấu tích',
     ];
 
     /** Dung lam 'option' cho o chon kieu select trong trang cau hinh. */
