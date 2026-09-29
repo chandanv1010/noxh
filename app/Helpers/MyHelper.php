@@ -864,7 +864,10 @@ if (!function_exists('khoang_so')) {
         $b = so_gon($den);
 
         if ($a !== '' && $b !== '' && $a !== $b) {
-            return $a . ' - ' . $b . $donVi;
+            // Gach NGANG (en dash) chu khong phai dau tru: ban thiet ke viet
+            // "32 - 70 m2" bang gach ngang, va dau tru dung giua hai so
+            // trong nhu phep tinh.
+            return $a . ' – ' . $b . $donVi;
         }
 
         if ($a !== '') {
@@ -1165,6 +1168,7 @@ if (!function_exists('nx_anh')) {
             'tin-tuc' => '/images/noxh/tin-tuc-mac-dinh.svg',
             'dang-ky' => '/images/noxh/dang-ky-mac-dinh.svg',
             'avatar' => '/images/noxh/avatar-mac-dinh.png',
+        'tu-van' => '/images/noxh/tu-van-vien.svg',
         ];
 
         return $thayThe[$loai] ?? $thayThe['du-an'];
@@ -1209,5 +1213,61 @@ if (!function_exists('nx_mau_tu_ten')) {
         $mau = ['#0a78f5', '#1e93cf', '#3e8c4a', '#7a5cd0', '#d4662a', '#0f6fa8', '#b8477e'];
 
         return $mau[crc32(mb_strtolower(trim((string) $ten))) % count($mau)];
+    }
+}
+
+if (!function_exists('nx_ban_do_khung')) {
+    /**
+     * Khung toa do cua hinh ban do Viet Nam trong component vn-map.
+     *
+     * Bon so nay PHAI khop voi hinh ve trong
+     * resources/views/frontend/noxh/component/vn-map.blade.php: duong bien
+     * va ghim deu chieu bang cung mot phep tinh, doi mot so ma khong doi hinh
+     * thi ghim se lech ra bien.
+     *
+     * [kinh do trai, kinh do phai, vi do tren, vi do duoi, rong, cao]
+     */
+    function nx_ban_do_khung(): array
+    {
+        return [
+            'lng_min' => 101.90,
+            'lng_max' => 109.90,
+            'lat_max' => 23.60,
+            'lat_min' => 8.30,
+            'rong' => 1000.0,
+            'cao' => 1565.0,
+        ];
+    }
+}
+
+if (!function_exists('nx_ban_do_diem')) {
+    /**
+     * Doi (vi do, kinh do) thanh toa do trong hinh ban do Viet Nam.
+     *
+     * Phep chieu la hinh chu nhat phang (equirectangular): dung cho mot
+     * nuoc hep ngang nhu Viet Nam thi sai so nho hon nua ghim, va khong
+     * phai keo thu vien ban do nao ve.
+     *
+     * Tra ve null neu thieu toa do hoac diem nam ngoai khung - goi ben ngoai
+     * phai bo qua, dung ve ghim de tranh ghim dinh vao mep hinh.
+     */
+    function nx_ban_do_diem($lat, $lng): ?array
+    {
+        if ($lat === null || $lng === null || $lat === '' || $lng === '') {
+            return null;
+        }
+
+        $lat = (float) $lat;
+        $lng = (float) $lng;
+        $k = nx_ban_do_khung();
+
+        if ($lng < $k['lng_min'] || $lng > $k['lng_max'] || $lat < $k['lat_min'] || $lat > $k['lat_max']) {
+            return null;
+        }
+
+        return [
+            'x' => round(($lng - $k['lng_min']) / ($k['lng_max'] - $k['lng_min']) * $k['rong'], 1),
+            'y' => round(($k['lat_max'] - $lat) / ($k['lat_max'] - $k['lat_min']) * $k['cao'], 1),
+        ];
     }
 }

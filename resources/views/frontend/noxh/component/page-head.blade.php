@@ -19,7 +19,7 @@
             <div class="nx-page-head__stats">
                 @foreach($soLieu as $s)
                     <div class="nx-mini-stat">
-                        @include('frontend.noxh.component.icon', ['name' => $s['icon'], 'size' => 22])
+                        @include('frontend.noxh.component.icon', ['name' => $s['icon'], 'size' => 25])
                         <span>
                             <span class="nx-mini-stat__value">{{ $s['value'] }}</span>
                             <span class="nx-mini-stat__label">{{ $s['label'] }}</span>

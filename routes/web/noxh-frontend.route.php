@@ -41,6 +41,9 @@ Route::name('noxh.')->group(function () {
 
     // --- Du an ---------------------------------------------------------------
     Route::get('du-an', [ProjectController::class, 'index'])->name('project.index');
+    // Dat TRUOC du-an/{canonical}, neu khong "ban-do" se bi hieu la duong dan
+    // cua mot du an va tra ve 404.
+    Route::get('du-an/ban-do', [ProjectController::class, 'map'])->name('project.map');
     Route::get('du-an/tinh-thanh', [ProjectController::class, 'provinces'])->name('project.provinces');
     Route::get('du-an/tinh-thanh/{code}', [ProjectController::class, 'byProvince'])->name('project.province');
     Route::get('du-an/{canonical}', [ProjectController::class, 'show'])->name('project.show');

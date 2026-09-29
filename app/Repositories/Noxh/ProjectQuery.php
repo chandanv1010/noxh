@@ -103,10 +103,13 @@ class ProjectQuery
     {
         return $this->co()
             ->whereNotNull('p.province_code')
-            ->groupBy('p.province_code', 'pr.name')
+            ->groupBy('p.province_code', 'pr.name', 'pr.lat', 'pr.lng')
             ->orderByDesc(DB::raw('COUNT(*)'))
             ->limit($soLuong)
-            ->get(['p.province_code', 'pr.name as province_name', DB::raw('COUNT(*) as so_du_an')]);
+            ->get([
+                'p.province_code', 'pr.name as province_name',
+                'pr.lat', 'pr.lng', DB::raw('COUNT(*) as so_du_an'),
+            ]);
     }
 
     /**

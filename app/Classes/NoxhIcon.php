@@ -53,6 +53,19 @@ class NoxhIcon
         'eye' => 'Con mắt',
         'info' => 'Thông tin',
         'warning' => 'Cảnh báo',
+
+        // Trang danh sách dự án
+        'city' => 'Ba toà nhà (thành phố)',
+        'map-pins' => 'Ghim cắm xuống bản đồ',
+        'group' => 'Hai người',
+        'verified' => 'Huy hiệu kiểm chứng',
+        'filter' => 'Phễu lọc',
+        'map' => 'Bản đồ gấp',
+        'news' => 'Tờ báo',
+        'bulb-rays' => 'Bóng đèn toả tia',
+        'area' => 'Khung bốn góc (diện tích)',
+        'units' => 'Ba khối xếp (số căn)',
+        'sort' => 'Mũi tên lên xuống',
     ];
 
     /** Dung lam 'option' cho o chon kieu select trong trang cau hinh. */

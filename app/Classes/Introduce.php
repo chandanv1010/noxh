@@ -137,12 +137,62 @@ class Introduce
         // --- Khoi du an noi bat -----------------------------------------------
         $data['project'] = [
             'label' => 'Khối 4: Dự án nổi bật + trang Dự án',
-            'description' => 'Tiêu đề khối dự án ở trang chủ và phần đầu trang danh sách dự án',
+            'description' => 'Tiêu đề khối dự án ở trang chủ, và phần đầu + bộ lọc của trang danh sách dự án',
             'value' => [
                 'block_heading' => ['type' => 'text', 'label' => 'Trang chủ - tiêu đề khối dự án nổi bật'],
                 'more_text' => ['type' => 'text', 'label' => 'Trang chủ - chữ liên kết "xem tất cả"'],
                 'heading' => ['type' => 'text', 'label' => 'Trang Dự án - tiêu đề'],
                 'description' => ['type' => 'textarea', 'label' => 'Trang Dự án - mô tả'],
+            ] + $this->oSoLieuDuAn($icon) + [
+                'search_placeholder' => ['type' => 'text', 'label' => 'Ô tìm kiếm - chữ mờ'],
+                'search_button' => ['type' => 'text', 'label' => 'Ô tìm kiếm - chữ trên nút'],
+                'sort_label' => ['type' => 'text', 'label' => 'Thanh trên danh sách - nhãn ô sắp xếp'],
+                'filter_heading' => ['type' => 'text', 'label' => 'Bộ lọc - tiêu đề'],
+                'filter_clear' => ['type' => 'text', 'label' => 'Bộ lọc - chữ xoá lọc'],
+                'filter_button' => ['type' => 'text', 'label' => 'Bộ lọc - chữ trên nút áp dụng'],
+            ],
+        ];
+
+        // --- Trang Du an: cot phai va banner tu van ----------------------------
+        $data['projectaside'] = [
+            'label' => 'Khối 4b: Trang Dự án - cột phải & banner tư vấn',
+            'description' => 'Khối bản đồ, khối tin tức nổi bật, khối "Có dự án phù hợp" và banner tư vấn ở cột trái',
+            'value' => [
+                'map_heading' => ['type' => 'text', 'label' => 'Bản đồ - tiêu đề'],
+                'map_all_text' => ['type' => 'text', 'label' => 'Bản đồ - chữ liên kết góc phải'],
+                'map_more_text' => ['type' => 'text', 'label' => 'Bản đồ - chữ nút dưới danh sách tỉnh'],
+                'map_note' => [
+                    'type' => 'text',
+                    'label' => 'Bản đồ - mô tả trang bản đồ',
+                    'title' => 'Hiện ở đầu trang /du-an/ban-do',
+                ],
+
+                'news_heading' => ['type' => 'text', 'label' => 'Tin tức nổi bật - tiêu đề'],
+                'news_more_text' => ['type' => 'text', 'label' => 'Tin tức nổi bật - chữ liên kết góc phải'],
+
+                'fit_heading' => ['type' => 'text', 'label' => 'Khối "Có dự án phù hợp" - tiêu đề'],
+                'fit_icon' => ['type' => 'select', 'label' => 'Khối "Có dự án phù hợp" - hình', 'option' => $icon],
+                'fit_point_1' => ['type' => 'text', 'label' => 'Khối "Có dự án phù hợp" - gạch đầu dòng 1'],
+                'fit_point_2' => ['type' => 'text', 'label' => 'Khối "Có dự án phù hợp" - gạch đầu dòng 2'],
+                'fit_point_3' => ['type' => 'text', 'label' => 'Khối "Có dự án phù hợp" - gạch đầu dòng 3'],
+                'fit_button' => ['type' => 'text', 'label' => 'Khối "Có dự án phù hợp" - chữ trên nút'],
+                'fit_url' => ['type' => 'text', 'label' => 'Khối "Có dự án phù hợp" - đường dẫn nút'],
+
+                'banner_heading' => ['type' => 'text', 'label' => 'Banner tư vấn - tiêu đề'],
+                'banner_point_1' => ['type' => 'text', 'label' => 'Banner tư vấn - gạch đầu dòng 1'],
+                'banner_point_2' => ['type' => 'text', 'label' => 'Banner tư vấn - gạch đầu dòng 2'],
+                'banner_point_3' => ['type' => 'text', 'label' => 'Banner tư vấn - gạch đầu dòng 3'],
+                'banner_button' => ['type' => 'text', 'label' => 'Banner tư vấn - chữ trên nút'],
+                'banner_url' => [
+                    'type' => 'text',
+                    'label' => 'Banner tư vấn - đường dẫn nút',
+                    'title' => 'Để trống thì nút gọi vào số Hotline trong Cấu hình hệ thống.',
+                ],
+                'banner_image' => [
+                    'type' => 'images',
+                    'label' => 'Banner tư vấn - ảnh người tư vấn',
+                    'title' => 'Ảnh DỌC đã tách nền, đặt sát mép phải của banner. Để trống thì banner chỉ có chữ.',
+                ],
             ],
         ];
 
@@ -242,6 +292,31 @@ class Introduce
             $o["{$i}_value"] = ['type' => 'text', 'label' => "Dòng {$i} - con số (VD: 100+)"];
             $o["{$i}_label"] = ['type' => 'text', 'label' => "Dòng {$i} - nhãn"];
             $o["{$i}_icon"] = ['type' => 'select', 'label' => "Dòng {$i} - hình", 'option' => $icon];
+        }
+
+        return $o;
+    }
+
+    /**
+     * Bon o so lieu o dau trang danh sach du an.
+     *
+     * O "con so" nhan hai dau thay the, de hai so nay luon dung voi CSDL ma
+     * quan tri van doi duoc cach viet:
+     *     {du_an}  - tong so du an dang hien
+     *     {tinh}   - so tinh/thanh dang co du an
+     */
+    private function oSoLieuDuAn(array $icon): array
+    {
+        $o = [];
+
+        for ($i = 1; $i <= 4; $i++) {
+            $o["stat_{$i}_value"] = [
+                'type' => 'text',
+                'label' => "Trang Dự án - ô số liệu {$i}: con số",
+                'title' => 'Gõ {du_an} để lấy tổng số dự án, {tinh} để lấy số tỉnh/thành có dự án.',
+            ];
+            $o["stat_{$i}_label"] = ['type' => 'text', 'label' => "Trang Dự án - ô số liệu {$i}: nhãn"];
+            $o["stat_{$i}_icon"] = ['type' => 'select', 'label' => "Trang Dự án - ô số liệu {$i}: hình", 'option' => $icon];
         }
 
         return $o;

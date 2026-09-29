@@ -87,14 +87,35 @@ const BANG = {
     'calendar': 'event',         // quy ban giao
     'ruler': 'straighten',
     'layers': 'layers',
+    'area': 'crop_free:net',     // khung vuong bon goc - dien tich can ho
+    'units': 'workspaces:net',   // ba khoi xep hinh thap - so can ho
+    'sort': 'swap_vert',
+
+    // --- trang danh sach du an (project-cate-fix.jpg) ---
+    'city': 'location_city:net',   // ba toa nha - "Du an toan quoc"
+    'map-pins': 'pin_drop:net',    // ghim cam xuong ban do - "Tinh / Thanh pho"
+    'group': 'group:net',          // hai nguoi - "Khach hang quan tam"
+    'verified': 'verified:net',    // huy hieu co dau tich - "Thong tin kiem chung"
+    'filter': 'filter_alt:net',    // pheu loc - nut "Ap dung bo loc"
+    'map': 'map:net',              // ban do gap - khoi "Ban do du an"
+    'news': 'newspaper:net',       // to bao - khoi "Tin tuc noi bat"
+    'bulb-rays': 'emoji_objects',  // bong den co tia - khoi "Co du an phu hop"
 };
 
+// Ten co the kem hau to ":net" - lay ban VE VIEN thay vi ban to dac. Ban
+// thiet ke trang danh sach du an dung hinh net manh cho dai so lieu va bo
+// loc, de hinh to dac vao thi nang han so voi ban ve.
 function doc(ten) {
-    for (const f of [`${ten}-fill.svg`, `${ten}.svg`]) {
+    const net = ten.endsWith(':net');
+    const goc = net ? ten.slice(0, -4) : ten;
+    const thu = net ? [`${goc}.svg`] : [`${goc}-fill.svg`, `${goc}.svg`];
+
+    for (const f of thu) {
         const p = resolve(kho, f);
         if (existsSync(p)) return readFileSync(p, 'utf8');
     }
-    throw new Error(`Khong tim thay icon "${ten}" trong ${kho}`);
+
+    throw new Error(`Khong tim thay icon "${goc}" trong ${kho}`);
 }
 
 function ruot(svg) {
@@ -106,7 +127,7 @@ function ruot(svg) {
 
 const dong = Object.entries(BANG).map(([ta, ho]) => {
     const d = ruot(doc(ho)).replace(/'/g, "\\'");
-    return `        '${ta}' => '${d}', // ${ho}`;
+    return `        '${ta}' => '${d}', // ${ho.replace(':net', ' (net)')}`;
 });
 
 const noiDung = `{{--

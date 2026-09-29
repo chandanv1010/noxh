@@ -20,7 +20,16 @@ use Illuminate\View\View;
  */
 class NoxhComposer
 {
-    protected static $cache = [];
+    /**
+     * Khoa bo nho tam trong container.
+     *
+     * Dung container chu khong dung bien static: mot luot chay PHP that chi
+     * phuc vu mot request nen hai cach giong nhau, nhung khi chay test (hoac
+     * sau nay chay Octane) thi nhieu request di qua cung mot tien trinh -
+     * bien static se giu lai du lieu cu va trang hien ra khong dung voi CSDL.
+     */
+    private const KHOA_CHUNG = 'noxh.composer.chung';
+    private const KHOA_INTRO = 'noxh.composer.intro';
 
     public function compose(View $view): void
     {
@@ -29,17 +38,42 @@ class NoxhComposer
 
     private function duLieu(): array
     {
-        if (!empty(self::$cache)) {
-            return self::$cache;
+        if (app()->bound(self::KHOA_CHUNG)) {
+            return app(self::KHOA_CHUNG);
         }
 
-        return self::$cache = [
+        $duLieu = [
             'menuChinh' => $this->menu('main-menu'),
             'menuChan' => $this->menu('footer-menu'),
             'chuyenGia' => $this->chuyenGia(),
-            'intro' => DB::table('introduces')->where('language_id', 1)
-                ->pluck('content', 'keyword')->toArray(),
+            'intro' => self::intro(),
         ];
+
+        app()->instance(self::KHOA_CHUNG, $duLieu);
+
+        return $duLieu;
+    }
+
+    /**
+     * Cac o chu quan tri sua duoc, dang khoa => noi dung.
+     *
+     * Static va co bo nho tam vi controller can doc truoc khi view chay
+     * (vi du trang danh sach du an dung noi dung nay de dung the SEO va dai
+     * so lieu), con composer thi chay sau - hai noi phai dung chung mot lan
+     * truy van.
+     */
+    public static function intro(): array
+    {
+        if (app()->bound(self::KHOA_INTRO)) {
+            return app(self::KHOA_INTRO);
+        }
+
+        $intro = DB::table('introduces')->where('language_id', 1)
+            ->pluck('content', 'keyword')->toArray();
+
+        app()->instance(self::KHOA_INTRO, $intro);
+
+        return $intro;
     }
 
     /**

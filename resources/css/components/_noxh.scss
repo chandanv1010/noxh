@@ -210,6 +210,22 @@ $nx-sm: 480px;
         }
     }
 
+    // Vang gold cua khoi "Co du an phu hop" o trang danh sach du an.
+    // Do tai (880,1200) tren project-cate-fix.jpg: #FDC101 - sang va am hon
+    // $nx-amber, chu tren nen nay phai la chu tham chu khong phai chu trang.
+    &--vang {
+        border-color: #fdc101;
+        background: #fdc101;
+        color: #1f2937;
+
+        &:hover,
+        &:focus-visible {
+            border-color: #ebb100;
+            background: #ebb100;
+            color: #1f2937;
+        }
+    }
+
     &--sm {
         padding: 9px 14px;
         font-size: 13px;
@@ -813,10 +829,18 @@ $nx-sm: 480px;
     font-size: 13px;
 
     a {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         color: $nx-muted;
         text-decoration: none;
 
         &:hover {
+            color: $nx-blue;
+        }
+
+        // Hinh ngoi nha o dau duong dan - xanh de tach khoi chu xam.
+        svg {
             color: $nx-blue;
         }
     }

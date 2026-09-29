@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers\Frontend\Noxh;
 
+use App\Classes\NoxhIcon;
 use App\Http\Controllers\FrontendController;
+use App\Http\ViewComposers\NoxhComposer;
 use App\Models\Product;
 use App\Models\ProjectDocument;
 use App\Models\ProjectFaq;
 use App\Models\ProjectMilestone;
 use App\Models\User;
 use App\Models\Province;
+use App\Repositories\Noxh\PostQuery;
 use App\Repositories\Noxh\ProjectQuery;
 use Illuminate\Http\Request;
 
@@ -29,11 +32,23 @@ class ProjectController extends FrontendController
         'tren-70' => ['nhan' => 'Trên 70', 'tu' => 70, 'den' => null],
     ];
 
-    protected $projectQuery;
+    /** So the tinh/thanh trong khoi ban do o cot phai (ban thiet ke ve 6). */
+    public const SO_TINH_COT_PHAI = 6;
 
-    public function __construct(ProjectQuery $projectQuery)
+    /** So tin trong khoi "Tin tuc noi bat" o cot phai. */
+    public const SO_TIN_COT_PHAI = 3;
+
+    protected $projectQuery;
+    protected $postQuery;
+
+    /** Cac o chu quan tri sua duoc - cung nguon voi bien $intro cua view. */
+    protected array $intro = [];
+
+    public function __construct(ProjectQuery $projectQuery, PostQuery $postQuery)
     {
         $this->projectQuery = $projectQuery;
+        $this->postQuery = $postQuery;
+        $this->intro = NoxhComposer::intro();
         parent::__construct();
     }
 
@@ -43,22 +58,140 @@ class ProjectController extends FrontendController
 
         $duAn = $this->projectQuery->danhSach($loc, $request->input('sap-xep', 'moi-nhat'), 10);
 
+        $tongDuAn = $this->projectQuery->tongSoDuAn();
+        $tongTinh = $this->projectQuery->tongSoTinh();
+        $tinhCoDuAn = $this->projectQuery->tinhCoDuAn(self::SO_TINH_COT_PHAI);
+
         return view('frontend.noxh.project.index', [
             'system' => $this->system,
-            'seo' => $this->seoTrang('Danh sách dự án nhà ở xã hội', url('/du-an')),
+            'seo' => $this->seoTrang($this->intro['project_heading'] ?? 'Danh sách dự án nhà ở xã hội', url('/du-an')),
             'duAn' => $duAn,
             'loc' => $loc,
             'locTho' => $request->all(),
             'tinhThanh' => Province::select('code', 'name')->orderBy('name')->get(),
-            'tinhCoDuAn' => $this->projectQuery->tinhCoDuAn(8),
+            'tinhCoDuAn' => $tinhCoDuAn,
+            'ghimBanDo' => $this->ghimBanDo(),
+            'tinTuc' => $this->postQuery->moiNhat(self::SO_TIN_COT_PHAI),
             'demTrangThai' => $this->projectQuery->demTheoTrangThai($loc),
             'demGia' => $this->projectQuery->demTheoKhoang($loc, 'price_from', 'price_to', self::KHOANG_GIA),
             'demDienTich' => $this->projectQuery->demTheoKhoang($loc, 'area_from', 'area_to', self::KHOANG_DIEN_TICH),
-            'tongDuAn' => $this->projectQuery->tongSoDuAn(),
-            'tongTinh' => $this->projectQuery->tongSoTinh(),
+            'tongDuAn' => $tongDuAn,
+            'tongTinh' => $tongTinh,
+            'soLieuDau' => $this->soLieuDau($tongDuAn, $tongTinh),
             'khoangGia' => self::KHOANG_GIA,
             'khoangDienTich' => self::KHOANG_DIEN_TICH,
         ]);
+    }
+
+    /**
+     * Trang ban do du an - /du-an/ban-do.
+     *
+     * Bam vao mot tinh tren khoi ban do (o cot phai trang danh sach) hoac
+     * vao chinh hinh ban do deu den day. Co ?province_code thi ghim cua tinh
+     * do duoc to sang va du an cua tinh hien ngay duoi ban do.
+     */
+    public function map(Request $request)
+    {
+        $maTinh = $request->input('province_code') ?: null;
+        $danhSach = $this->projectQuery->tinhCoDuAn(64);
+
+        $tinhDangXem = $maTinh
+            ? $danhSach->firstWhere('province_code', $maTinh)
+            : null;
+
+        // Ma tinh khong co du an nao thi coi nhu khong loc, thay vi hien mot
+        // trang trong khong giai thich duoc.
+        if (!$tinhDangXem) {
+            $maTinh = null;
+        }
+
+        $tongDuAn = $this->projectQuery->tongSoDuAn();
+        $tongTinh = $this->projectQuery->tongSoTinh();
+
+        return view('frontend.noxh.project.map', [
+            'system' => $this->system,
+            'seo' => $this->seoTrang(
+                $tinhDangXem
+                    ? 'Dự án nhà ở xã hội tại ' . nx_ten_dia_gioi_ngan($tinhDangXem->province_name)
+                    : ($this->intro['projectaside_map_heading'] ?? 'Bản đồ dự án'),
+                url('/du-an/ban-do')
+            ),
+            'ghimBanDo' => $this->ghimBanDo($maTinh),
+            'danhSach' => $danhSach,
+            'maTinh' => $maTinh,
+            'tinhDangXem' => $tinhDangXem,
+            'duAn' => $maTinh
+                ? $this->projectQuery->danhSach(['province_code' => $maTinh], 'moi-nhat', 20)
+                : null,
+            'tongDuAn' => $tongDuAn,
+            'tongTinh' => $tongTinh,
+            'soLieuDau' => $this->soLieuDau($tongDuAn, $tongTinh),
+        ]);
+    }
+
+    /**
+     * Ghim cho hinh ban do Viet Nam: moi tinh dang co du an mot ghim.
+     *
+     * Tinh nao chua co toa do trong vn_provinces thi nx_ban_do_diem tra ve
+     * null va bi bo qua - ve ghim o toa do rong se dinh vao goc tren trai
+     * cua hinh, trong nhu loi.
+     */
+    private function ghimBanDo(?string $maToSang = null): array
+    {
+        $ghim = [];
+
+        foreach ($this->projectQuery->tinhCoDuAn(64) as $t) {
+            $diem = nx_ban_do_diem($t->lat ?? null, $t->lng ?? null);
+
+            if (!$diem) {
+                continue;
+            }
+
+            $ghim[] = $diem + [
+                'ten' => nx_ten_dia_gioi_ngan($t->province_name),
+                'so' => (int) $t->so_du_an,
+                'url' => url('/du-an/ban-do?province_code=' . $t->province_code),
+                'sang' => $maToSang !== null && $maToSang === $t->province_code,
+            ];
+        }
+
+        return $ghim;
+    }
+
+    /**
+     * Bon o so lieu o dau trang.
+     *
+     * Chu va hinh do quan tri dat (module Gioi thieu, nhom "Khoi 4"); rieng
+     * con so nhan hai dau thay the {du_an} va {tinh} de hai o dau luon dung
+     * voi CSDL. O nao bo trong ca con so lan nhan thi khong hien.
+     */
+    private function soLieuDau(int $tongDuAn, int $tongTinh): array
+    {
+        $thay = [
+            '{du_an}' => number_format($tongDuAn, 0, ',', '.'),
+            '{tinh}' => number_format($tongTinh, 0, ',', '.'),
+        ];
+
+        $o = [];
+
+        for ($i = 1; $i <= 4; $i++) {
+            $gia = trim((string) ($this->intro["project_stat_{$i}_value"] ?? ''));
+            $nhan = trim((string) ($this->intro["project_stat_{$i}_label"] ?? ''));
+
+            if ($gia === '' && $nhan === '') {
+                continue;
+            }
+
+            $hinh = $this->intro["project_stat_{$i}_icon"] ?? '';
+
+            $o[] = [
+                'value' => strtr($gia, $thay),
+                'label' => $nhan,
+                'icon' => NoxhIcon::hopLe($hinh) ? $hinh : 'building',
+            ];
+        }
+
+        return $o;
     }
 
     public function show(string $canonical)

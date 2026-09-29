@@ -7,36 +7,43 @@
     $dangChon = function ($ten, $gia) {
         return in_array($gia, (array) request($ten, []), true);
     };
+
+    $dangLoc = request()->hasAny(['province_code', 'status', 'gia', 'dien-tich', 'tu-khoa']);
 @endphp
 
 @include('frontend.noxh.component.page-head', [
     'crumbs' => ['Dự án' => ''],
-    'tieuDe' => $intro['project_heading'] ?? 'Danh sách dự án nhà ở xã hội',
+    'tieuDe' => $intro['project_heading'] ?? 'Danh sách dự án Nhà ở xã hội',
     'moTa' => $intro['project_description'] ?? '',
-    'soLieu' => [
-        ['icon' => 'building', 'value' => number_format($tongDuAn, 0, ',', '.'), 'label' => 'Dự án toàn quốc'],
-        ['icon' => 'pin', 'value' => $tongTinh, 'label' => 'Tỉnh / Thành phố'],
-    ],
+    'soLieu' => $soLieuDau,
 ])
 
-<div class="nx__container">
-    <form method="GET" action="{{ url('/du-an') }}" class="nx-searchbar">
-        <input type="text" name="tu-khoa" value="{{ request('tu-khoa') }}"
-               placeholder="Tìm kiếm dự án (ví dụ: Túc Duyên, Hà Nội, Thái Nguyên...)">
-        <button type="submit" class="nx-btn">Tìm kiếm</button>
-    </form>
-</div>
+{{-- THANH TIM KIEM ---------------------------------------------------------
+     Chi trum hai cot trai + giua, khong keo sang cot ban do ben phai:
+     lop nx-tim-du-an nam trong cung luoi ba cot cua .nx-listing va chiem hai
+     o dau (xem _noxh-page.scss). --}}
+<div class="nx-listing nx-listing--du-an">
 
-<div class="nx-listing">
+    <form method="GET" action="{{ url('/du-an') }}" class="nx-tim-du-an">
+        <label class="nx-tim-du-an__o">
+            <span class="nx-an-di">Từ khoá tìm dự án</span>
+            @include('frontend.noxh.component.icon', ['name' => 'search', 'size' => 18])
+            <input type="text" name="tu-khoa" value="{{ request('tu-khoa') }}"
+                   placeholder="{{ $intro['project_search_placeholder'] ?? 'Tìm kiếm dự án (ví dụ: Túc Duyên, Hà Nội, Thái Nguyên...)' }}">
+        </label>
+        <button type="submit" class="nx-btn">{{ $intro['project_search_button'] ?? 'Tìm kiếm' }}</button>
+    </form>
 
     {{-- CỘT TRÁI: BỘ LỌC ---------------------------------------------------- --}}
-    <aside>
-        <form method="GET" action="{{ url('/du-an') }}" class="nx-panel">
-            <h2 class="nx-panel__title">
-                Lọc dự án
-                @if(request()->hasAny(['province_code', 'status', 'gia', 'dien-tich', 'tu-khoa']))
-                    <a href="{{ url('/du-an') }}">Xóa lọc</a>
-                @endif
+    <aside class="nx-listing__trai">
+        <form method="GET" action="{{ url('/du-an') }}" class="nx-panel nx-bo-loc">
+            <h2 class="nx-panel__title nx-bo-loc__dau">
+                {{ $intro['project_filter_heading'] ?? 'Lọc dự án' }}
+                {{-- Luon hien: nguoi dung phai thay duong thoat truoc khi
+                     tich chon, chu khong phai sau khi da loc roi moi biet. --}}
+                <a href="{{ url('/du-an') }}" class="{{ $dangLoc ? '' : 'is-mo-nhat' }}">
+                    {{ $intro['project_filter_clear'] ?? 'Xóa lọc' }}
+                </a>
             </h2>
 
             @if(request('tu-khoa'))
@@ -45,7 +52,7 @@
 
             <div class="nx-filter__group">
                 <div class="nx-filter__legend">Tỉnh / Thành phố</div>
-                <select name="province_code" class="nx-field" style="width:100%;padding:9px 11px;border:1px solid #e3ebf6;border-radius:8px">
+                <select name="province_code" data-nx-chon>
                     <option value="">Tất cả tỉnh / thành</option>
                     @foreach($tinhThanh as $t)
                         <option value="{{ $t->code }}" {{ request('province_code') == $t->code ? 'selected' : '' }}>{{ $t->name }}</option>
@@ -87,15 +94,16 @@
             </div>
 
             <button type="submit" class="nx-btn nx-btn--block">
-                ÁP DỤNG BỘ LỌC
+                @include('frontend.noxh.component.icon', ['name' => 'filter', 'size' => 17])
+                {{ $intro['project_filter_button'] ?? 'ÁP DỤNG BỘ LỌC' }}
             </button>
         </form>
 
-        @include('frontend.noxh.component.expert-box')
+        @include('frontend.noxh.component.advisor-banner')
     </aside>
 
     {{-- CỘT GIỮA: DANH SÁCH -------------------------------------------------- --}}
-    <div>
+    <div class="nx-listing__giua">
         <div class="nx-toolbar">
             <div class="nx-toolbar__count">
                 Hiển thị <strong>{{ $duAn->firstItem() ?: 0 }} – {{ $duAn->lastItem() ?: 0 }}</strong>
@@ -108,8 +116,8 @@
                         <input type="hidden" name="{{ $k }}{{ is_array($v) ? '[]' : '' }}" value="{{ $vv }}">
                     @endforeach
                 @endforeach
-                <label for="sapxep">Sắp xếp:</label>
-                <select id="sapxep" name="sap-xep" data-nx-auto-submit>
+                <label for="sapxep">{{ $intro['project_sort_label'] ?? 'Sắp xếp:' }}</label>
+                <select id="sapxep" name="sap-xep" data-nx-chon data-nx-auto-submit>
                     <option value="moi-nhat" {{ request('sap-xep') === 'moi-nhat' ? 'selected' : '' }}>Mới nhất</option>
                     <option value="gia-tang" {{ request('sap-xep') === 'gia-tang' ? 'selected' : '' }}>Giá thấp đến cao</option>
                     <option value="gia-giam" {{ request('sap-xep') === 'gia-giam' ? 'selected' : '' }}>Giá cao đến thấp</option>
@@ -119,71 +127,7 @@
         </div>
 
         @forelse($duAn as $d)
-            @php
-                $url = url('/du-an/' . $d->canonical);
-                $tt = \App\Models\Product::TRANG_THAI_DU_AN[$d->status] ?? null;
-            @endphp
-            <article class="nx-project-row">
-                <a href="{{ $url }}" class="nx-project-row__media" title="{{ $d->name }}">
-                    @if(!empty($d->image))
-                        <img src="{{ $d->image }}" alt="{{ $d->name }}" loading="lazy">
-                    @endif
-                    @if($tt)
-                        <span class="nx-badge nx-badge--{{ $d->status }} nx-project-row__badge">{{ $tt }}</span>
-                    @endif
-                </a>
-
-                <div>
-                    <div class="nx-project-row__head">
-                        <div>
-                            <h2 class="nx-project-row__title"><a href="{{ $url }}">{{ $d->name }}</a></h2>
-                            @if($d->province_name)
-                                <div class="nx-project-row__place">
-                                    @include('frontend.noxh.component.icon', ['name' => 'pin', 'size' => 14])
-                                    {{ $d->province_name }}
-                                </div>
-                            @endif
-                        </div>
-                        <div class="nx-project-row__price">
-                            {{ khoang_gia($d->price_from, $d->price_to) }}
-                            <small>triệu/m²</small>
-                        </div>
-                    </div>
-
-                    @if($d->description)
-                        <p class="nx-project-row__description">{{ \Illuminate\Support\Str::words(strip_tags($d->description), 28, '…') }}</p>
-                    @endif
-
-                    <div class="nx-project-row__meta">
-                        <div>
-                            @include('frontend.noxh.component.icon', ['name' => 'ruler', 'size' => 15])
-                            Diện tích <strong>{{ khoang_so($d->area_from, $d->area_to, ' m²') }}</strong>
-                        </div>
-                        @if($d->total_units)
-                            <div>
-                                @include('frontend.noxh.component.icon', ['name' => 'layers', 'size' => 15])
-                                Số căn <strong>{{ number_format($d->total_units, 0, ',', '.') }}</strong>
-                            </div>
-                        @endif
-                        @if($tt)
-                            <div>
-                                @include('frontend.noxh.component.icon', ['name' => 'building', 'size' => 15])
-                                Tiến độ <strong>{{ $tt }}</strong>
-                            </div>
-                        @endif
-                    </div>
-
-                    <div class="nx-project-row__foot">
-                        <span class="nx-project-row__updated">
-                            Cập nhật: {{ \Illuminate\Support\Carbon::parse($d->updated_at)->format('d/m/Y') }}
-                        </span>
-                        <span style="display:flex;gap:8px">
-                            <a href="{{ $url }}" class="nx-btn nx-btn--ghost nx-btn--sm">Xem chi tiết</a>
-                            <a href="{{ $url }}#dang-ky" class="nx-btn nx-btn--sm">Đăng ký tư vấn</a>
-                        </span>
-                    </div>
-                </div>
-            </article>
+            @include('frontend.noxh.component.project-row', ['d' => $d])
         @empty
             <div class="nx-empty">
                 Không tìm thấy dự án nào khớp với bộ lọc.
@@ -196,32 +140,9 @@
 
     {{-- CỘT PHẢI ------------------------------------------------------------ --}}
     <aside class="nx-listing__aside-right">
-        <div class="nx-panel">
-            <h2 class="nx-panel__title">
-                Dự án theo tỉnh
-                <a href="{{ url('/du-an/tinh-thanh') }}">Xem tất cả</a>
-            </h2>
-            <div class="nx-chips">
-                @foreach($tinhCoDuAn as $t)
-                    <a href="{{ url('/du-an?province_code=' . $t->province_code) }}"
-                       class="{{ request('province_code') == $t->province_code ? 'is-active' : '' }}">
-                        {{ $t->province_name }} ({{ $t->so_du_an }})
-                    </a>
-                @endforeach
-            </div>
-        </div>
-
-        <div class="nx-panel">
-            <h2 class="nx-panel__title">Có dự án phù hợp với bạn?</h2>
-            <ul class="nx-ticks nx-ticks--green">
-                <li>@include('frontend.noxh.component.icon', ['name' => 'check-circle', 'size' => 16]) Tư vấn chọn dự án theo nhu cầu</li>
-                <li>@include('frontend.noxh.component.icon', ['name' => 'check-circle', 'size' => 16]) Kiểm tra điều kiện mua</li>
-                <li>@include('frontend.noxh.component.icon', ['name' => 'check-circle', 'size' => 16]) Hỗ trợ chuẩn bị hồ sơ</li>
-            </ul>
-            <a href="{{ url('/kiem-tra-dieu-kien') }}" class="nx-btn nx-btn--amber nx-btn--block">
-                KIỂM TRA ĐIỀU KIỆN NGAY
-            </a>
-        </div>
+        @include('frontend.noxh.component.map-box')
+        @include('frontend.noxh.component.news-box')
+        @include('frontend.noxh.component.fit-box')
     </aside>
 </div>
 @endsection

@@ -78,7 +78,8 @@ class NoxhFrontendTest extends TestCase
         $this->assertStringContainsString('NOXH Túc Duyên', $html);
         $this->assertStringContainsString('Khởi công xây dựng', $html, 'Thieu khoi tien do');
         $this->assertStringContainsString('Quyết định chủ trương đầu tư', $html, 'Thieu khoi phap ly');
-        $this->assertStringContainsString('19,55 - 23,99', $html, 'Khoang gia hien sai dinh dang');
+        // Gach NGANG (en dash) giua hai so, theo ban thiet ke - xem khoang_so().
+        $this->assertStringContainsString('19,55 – 23,99', $html, 'Khoang gia hien sai dinh dang');
     }
 
     public function test_du_an_khong_ton_tai_thi_404(): void
