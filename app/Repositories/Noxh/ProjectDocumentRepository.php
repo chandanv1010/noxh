@@ -20,7 +20,7 @@ class ProjectDocumentRepository extends BaseRepository
      * vi ham do goi scope keyword() do cot `name` - ba bang nay khong co cot
      * do, va ta con can nap san quan he du an de khoi sinh N+1.
      */
-    public function phanTrang(?int $duAnId, ?string $keyword, int $perPage)
+    public function phanTrang(?int $duAnId, ?string $keyword, int $perPage, ?string $nhom = null)
     {
         $query = $this->model->newQuery()->with('project');
 
@@ -28,11 +28,16 @@ class ProjectDocumentRepository extends BaseRepository
             $query->where('product_id', $duAnId);
         }
 
+        if ($nhom) {
+            $query->where('group', $nhom);
+        }
+
         if (!empty($keyword)) {
             $query->where('title', 'LIKE', '%' . $keyword . '%');
         }
 
         return $query->orderBy('product_id')
+            ->orderBy('group')
             ->orderBy('order')
             ->paginate($perPage)
             ->withQueryString()

@@ -37,6 +37,12 @@
                                             <option value="{{ $cha->id }}" {{ request('product_id') == $cha->id ? 'selected' : '' }}>{{ $cha->name }}</option>
                                         @endforeach
                                     </select>
+                                    <select name="group" class="form-control mr10" style="width:auto;">
+                                        <option value="">[Cả hai khối]</option>
+                                        @foreach(\App\Models\ProjectDocument::NHOM as $ma => $ten)
+                                            <option value="{{ $ma }}" {{ request('group') === $ma ? 'selected' : '' }}>{{ $ten }}</option>
+                                        @endforeach
+                                    </select>
                                     @include('backend.dashboard.component.filterPublish')
                                     @include('backend.dashboard.component.keyword')
                                     <a href="{{ route('project.document.create') }}" class="btn btn-danger"><i class="fa fa-plus mr5"></i>Thêm mới</a>
@@ -50,6 +56,7 @@
                     <thead>
                         <tr>
                             <th style="width:50px;"><input type="checkbox" value="" id="checkAll" class="input-checkbox"></th>
+                            <th style="width:210px;">Thuộc khối</th>
                             <th>Tên hồ sơ</th>
                             <th style="width:170px;">Số hiệu</th>
                             <th class="text-center" style="width:130px;">Ngày ban hành</th>
@@ -62,6 +69,7 @@
                         @foreach($documents as $o)
                             <tr>
                                 <td><input type="checkbox" value="{{ $o->id }}" class="input-checkbox checkBoxItem"></td>
+                                <td>{{ \App\Models\ProjectDocument::NHOM[$o->group] ?? $o->group }}</td>
                                 <td>{{ $o->title }}</td>
                                 <td>{{ $o->doc_number ?: '—' }}</td>
                                 <td class="text-center">{{ $o->issued_date ? \Illuminate\Support\Carbon::parse($o->issued_date)->format('d/m/Y') : '—' }}</td>
@@ -78,7 +86,7 @@
 
                         @if(!$documents->count())
                             <tr>
-                                <td colspan="7" class="text-center text-muted" style="padding:30px;">
+                                <td colspan="8" class="text-center text-muted" style="padding:30px;">
                                     Chưa có bản ghi nào. Bấm <strong>Thêm mới</strong> để bắt đầu.
                                 </td>
                             </tr>

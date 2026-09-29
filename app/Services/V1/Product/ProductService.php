@@ -154,6 +154,7 @@ class ProductService extends BaseService
                 $this->updateLanguageForProduct($product, $request, $languageId);
                 $this->updateCatalogueForProduct($product, $request);
                 $this->capNhatNhanVienKinhDoanh($product, $request);
+                $this->capNhatDuAnTuongTu($product, $request);
                 $this->createRouter($product, $request, $this->controllerName, $languageId);
                 if ($request->input('attribute')) {
                     $this->createVariant($product, $request, $languageId);
@@ -181,6 +182,7 @@ class ProductService extends BaseService
                 $this->updateLanguageForProduct($product, $request, $languageId);
                 $this->updateCatalogueForProduct($product, $request);
                 $this->capNhatNhanVienKinhDoanh($product, $request);
+                $this->capNhatDuAnTuongTu($product, $request);
                 $this->updateRouter(
                     $product,
                     $request,
@@ -403,6 +405,29 @@ class ProductService extends BaseService
         }
 
         $product->nhanVienKinhDoanh()->sync($duLieu);
+    }
+
+    /**
+     * Gan du an tuong tu. Cung co che o an nhu khoi nhan vien: khong co
+     * co_gan_tuong_tu thi coi nhu form khong quan ly o nay, giu nguyen.
+     */
+    private function capNhatDuAnTuongTu($product, $request): void
+    {
+        if (!$request->boolean('co_gan_tuong_tu')) {
+            return;
+        }
+
+        $duLieu = [];
+        foreach (array_values(array_filter((array) $request->input('du_an_tuong_tu', []))) as $thuTu => $id) {
+            // Bo chinh no ra: mot du an tuong tu voi chinh no la mot vong lap.
+            if ((int) $id === (int) $product->id) {
+                continue;
+            }
+
+            $duLieu[(int) $id] = ['order' => $thuTu];
+        }
+
+        $product->duAnTuongTu()->sync($duLieu);
     }
 
     private function formatLanguagePayload($payload, $productId, $languageId)

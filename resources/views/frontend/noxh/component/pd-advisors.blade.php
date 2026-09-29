@@ -14,8 +14,6 @@
 @php
     $thay = ['{tinh}' => $tenTinh ?: 'khu vực dự án'];
     $moTa = trim(strtr((string) ($intro['projectlead_staff_note'] ?? ''), $thay));
-    $khuVuc = trim(strtr((string) ($intro['projectlead_staff_area'] ?? ''), $thay));
-    $chucDanh = $intro['projectlead_staff_role'] ?? '';
 @endphp
 
 <section class="nx-pd-tuvan" id="tu-van">
@@ -34,39 +32,18 @@
     @if($nhanVien->count())
         <ul class="nx-pd-tuvan__ds">
             @foreach($nhanVien as $nv)
-                <li>
-                    <span class="nx-pd-tuvan__anh">
-                        @include('frontend.noxh.component.avatar', [
-                            'ten' => $nv->name, 'anh' => $nv->image, 'co' => 52,
-                        ])
-                    </span>
-
-                    <span class="nx-pd-tuvan__chu">
-                        <strong>{{ $nv->name }}</strong>
-                        @if($nv->title || $chucDanh !== '')
-                            <span>{{ $nv->title ?: $chucDanh }}</span>
-                        @endif
-                        @if($khuVuc !== '')
-                            <span>{{ $khuVuc }}</span>
-                        @endif
-                    </span>
-
-                    {{-- Popup do component advisor-modal lo, chi in mot lan
-                         cho ca trang. --}}
-                    <button type="button" class="nx-btn nx-btn--sm nx-pd-tuvan__nut"
-                            data-nx-lien-he="{{ $nv->id }}" data-nx-ten="{{ $nv->name }}">
-                        @include('frontend.noxh.component.icon', ['name' => 'phone', 'size' => 15])
-                        {{ $intro['projectlead_staff_button'] ?? 'Liên hệ' }}
-                    </button>
-                </li>
+                @include('frontend.noxh.component.pd-advisor-item', ['nv' => $nv])
             @endforeach
         </ul>
 
-        @if(!empty($intro['projectlead_staff_more']))
-            <a href="{{ route('noxh.page.advise') }}" class="nx-pd-tuvan__them">
+        {{-- Chi moi bam sang hop day du khi CON nguoi chua hien ra o day. --}}
+        @if(!empty($intro['projectlead_staff_more']) && ($tatCaNhanVien ?? $nhanVien)->count() > $nhanVien->count())
+            {{-- Bam vao thi bat hop liet ke DAY DU nguoi phu trach du an nay,
+                 khong phai nhay sang trang doi tu van chung cua website. --}}
+            <button type="button" class="nx-pd-tuvan__them" data-nx-mo="tu-van-day">
                 {{ $intro['projectlead_staff_more'] }}
                 @include('frontend.noxh.component.icon', ['name' => 'arrow-right', 'size' => 15])
-            </a>
+            </button>
         @endif
     @else
         <p class="nx-pd-tuvan__trong">

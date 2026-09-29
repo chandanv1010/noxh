@@ -336,4 +336,45 @@ class NoxhDashboardCrudTest extends TestCase
 
         $this->assertNull(ProjectHighlight::find($o->id));
     }
+
+    public function test_giay_to_phai_khai_thuoc_khoi_nao(): void
+    {
+        $u = $this->quanTri();
+        $duAnId = \Illuminate\Support\Facades\DB::table('products')
+            ->whereNull('deleted_at')->value('id');
+
+        if (!$duAnId) {
+            $this->markTestSkipped('Chua co du an nao.');
+        }
+
+        // Nhom quyet dinh giay to hien o tab "Phap ly" hay tab "Tai lieu".
+        // Gui bua thi phai bi chan chu khong duoc am tham nhet vao mot khoi.
+        $this->actingAs($u)
+            ->from('/project/document/create')
+            ->post('/project/document/store', [
+                'product_id' => $duAnId,
+                'group' => 'linh tinh',
+                'title' => 'Giay to nhom bua',
+            ])
+            ->assertSessionHasErrors('group');
+
+        $this->assertNull(
+            \App\Models\ProjectDocument::where('title', 'Giay to nhom bua')->first()
+        );
+
+        $this->actingAs($u)->post('/project/document/store', [
+            'product_id' => $duAnId,
+            'group' => 'doc',
+            'title' => 'Tai lieu thu nghiem tu dong',
+            'publish' => 2,
+            'order' => 0,
+        ])->assertRedirect(route('project.document.index'));
+
+        $o = \App\Models\ProjectDocument::where('title', 'Tai lieu thu nghiem tu dong')->first();
+        $this->assertNotNull($o);
+        $this->assertSame('doc', $o->group);
+
+        $this->actingAs($u)->delete("/project/document/{$o->id}/destroy")
+            ->assertRedirect(route('project.document.index'));
+    }
 }

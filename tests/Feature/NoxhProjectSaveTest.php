@@ -90,6 +90,7 @@ class NoxhProjectSaveTest extends TestCase
         $this->actingAs($u)->post('/project/document/store', [
             'product_id' => $duAn->id,
             'title' => 'Quyet dinh chu truong dau tu',
+            'group' => 'legal',
             'doc_number' => '123/QD-UBND',
             'issued_date' => '2026-03-15',
             'order' => 0,

@@ -206,8 +206,9 @@ class NoxhProjectDetailTest extends TestCase
             $this->assertStringContainsString('Căn thử nghiệm 9PN', $html);
             $this->assertStringContainsString('19,55 – 21 m²', $html);
             // Gia can tinh bang ty phai giu ba chu so le, lam tron hai so la
-            // lech hang trieu dong.
-            $this->assertStringContainsString('1,075 – 1,18 tỷ', $html);
+            // lech hang trieu dong. Hai dau cung phai cung so chu so le:
+            // "1,075 - 1,18" nhin nhu mot loi danh may.
+            $this->assertStringContainsString('1,075 – 1,180 tỷ', $html);
             $this->assertStringContainsString('Gạch đầu dòng thử', $html);
         } finally {
             DB::table('project_units')->where('id', $id)->delete();
@@ -293,14 +294,14 @@ class NoxhProjectDetailTest extends TestCase
 
         // Khoi Tong quan luon co du lieu (it nhat la ten du an) nen tab nay
         // phai co mat.
-        $this->assertStringContainsString('data-nx-tab="tong-quan"', $html);
+        $this->assertStringContainsString('data-nx-tab="overview"', $html);
 
         // Du an khong co hoi dap thi khong duoc ve tab dan xuong cho trong.
         $coFaq = DB::table('project_faqs')
             ->where('product_id', $d->id)->where('publish', 2)->exists();
 
         if (!$coFaq) {
-            $this->assertStringNotContainsString('data-nx-tab="hoi-dap"', $html);
+            $this->assertStringNotContainsString('data-nx-tab="faq"', $html);
         }
     }
 
@@ -378,4 +379,183 @@ class NoxhProjectDetailTest extends TestCase
         $this->assertSame('Quý IV/2026', nx_quy_nam('2026-10-01'));
         $this->assertSame('', nx_quy_nam(null));
     }
+
+    public function test_moi_tab_co_mot_khung_noi_dung_di_kem(): void
+    {
+        $d = $this->duAn();
+
+        if (!$d) {
+            $this->markTestSkipped('Chua co du an nao.');
+        }
+
+        $html = $this->get('/du-an/' . $d->canonical)->assertOk()->getContent();
+
+        preg_match_all('/data-nx-tab="([a-z]+)"/', $html, $m);
+        $tab = array_unique($m[1]);
+
+        $this->assertNotEmpty($tab, 'Trang khong ve tab nao');
+
+        // Bam mot tab thi khung cung ma phai co san trong trang - khong co
+        // thi bam vao la mat trang, chu khong phai doi noi dung.
+        foreach ($tab as $ma) {
+            $this->assertStringContainsString(
+                'data-nx-pane="' . $ma . '"',
+                $html,
+                "Tab {$ma} khong co khung noi dung di kem"
+            );
+        }
+
+        // Dung mot khung duoc mo san, khong phai khong cai nao hay hai cai.
+        $this->assertSame(1, substr_count($html, 'nx-pd-khung__o is-hien'));
+    }
+
+    public function test_giay_to_tach_hai_tab_theo_nhom(): void
+    {
+        $d = $this->duAn();
+
+        if (!$d) {
+            $this->markTestSkipped('Chua co du an nao.');
+        }
+
+        $idA = DB::table('project_documents')->insertGetId([
+            'product_id' => $d->id, 'group' => 'legal',
+            'title' => 'Giay to phap ly thu nghiem', 'publish' => 2, 'order' => 90,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        $idB = DB::table('project_documents')->insertGetId([
+            'product_id' => $d->id, 'group' => 'doc',
+            'title' => 'Tai lieu tai ve thu nghiem', 'publish' => 2, 'order' => 91,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        try {
+            $html = $this->get('/du-an/' . $d->canonical)->assertOk()->getContent();
+
+            $phapLy = $this->khung($html, 'legal');
+            $taiLieu = $this->khung($html, 'doc');
+
+            $this->assertStringContainsString('Giay to phap ly thu nghiem', $phapLy);
+            $this->assertStringNotContainsString('Tai lieu tai ve thu nghiem', $phapLy);
+
+            $this->assertStringContainsString('Tai lieu tai ve thu nghiem', $taiLieu);
+            $this->assertStringNotContainsString('Giay to phap ly thu nghiem', $taiLieu);
+        } finally {
+            DB::table('project_documents')->whereIn('id', [$idA, $idB])->delete();
+        }
+    }
+
+    public function test_du_an_tuong_tu_lay_theo_lua_chon_cua_quan_tri(): void
+    {
+        $d = $this->duAn();
+
+        if (!$d) {
+            $this->markTestSkipped('Chua co du an nao.');
+        }
+
+        // Mot du an o TINH KHAC - danh sach tu doc theo tinh se khong bao gio
+        // lay no, nen no chung minh duoc lua chon cua quan tri thang the.
+        $khac = DB::table('products as p')
+            ->join('product_language as pl', function ($j) {
+                $j->on('pl.product_id', '=', 'p.id')->where('pl.language_id', 1);
+            })
+            ->whereNull('p.deleted_at')->where('p.publish', 2)
+            ->where('p.id', '!=', $d->id)
+            ->where(function ($q) use ($d) {
+                $q->where('p.province_code', '!=', $d->province_code)
+                  ->orWhereNull('p.province_code');
+            })
+            ->first(['p.id', 'pl.name']);
+
+        if (!$khac) {
+            $this->markTestSkipped('Khong co du an nao o tinh khac de thu.');
+        }
+
+        $cu = DB::table('product_related')->where('product_id', $d->id)->get();
+        DB::table('product_related')->where('product_id', $d->id)->delete();
+
+        DB::table('product_related')->insert([
+            'product_id' => $d->id, 'related_id' => $khac->id, 'order' => 0,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        try {
+            $html = $this->get('/du-an/' . $d->canonical)->assertOk()->getContent();
+            $this->assertStringContainsString(e($khac->name), $html);
+        } finally {
+            DB::table('product_related')->where('product_id', $d->id)->delete();
+
+            foreach ($cu as $o) {
+                DB::table('product_related')->insert([
+                    'product_id' => $o->product_id, 'related_id' => $o->related_id,
+                    'order' => $o->order, 'created_at' => now(), 'updated_at' => now(),
+                ]);
+            }
+        }
+    }
+
+    public function test_hop_tien_do_liet_ke_day_du_con_khoi_nho_thi_cat_bot(): void
+    {
+        $d = $this->duAn();
+
+        if (!$d) {
+            $this->markTestSkipped('Chua co du an nao.');
+        }
+
+        $them = [];
+
+        // Nhoi cho vuot han nguong SO_MOC_TIEN_DO de thay duoc su khac nhau.
+        for ($i = 0; $i < 7; $i++) {
+            $them[] = DB::table('project_milestones')->insertGetId([
+                'product_id' => $d->id,
+                'title' => 'Moc thu nghiem so ' . $i,
+                'date_label' => 'Quý I/2030',
+                'status' => 'pending',
+                'order' => 500 + $i,
+                'created_at' => now(), 'updated_at' => now(),
+            ]);
+        }
+
+        try {
+            $html = $this->get('/du-an/' . $d->canonical)->assertOk()->getContent();
+
+            $hop = $this->hop($html, 'tien-do-day');
+
+            // Hop bat len phai co DU moc, ke ca moc cuoi cung.
+            $this->assertStringContainsString('Moc thu nghiem so 6', $hop);
+
+            // Khoi nho canh ban do chi ve bon moc dau.
+            $khoiNho = substr($html, strpos($html, 'nx-pd-tiendo'), 4000);
+            $this->assertStringNotContainsString('Moc thu nghiem so 6', $khoiNho);
+        } finally {
+            DB::table('project_milestones')->whereIn('id', $them)->delete();
+        }
+    }
+
+    /**
+     * Cat lay phan HTML cua MOT khung tab.
+     *
+     * Phai cat chu khong do ca trang: ten mot giay to cung xuat hien o khung
+     * ben canh thi do ca trang se bao "co" du no nam sai cho.
+     */
+    private function khung(string $html, string $pane): string
+    {
+        $tu = strpos($html, 'data-nx-pane="' . $pane . '"');
+        $this->assertNotFalse($tu, "Khong tim thay khung {$pane}");
+
+        // Ket thuc o khung ke tiep, hoac het khoi tab neu day la khung cuoi.
+        $den = strpos($html, 'data-nx-pane="', $tu + 20);
+
+        return $den === false ? substr($html, $tu) : substr($html, $tu, $den - $tu);
+    }
+
+    /** Phan HTML cua mot hop bat len - cac hop deu nam o cuoi trang. */
+    private function hop(string $html, string $id): string
+    {
+        $tu = strpos($html, 'id="' . $id . '"');
+        $this->assertNotFalse($tu, "Khong tim thay hop {$id}");
+
+        return substr($html, $tu);
+    }
+
 }

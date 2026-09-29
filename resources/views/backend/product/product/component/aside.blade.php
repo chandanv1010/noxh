@@ -177,6 +177,7 @@
 
 
 @include('backend.product.product.component.nhan-vien')
+@include('backend.product.product.component.du-an-tuong-tu')
 
 @include('backend.dashboard.component.publish', ['model' => $product ?? null, 'hideImage' => false])
 

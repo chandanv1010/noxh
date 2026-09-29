@@ -303,6 +303,26 @@ class Introduce
     }
 
     /**
+     * Muoi tab cua trang chi tiet du an, dung thu tu ban thiet ke.
+     *
+     * Day vua la thanh tab vua la danh sach khung noi dung: bam mot tab thi
+     * doi noi dung trong khung chu khong truot xuong. Khoa o day trung voi
+     * khoa ma show.blade.php dung.
+     */
+    public const TAB_CHI_TIET = [
+        'overview' => 'Tổng quan',
+        'location' => 'Vị trí',
+        'units' => 'Mặt bằng',
+        'amenity' => 'Tiện ích',
+        'price' => 'Giá bán',
+        'progress' => 'Tiến độ',
+        'legal' => 'Pháp lý',
+        'gallery' => 'Hình ảnh - Video',
+        'doc' => 'Tài liệu',
+        'faq' => 'Hỏi đáp',
+    ];
+
+    /**
      * Cac dong cua bang "Tong quan du an", theo dung thu tu ban thiet ke.
      *
      * Khoa o day trung voi khoa ma ProjectController::bangTongQuan() dung,
@@ -391,6 +411,11 @@ class Introduce
         $o += [
             'overview_photo_text' => ['type' => 'text', 'label' => 'Khối Tổng quan - chữ trên nút xem ảnh thực tế'],
 
+            'units_block_heading' => [
+                'type' => 'text',
+                'label' => 'Khối Các loại căn hộ - tiêu đề',
+                'title' => 'Khối ba thẻ căn hộ nằm dưới khung tab, khác với tab "Mặt bằng".',
+            ],
             'units_all_text' => ['type' => 'text', 'label' => 'Khối Loại căn hộ - chữ liên kết góc phải'],
             'units_detail_text' => ['type' => 'text', 'label' => 'Khối Loại căn hộ - chữ trên nút của mỗi thẻ'],
             'units_area_label' => ['type' => 'text', 'label' => 'Khối Loại căn hộ - nhãn dòng diện tích'],
@@ -398,32 +423,34 @@ class Introduce
 
             'location_button' => ['type' => 'text', 'label' => 'Khối Vị trí - chữ trên nút mở bản đồ'],
             'progress_button' => ['type' => 'text', 'label' => 'Khối Tiến độ - chữ trên nút xem cập nhật'],
+            'progress_modal_heading' => [
+                'type' => 'text',
+                'label' => 'Khối Tiến độ - tiêu đề hộp hiện đầy đủ tiến độ',
+                'title' => 'Hộp bật lên khi bấm nút xem cập nhật.',
+            ],
+            'price_col_name' => ['type' => 'text', 'label' => 'Tab Giá bán - tên cột loại căn hộ'],
+            'price_col_area' => ['type' => 'text', 'label' => 'Tab Giá bán - tên cột diện tích'],
+            'price_col_price' => ['type' => 'text', 'label' => 'Tab Giá bán - tên cột giá dự kiến'],
+            'gallery_video_text' => ['type' => 'text', 'label' => 'Tab Hình ảnh - chữ trên nút mở video'],
+            'empty_text' => [
+                'type' => 'text',
+                'label' => 'Chữ hiện khi một tab chưa có dữ liệu',
+                'title' => 'Ví dụ: Đang cập nhật',
+            ],
             'similar_all_text' => ['type' => 'text', 'label' => 'Khối Dự án tương tự - chữ liên kết góc phải'],
         ];
 
         // Moi khoi noi dung co HAI o chu: tieu de in dam tren khoi, va nhan
         // ngan tren thanh tab dinh o dau trang. Thanh tab chi liet ke nhung
         // khoi THUC SU co du lieu, nen khong can o bat/tat rieng.
-        $khoi = [
-            'overview' => 'Tổng quan',
-            'units' => 'Loại căn hộ',
-            'location' => 'Vị trí',
-            'amenity' => 'Tiện ích',
-            'progress' => 'Tiến độ',
-            'legal' => 'Pháp lý',
-            'gallery' => 'Hình ảnh - Video',
-            'content' => 'Giới thiệu chi tiết',
-            'faq' => 'Hỏi đáp',
-            'similar' => 'Dự án tương tự',
-        ];
-
-        foreach ($khoi as $ma => $ten) {
-            // Tieu de khoi "Du an tuong tu" da khai o tren (co dau {tinh}).
-            if (!isset($o["{$ma}_heading"])) {
-                $o["{$ma}_heading"] = ['type' => 'text', 'label' => "Khối {$ten} - tiêu đề"];
-            }
-            $o["{$ma}_tab"] = ['type' => 'text', 'label' => "Khối {$ten} - nhãn trên thanh tab"];
+        foreach (self::TAB_CHI_TIET as $ma => $ten) {
+            $o["{$ma}_heading"] = ['type' => 'text', 'label' => "Tab {$ten} - tiêu đề trong khung"];
+            $o["{$ma}_tab"] = ['type' => 'text', 'label' => "Tab {$ten} - nhãn trên thanh tab"];
+            $o["{$ma}_icon"] = ['type' => 'select', 'label' => "Tab {$ten} - hình trên thanh tab", 'option' => $icon];
         }
+
+        // Hai khoi nam ngoai thanh tab nen chi co tieu de.
+        $o['content_heading'] = ['type' => 'text', 'label' => 'Khối Giới thiệu chi tiết - tiêu đề'];
 
         // Nhan tung dong cua bang Tong quan. Gia tri thi lay tu du an, day
         // chi la chu o cot trai - de quan tri doi duoc "Tổng số căn" thanh
@@ -482,6 +509,11 @@ class Introduce
             ],
             'staff_button' => ['type' => 'text', 'label' => 'Danh sách tư vấn - chữ trên nút của mỗi người'],
             'staff_more' => ['type' => 'text', 'label' => 'Danh sách tư vấn - chữ trên nút cuối khối'],
+            'staff_modal_heading' => [
+                'type' => 'text',
+                'label' => 'Danh sách tư vấn - tiêu đề hộp hiện đầy đủ danh sách',
+                'title' => 'Hộp bật lên khi bấm nút ở cuối khối. Gõ {tinh} để thay bằng tên tỉnh/thành.',
+            ],
             'staff_empty' => [
                 'type' => 'text',
                 'label' => 'Danh sách tư vấn - chữ khi dự án chưa gán ai',

@@ -17,7 +17,18 @@ class ProjectDocument extends Model
 
     protected $table = 'project_documents';
 
-    protected $fillable = ['product_id', 'title', 'doc_number', 'issued_date', 'issuer', 'file', 'file_type', 'description', 'publish', 'order'];
+    /**
+     * Hai tab "Phap ly" va "Tai lieu" cua trang chi tiet du an.
+     *
+     * Cung la giay to nen dung chung mot bang va mot man hinh quan tri; cai
+     * khac nhau chi la no hien o tab nao.
+     */
+    public const NHOM = [
+        'legal' => 'Hồ sơ pháp lý (tab "Pháp lý")',
+        'doc' => 'Tài liệu tải về (tab "Tài liệu")',
+    ];
+
+    protected $fillable = ['product_id', 'group', 'title', 'doc_number', 'issued_date', 'issuer', 'file', 'file_type', 'description', 'publish', 'order'];
 
     public function project()
     {

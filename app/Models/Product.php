@@ -191,6 +191,20 @@ class Product extends Model
             ->orderBy('product_user.order');
     }
 
+    /**
+     * Du an tuong tu - do quan tri tu chon o form sua du an.
+     *
+     * Co y khong tu suy ra theo tinh: du an lien quan nhat doi khi o tinh ben
+     * canh, va nguoc lai hai du an cung tinh chua chac thay the duoc cho nhau.
+     */
+    public function duAnTuongTu()
+    {
+        return $this->belongsToMany(Product::class, 'product_related', 'product_id', 'related_id')
+            ->withPivot('order')
+            ->withTimestamps()
+            ->orderBy('product_related.order');
+    }
+
     /** Cac loai can ho - khoi "CAC LOAI CAN HO" o trang chi tiet. */
     public function loaiCanHo()
     {

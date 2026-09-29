@@ -203,6 +203,12 @@ class ProjectController extends FrontendController
     /** So nguoi trong khoi "Danh sach tu van ho tro" (ban thiet ke ve 6). */
     public const SO_TU_VAN = 6;
 
+    /** So moc tien do ve san trong khoi; con lai xem trong hop bat len. */
+    public const SO_MOC_TIEN_DO = 4;
+
+    /** So du an trong khoi "Du an tuong tu". */
+    public const SO_TUONG_TU = 3;
+
     public function show(string $canonical)
     {
         $duAn = $this->projectQuery->theoCanonical($canonical);
@@ -212,13 +218,21 @@ class ProjectController extends FrontendController
         }
 
         $tienDo = ProjectMilestone::where('product_id', $duAn->id)->orderBy('order')->get();
-        $hoSo = ProjectDocument::where('product_id', $duAn->id)->where('publish', 2)->orderBy('order')->get();
+
+        // Ban thiet ke co hai tab rieng cho giay to: "Phap ly" va "Tai lieu".
+        // Cung mot bang, khac nhau o cot group.
+        $giayTo = ProjectDocument::where('product_id', $duAn->id)
+            ->where('publish', 2)->orderBy('order')->get()->groupBy('group');
         $faq = ProjectFaq::where('product_id', $duAn->id)->where('publish', 2)->orderBy('order')->get();
         $loaiCanHo = ProjectUnit::where('product_id', $duAn->id)
             ->where('publish', 2)->orderBy('order')->orderBy('id')->get();
 
         $anh = $this->anhDuAn($duAn);
         $tenTinh = nx_ten_dia_gioi_ngan($duAn->province_name);
+
+        // Lay ca danh sach: cot phai ve 6 nguoi, con lai nam trong hop
+        // "Xem them tu van vien khac".
+        $nhanVien = $this->nhanVienPhuTrach($duAn->id);
 
         return view('frontend.noxh.project.show', [
             'system' => $this->system,
@@ -240,13 +254,17 @@ class ProjectController extends FrontendController
             'bangTongQuan' => $this->bangTongQuan($duAn),
             'nhanTrangThai' => $this->nhanTrangThai(),
             'loaiCanHo' => $loaiCanHo->take(self::SO_LOAI_CAN_HO),
+            'tatCaLoaiCanHo' => $loaiCanHo,
             'conLoaiCanHo' => max(0, $loaiCanHo->count() - self::SO_LOAI_CAN_HO),
             'banDoUrl' => $this->banDoUrl($duAn),
-            'tienDo' => $tienDo,
-            'hoSo' => $hoSo,
+            'tienDo' => $tienDo->take(self::SO_MOC_TIEN_DO),
+            'tatCaTienDo' => $tienDo,
+            'hoSo' => $giayTo->get('legal', collect()),
+            'taiLieu' => $giayTo->get('doc', collect()),
             'faq' => $faq,
-            'tuongTu' => $this->projectQuery->tuongTu($duAn, 3),
-            'nhanVien' => $this->nhanVienPhuTrach($duAn->id, self::SO_TU_VAN),
+            'tuongTu' => $this->projectQuery->tuongTu($duAn, self::SO_TUONG_TU),
+            'nhanVien' => $nhanVien->take(self::SO_TU_VAN),
+            'tatCaNhanVien' => $nhanVien,
         ]);
     }
 

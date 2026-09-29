@@ -41,7 +41,7 @@
             <ul>
                 @foreach($diem as $d)
                     <li>
-                        @include('frontend.noxh.component.icon', ['name' => 'check-circle', 'size' => 16])
+                        @include('frontend.noxh.component.icon', ['name' => 'bullet', 'size' => 17])
                         <span>{{ $d }}</span>
                     </li>
                 @endforeach

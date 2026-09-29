@@ -1169,8 +1169,10 @@
     &__tren {
         display: grid;
         grid-template-columns: minmax(0, 1fr) 40.5%;
-        gap: 18px;
-        align-items: start;
+        gap: 14px;
+        // Hai cot phai CAO BANG NHAU nhu ban ve. Anh lon co giay theo chieu
+        // cao cua the gia, khong de mot ben thua mot ben thieu.
+        align-items: stretch;
 
         @media (max-width: $nx-lg) {
             grid-template-columns: minmax(0, 1fr);
@@ -1181,9 +1183,9 @@
     &__than {
         display: grid;
         grid-template-columns: minmax(0, 1fr) 36%;
-        gap: 16px;
+        gap: 14px;
         align-items: start;
-        padding-top: 18px;
+        padding-top: 14px;
 
         @media (max-width: $nx-lg) {
             grid-template-columns: minmax(0, 1fr);
@@ -1193,8 +1195,14 @@
     &__chinh,
     &__phu {
         display: grid;
-        gap: 16px;
+        gap: 14px;
         align-content: start;
+    }
+
+    // Ban ve xep cac khoi sat nhau hon nhieu so voi mac dinh cua .nx-panel.
+    .nx-panel {
+        margin-bottom: 0;
+        padding: 15px 16px 16px;
     }
 
     // Tieu de khoi: chu hoa, xanh, dam.
@@ -1203,22 +1211,31 @@
         align-items: baseline;
         justify-content: space-between;
         gap: 14px;
-        margin: 0 0 14px;
+        margin: 0 0 11px;
         color: $nx-heading;
-        font-size: 21px;
+        font-size: 20px;
         font-weight: 800;
         line-height: 1.25;
+        // Ban ve in hoa moi tieu de khoi, ke ca phan {tinh} duoc thay vao.
+        text-transform: uppercase;
 
-        a {
+        a,
+        button {
+            text-transform: none;
             flex: none;
             display: inline-flex;
             align-items: center;
             gap: 5px;
+            padding: 0;
+            border: 0;
+            background: none;
             color: $nx-blue;
+            font-family: inherit;
             font-size: 13.5px;
             font-weight: 600;
             text-decoration: none;
             white-space: nowrap;
+            cursor: pointer;
 
             &:hover { text-decoration: underline; }
         }
@@ -1231,13 +1248,26 @@
 
 // --- Anh lon + dai anh nho ---------------------------------------------------
 .nx-pd-anh {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+
     &__chinh {
         position: relative;
-        margin: 0 0 10px;
+        // Anh chinh chiem phan con lai sau dai anh nho, nho vay ca cot cao
+        // dung bang the gia ben canh. So do tren ban ve la 565x185, tuc gan
+        // 3:1 - de 16:9 thi khung cao qua, anh bi phong to va vo net.
+        // Ty le lay tu ban ve (565x185). Phai ghi ro ty le chu khong de khung
+        // an theo kich thuoc THAT cua tam anh: anh dai dien nao cung co ty le
+        // rieng, de mac thi khung nhay len 4:3 va cao vot so voi the gia.
+        flex: 1 1 auto;
+        aspect-ratio: 706 / 232;
+        min-height: 190px;
+        margin: 0;
         border-radius: 12px;
         overflow: hidden;
         background: $nx-blue-soft;
-        aspect-ratio: 16 / 9;
+        box-shadow: 0 4px 16px rgba(16, 45, 90, 0.12);
 
         img {
             width: 100%;
@@ -1277,9 +1307,10 @@
     }
 
     &__nho {
+        flex: none;
         display: grid;
         grid-template-columns: repeat(5, minmax(0, 1fr));
-        gap: 10px;
+        gap: 8px;
 
         @media (max-width: $nx-sm) {
             grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1289,10 +1320,12 @@
     &__o {
         position: relative;
         display: block;
-        aspect-ratio: 4 / 3;
+        // Ban ve: moi o 107x59 diem anh -> gan dung 16:9.
+        aspect-ratio: 16 / 9;
         border-radius: 8px;
         overflow: hidden;
         background: $nx-blue-soft;
+        box-shadow: 0 2px 8px rgba(16, 45, 90, 0.1);
 
         img {
             width: 100%;
@@ -1330,7 +1363,10 @@
 // --- The gia -----------------------------------------------------------------
 .nx-pd-gia {
     @include nx-card;
-    padding: 20px 22px 18px;
+    display: flex;
+    flex-direction: column;
+    padding: 18px 20px 16px;
+    box-shadow: 0 4px 16px rgba(16, 45, 90, 0.1);
 
     &__nhan {
         margin: 0;
@@ -1370,9 +1406,9 @@
         // 265, 285, tuc ty le 0.85 : 0.97 : 1.12 : 1.20. Cot thu ba rong hon
         // vi phai chua "1PN, 2PN, 3PN" tren mot dong.
         grid-template-columns: 0.92fr 0.98fr 1.1fr 1fr;
-        gap: 14px 8px;
-        margin: 16px 0 0;
-        padding: 15px 0 0;
+        gap: 13px 8px;
+        margin: 14px 0 14px;
+        padding: 14px 0 0;
         border-top: 1px solid #eef3fa;
 
         @media (max-width: 1180px) {
@@ -1396,8 +1432,8 @@
     }
 
     &__nut {
-        margin-top: 16px;
-        height: 50px;
+        margin-top: auto;
+        height: 48px;
         font-size: 16px;
         letter-spacing: 0.02em;
     }
@@ -1462,24 +1498,35 @@
 
     &__trong {
         display: flex;
-        gap: 2px;
+        gap: 0;
         overflow-x: auto;
         scrollbar-width: none;
 
         &::-webkit-scrollbar { display: none; }
     }
 
+    // Muoi o dan deu het chieu ngang khung nhu ban ve, khong don ve ben trai.
     &__muc {
+        flex: 1 1 0;
+        min-width: 0;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 14px 14px 12px;
+        justify-content: center;
+        gap: 7px;
+        padding: 13px 6px 11px;
         color: $nx-blue;
-        font-size: 14px;
+        font-size: 13.5px;
         font-weight: 600;
         text-decoration: none;
         white-space: nowrap;
         border-bottom: 3px solid transparent;
+        cursor: pointer;
+
+        // Man hinh hep thi khong nhoi duoc muoi o: cho cuon ngang tro lai.
+        @media (max-width: 1100px) {
+            flex: none;
+            padding-inline: 13px;
+        }
 
         svg { flex: none; }
 
@@ -1498,8 +1545,10 @@
     &__trong {
         display: grid;
         grid-template-columns: minmax(0, 1fr) 44%;
-        gap: 18px;
-        align-items: start;
+        gap: 16px;
+        // Ban ve: anh so do cao DUNG BANG bang thong so ben trai, khong phai
+        // mot o vuong lo lung o goc tren.
+        align-items: stretch;
 
         @media (max-width: $nx-md) {
             grid-template-columns: minmax(0, 1fr);
@@ -1509,6 +1558,7 @@
     &__so-do {
         position: relative;
         margin: 0;
+        min-height: 240px;
         border-radius: 10px;
         overflow: hidden;
         background: $nx-blue-soft;
@@ -1518,26 +1568,28 @@
             height: 100%;
             object-fit: cover;
             display: block;
-            aspect-ratio: 4 / 3;
         }
     }
 
+    // Ban ve dat nut o GOC TRAI DUOI cua anh, khong phai giua canh tren.
     &__nut {
         position: absolute;
-        left: 50%;
-        top: 14px;
-        transform: translateX(-50%);
+        left: 14px;
+        bottom: 14px;
         display: inline-flex;
         align-items: center;
         gap: 7px;
-        padding: 8px 14px;
+        padding: 9px 14px;
+        border: 0;
         border-radius: 8px;
         background: #fff;
         color: $nx-blue;
+        font-family: inherit;
         font-size: 13.5px;
         font-weight: 600;
         text-decoration: none;
         white-space: nowrap;
+        cursor: pointer;
         box-shadow: 0 2px 8px rgba(16, 45, 90, 0.18);
 
         &:hover { background: $nx-blue-pale; }
@@ -1545,21 +1597,29 @@
 }
 
 // Bang thong so cua khoi Tong quan: dong le co nen nhat cho de doc.
+// Ban ve ke mot net mo giua cac dong chu khong to nen xen ke, va hai dong
+// sat nhau hon nhieu so voi ban dung dau tien.
 .nx-pd-bang {
     width: 100%;
     border-collapse: collapse;
-    font-size: 14.5px;
+    font-size: 14px;
 
     th,
     td {
-        padding: 10px 12px;
+        padding: 7px 10px;
         text-align: left;
         vertical-align: top;
-        line-height: 1.45;
+        line-height: 1.4;
+        border-bottom: 1px solid #eef2f7;
+    }
+
+    tbody tr:last-child th,
+    tbody tr:last-child td {
+        border-bottom: 0;
     }
 
     th {
-        width: 38%;
+        width: 36%;
         color: $nx-text;
         font-weight: 400;
     }
@@ -1569,8 +1629,22 @@
         font-weight: 500;
     }
 
-    tr:nth-child(odd) {
-        background: #f7fafd;
+    // Bang gia co hang tieu de.
+    &--gia {
+        thead th {
+            width: auto;
+            color: $nx-heading;
+            font-weight: 700;
+            background: #f4f9ff;
+        }
+
+        tbody th {
+            width: 34%;
+            color: $nx-ink;
+            font-weight: 600;
+        }
+
+        strong { color: $nx-blue; }
     }
 }
 
@@ -1667,8 +1741,10 @@
 .nx-pd-doi {
     display: grid;
     grid-template-columns: 37% minmax(0, 1fr);
-    gap: 16px;
-    align-items: start;
+    gap: 14px;
+    // Ban ve de hai khoi cao bang nhau: ban do gian ra cho vua chieu cao
+    // cua duong tien do ben canh.
+    align-items: stretch;
 
     @media (max-width: $nx-md) {
         grid-template-columns: minmax(0, 1fr);
@@ -1676,8 +1752,14 @@
 }
 
 .nx-pd-vitri {
+    display: flex;
+    flex-direction: column;
+
     &__khung {
         position: relative;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
         border: 1px solid $nx-line;
         border-radius: 10px;
         overflow: hidden;
@@ -1685,9 +1767,17 @@
 
         img {
             width: 100%;
+            flex: 1;
+            min-height: 180px;
             display: block;
-            aspect-ratio: 4 / 3;
             object-fit: cover;
+        }
+
+        // Trong tab "Vi tri" thi khung rong het be ngang nen anh phai thap
+        // lai, khong thi mot tam ban do cao ca man hinh.
+        &--to img {
+            flex: none;
+            aspect-ratio: 21 / 9;
         }
     }
 
@@ -1729,6 +1819,9 @@
 }
 
 .nx-pd-tiendo {
+    display: flex;
+    flex-direction: column;
+
     &__trong {
         display: grid;
         grid-template-columns: minmax(0, 1fr) 42%;
@@ -1759,11 +1852,17 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        margin-top: 14px;
+        width: 100%;
+        margin-top: auto;
+        padding: 10px 0 0;
+        border: 0;
+        background: none;
         color: $nx-blue;
+        font-family: inherit;
         font-size: 14.5px;
         font-weight: 600;
         text-decoration: none;
+        cursor: pointer;
 
         &:hover { text-decoration: underline; }
     }
@@ -2061,7 +2160,7 @@
     }
 
     &__ds {
-        margin: 12px 0 0;
+        margin: 10px 0 0;
         padding: 0;
         list-style: none;
 
@@ -2069,8 +2168,21 @@
             display: flex;
             align-items: center;
             gap: 11px;
-            padding: 11px 0;
+            padding: 9px 0;
             border-top: 1px solid #eef3fa;
+        }
+
+        // Trong hop bat len thi khong con bi be ngang cua cot phai ep, nen
+        // xep duoc hai nguoi mot hang.
+        &--hop {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0 20px;
+            margin: 0;
+
+            @media (max-width: $nx-sm) {
+                grid-template-columns: minmax(0, 1fr);
+            }
         }
     }
 
@@ -2113,11 +2225,14 @@
 
     &__nut {
         flex: none;
+        gap: 7px;
         height: 38px;
         padding: 0 16px;
         font-size: 14px;
         text-transform: none;
         letter-spacing: 0;
+
+        svg { flex: none; }
     }
 
     &__them {
@@ -2125,14 +2240,18 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
+        width: 100%;
         margin-top: 10px;
         padding: 11px;
+        border: 0;
         border-radius: 8px;
         background: #eef5fe;
         color: $nx-blue;
+        font-family: inherit;
         font-size: 14.5px;
         font-weight: 600;
         text-decoration: none;
+        cursor: pointer;
 
         &:hover { background: #e2eefd; }
     }
@@ -2403,6 +2522,249 @@
         color: $nx-text;
         font-size: 13.5px;
         line-height: 1.7;
+    }
+}
+
+// --- Khung doi noi dung theo tab ----------------------------------------------
+// Bam mot tab thi doi noi dung ngay trong khung nay chu khong truot xuong.
+// Khi CHUA co JS thi khong co class is-tab, moi khoi cung hien ra - trang van
+// doc duoc het thay vi chi thay mot khoi.
+.nx-pd-khung {
+    &.is-tab > &__o {
+        display: none;
+
+        &.is-hien {
+            display: block;
+            animation: nx-pd-hien 0.18s ease-out;
+        }
+    }
+
+    // Khong co JS: cac khoi noi tiep nhau nen can mot net ngan cach.
+    &:not(.is-tab) > &__o + &__o {
+        margin-top: 20px;
+        padding-top: 18px;
+        border-top: 1px solid $nx-line;
+    }
+
+    &__dong {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 12px 0 0;
+        color: $nx-text;
+        font-size: 14.5px;
+
+        svg { flex: none; color: $nx-blue; }
+    }
+}
+
+@keyframes nx-pd-hien {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: none; }
+}
+
+// Gioi thieu chi tiet nam duoi bang tong quan trong cung tab "Tong quan".
+.nx-pd-gioi {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid $nx-line;
+
+    h3 {
+        margin: 0 0 8px;
+        color: $nx-heading;
+        font-size: 16px;
+        font-weight: 800;
+    }
+}
+
+// --- Tab "Mat bang": so do tong the + mat bang tung loai can -------------------
+.nx-pd-mb {
+    &__tong {
+        margin: 0 0 14px;
+        border-radius: 10px;
+        overflow: hidden;
+        background: $nx-blue-soft;
+
+        img {
+            width: 100%;
+            display: block;
+        }
+    }
+
+    &__luoi {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+
+        @media (max-width: $nx-md) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    &__o {
+        margin: 0;
+        border: 1px solid $nx-line;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #fff;
+
+        a {
+            display: block;
+            // Anh mat bang la ban ve, cat mat vien la mat nghia - dung
+            // contain chu khong cover.
+            aspect-ratio: 4 / 3;
+            background: #fff;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        figcaption {
+            padding: 8px 10px 10px;
+            border-top: 1px solid $nx-line;
+
+            strong {
+                display: block;
+                color: $nx-ink;
+                font-size: 14px;
+                font-weight: 700;
+            }
+
+            span {
+                color: $nx-text;
+                font-size: 13px;
+            }
+        }
+    }
+}
+
+// --- Tab "Gia ban" --------------------------------------------------------------
+.nx-pd-gb {
+    &__so {
+        margin: 0 0 12px;
+        color: $nx-blue;
+        font-size: 27px;
+        font-weight: 800;
+        line-height: 1.2;
+
+        span {
+            display: block;
+            margin-top: 2px;
+            color: $nx-text;
+            font-size: 14px;
+            font-weight: 400;
+        }
+    }
+}
+
+// --- Tab "Hinh anh - Video" -------------------------------------------------------
+.nx-pd-album__video {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 9px 16px;
+    border: 0;
+    border-radius: 8px;
+    background: $nx-blue;
+    color: #fff;
+    font-family: inherit;
+    font-size: 14.5px;
+    font-weight: 600;
+    cursor: pointer;
+
+    svg { flex: none; }
+
+    &:hover { background: $nx-blue-dark; }
+}
+
+// Moc tien do dang day du: co them mo ta va anh cua tung moc.
+.nx-pd-moc--day {
+    .nx-pd-moc__chu img {
+        width: 100%;
+        max-width: 320px;
+        margin-top: 8px;
+        border-radius: 8px;
+        display: block;
+    }
+
+    .nx-pd-moc__mo {
+        color: $nx-text;
+        font-size: 13.5px;
+        line-height: 1.5;
+    }
+}
+
+// --- Hop bat len (tien do day du, danh sach tu van vien) -------------------------
+.nx-hop {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+
+    &[hidden] { display: none; }
+
+    &__nen {
+        position: absolute;
+        inset: 0;
+        background: rgba(10, 26, 54, 0.55);
+    }
+
+    &__khung {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: min(760px, 100%);
+        max-height: min(84vh, 760px);
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 18px 50px rgba(10, 26, 54, 0.3);
+        overflow: hidden;
+    }
+
+    &__dau {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 15px 18px;
+        border-bottom: 1px solid $nx-line;
+
+        h2 {
+            margin: 0;
+            color: $nx-heading;
+            font-size: 18px;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+    }
+
+    &__dong {
+        flex: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border: 0;
+        border-radius: 50%;
+        background: $nx-blue-pale;
+        color: $nx-heading;
+        cursor: pointer;
+
+        &:hover { background: #dde9f8; }
+    }
+
+    &__than {
+        padding: 16px 18px 20px;
+        overflow-y: auto;
     }
 }
 

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
  * tro tam vao anh mac dinh. Chay khi can dung thu giao dien, khong chay tren
  * ban that.
  *
+ *     python tools/ve-anh-mau.py           # ve bo anh minh hoa truoc
  *     php artisan db:seed --class=NoxhProjectDetailDemoSeeder --force
  *
  * Chi them cho du an CHUA co du lieu, chay lai khong nhan doi.
@@ -21,6 +22,18 @@ class NoxhProjectDetailDemoSeeder extends Seeder
 {
     private const ANH = '/uploads/noxh/du-an-mac-dinh-the.jpg';
     private const ANH_PHU = '/uploads/noxh/du-an-mac-dinh.jpg';
+    private const SO_DO = '/uploads/noxh/mat-bang-tong-the.jpg';
+    private const BAN_DO = '/uploads/noxh/ban-do-mac-dinh.jpg';
+
+    /** Anh mat bang tung loai can - ve tay bang tools, khong tai tren mang. */
+    private const MAT_BANG = [
+        '/uploads/noxh/mat-bang-1pn-1wc.jpg',
+        '/uploads/noxh/mat-bang-2pn-1wc.jpg',
+        '/uploads/noxh/mat-bang-2pn-2wc.jpg',
+    ];
+
+    /** Video mau - dung mot doan gioi thieu cong khai cua YouTube. */
+    private const VIDEO = 'https://www.youtube.com/watch?v=aqz-KE-bpKQ';
 
     public function run(): void
     {
@@ -34,6 +47,7 @@ class NoxhProjectDetailDemoSeeder extends Seeder
         $themCan = 0;
         $themIch = 0;
         $themAnh = 0;
+        $themGiay = 0;
         $themNguoi = 0;
 
         // Gan nhan vien cho MOT SO du an thoi, khong gan het: phai con du an
@@ -45,14 +59,16 @@ class NoxhProjectDetailDemoSeeder extends Seeder
             $themCan += $this->loaiCanHo($id);
             $themIch += $this->tienIch($id);
             $themAnh += $this->anhMau($id);
+            $themGiay += $this->giayTo($id);
             $this->toaDo($id);
+            $this->tuongTu($id, $duAn);
 
             if ($coNguoi->contains($id)) {
                 $themNguoi += $this->nhanVien($id);
             }
         }
 
-        $this->command?->info("Du lieu mau: {$themCan} loai can ho, {$themIch} o tien ich, {$themAnh} du an duoc gan anh, {$themNguoi} luot gan nhan vien.");
+        $this->command?->info("Du lieu mau: {$themCan} loai can ho, {$themIch} o tien ich, {$themGiay} giay to, {$themAnh} du an duoc gan anh, {$themNguoi} luot gan nhan vien.");
     }
 
     private function loaiCanHo(int $duAnId): int
@@ -71,7 +87,7 @@ class NoxhProjectDetailDemoSeeder extends Seeder
             DB::table('project_units')->insert([
                 'product_id' => $duAnId,
                 'name' => $m[0],
-                'image' => self::ANH,
+                'image' => self::MAT_BANG[$i] ?? self::ANH,
                 'area_from' => $m[1],
                 'area_to' => $m[2],
                 'price_from' => $m[3],
@@ -125,7 +141,7 @@ class NoxhProjectDetailDemoSeeder extends Seeder
     private function anhMau(int $duAnId): int
     {
         $d = DB::table('products')->where('id', $duAnId)
-            ->first(['album', 'site_plan_image', 'map_image', 'progress_image']);
+            ->first(['album', 'video_url', 'site_plan_image', 'map_image', 'progress_image']);
 
         if (!$d) {
             return 0;
@@ -133,20 +149,30 @@ class NoxhProjectDetailDemoSeeder extends Seeder
 
         $sua = ['updated_at' => now()];
 
-        foreach (['site_plan_image', 'map_image', 'progress_image'] as $o) {
-            if (empty($d->$o)) {
-                $sua[$o] = self::ANH;
-            }
+        if (empty($d->site_plan_image)) {
+            $sua['site_plan_image'] = self::SO_DO;
+        }
+
+        if (empty($d->map_image)) {
+            $sua['map_image'] = self::BAN_DO;
+        }
+
+        if (empty($d->progress_image)) {
+            $sua['progress_image'] = self::ANH;
+        }
+
+        if (empty($d->video_url)) {
+            $sua['video_url'] = self::VIDEO;
         }
 
         if (empty($d->album)) {
             // Xen ke hai anh: dai anh nho tu bo nhung anh TRUNG voi anh dai
             // dien, nen album toan mot anh giong anh dai dien se ra rong.
-            // Dai anh nho chi ve 5 o, o cuoi mang chu "+ N anh"; de du 12 anh
-            // cho con nhin thay con so do.
+            // Dai anh nho chi ve 5 o, o cuoi mang chu "+ N anh"; de 17 anh
+            // cho ra dung con so "+ 12 anh" nhu ban thiet ke.
             $sua['album'] = json_encode(array_merge(
-                array_fill(0, 11, self::ANH_PHU),
-                [self::ANH]
+                array_fill(0, 12, self::ANH_PHU),
+                array_fill(0, 5, self::SO_DO)
             ));
         }
 
@@ -188,6 +214,88 @@ class NoxhProjectDetailDemoSeeder extends Seeder
         ]);
 
         return 1;
+    }
+
+    /**
+     * Giay to mau cho hai tab "Phap ly" va "Tai lieu".
+     *
+     * Hai tab do doc chung bang project_documents, khac nhau o cot group -
+     * khong co dong nhom "doc" thi tab "Tai lieu" khong hien ra.
+     */
+    private function giayTo(int $duAnId): int
+    {
+        // Kiem tra tung nhom rieng: du an co san ho so phap ly tu truoc van
+        // con thieu nhom "Tai lieu", ma thieu la mat han mot tab.
+        $daCo = DB::table('project_documents')->where('product_id', $duAnId)
+            ->distinct()->pluck('group')->all();
+
+        $mau = [
+            ['legal', 'Quyết định chấp thuận chủ trương đầu tư', '1234/QĐ-UBND', 'UBND tỉnh'],
+            ['legal', 'Giấy chứng nhận quyền sử dụng đất', 'CX 123456', 'Sở Tài nguyên và Môi trường'],
+            ['legal', 'Giấy phép xây dựng', '88/GPXD', 'Sở Xây dựng'],
+            ['legal', 'Văn bản nghiệm thu phòng cháy chữa cháy', '45/NT-PCCC', 'Công an tỉnh'],
+            ['doc', 'Bảng giá bán dự kiến', null, null],
+            ['doc', 'Mẫu đơn đăng ký mua nhà ở xã hội', null, null],
+            ['doc', 'Hướng dẫn hồ sơ vay gói ưu đãi', null, null],
+        ];
+
+        $them = 0;
+
+        foreach ($mau as $i => $m) {
+            if (in_array($m[0], $daCo, true)) {
+                continue;
+            }
+
+            $them++;
+
+            DB::table('project_documents')->insert([
+                'product_id' => $duAnId,
+                'group' => $m[0],
+                'title' => $m[1],
+                'doc_number' => $m[2],
+                'issuer' => $m[3],
+                'issued_date' => $m[0] === 'legal' ? now()->subMonths(6 + $i)->toDateString() : null,
+                'publish' => 2,
+                'order' => $i,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        return $them;
+    }
+
+    /**
+     * Chon san vai du an tuong tu, de khoi cuoi trang co cai ma xem.
+     */
+    private function tuongTu(int $duAnId, $duAn): int
+    {
+        if (DB::table('product_related')->where('product_id', $duAnId)->exists()) {
+            return 0;
+        }
+
+        // Uu tien du an cung tinh: tieu de khoi co dau {tinh} nen mot du an
+        // tinh khac nam duoi dong chu "tai Thai Nguyen" trong nhu loi.
+        $tinh = DB::table('products')->where('id', $duAnId)->value('province_code');
+
+        $khac = DB::table('products')->whereNull('deleted_at')
+            ->where('id', '!=', $duAnId)
+            ->when($tinh, fn ($q) => $q->orderByRaw('province_code = ? DESC', [$tinh]))
+            ->orderBy('id')
+            ->limit(3)
+            ->pluck('id');
+
+        foreach ($khac as $i => $id) {
+            DB::table('product_related')->insert([
+                'product_id' => $duAnId,
+                'related_id' => $id,
+                'order' => $i,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        return $khac->count();
     }
 
     /**

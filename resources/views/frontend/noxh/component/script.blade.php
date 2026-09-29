@@ -387,9 +387,9 @@ window.NX.tienTuTrieu = function (trieu) {
 // Chi dung mot lop phu duy nhat, tao luc bam lan dau. Dong lai thi GO HAN
 // the iframe chu khong chi an di - de an thi YouTube van chay tieng ngam.
 (function () {
-    var nut = document.querySelector('[data-nx-video]');
+    var cacNut = document.querySelectorAll('[data-nx-video]');
 
-    if (!nut) return;
+    if (!cacNut.length) return;
 
     var lop = null;
 
@@ -412,8 +412,7 @@ window.NX.tienTuTrieu = function (trieu) {
         document.body.style.overflow = '';
     }
 
-    nut.addEventListener('click', function () {
-        var url = nut.getAttribute('data-nx-video');
+    function mo(url) {
         var nhung = duongNhung(url);
 
         if (!nhung) {
@@ -436,6 +435,12 @@ window.NX.tienTuTrieu = function (trieu) {
 
         document.body.appendChild(lop);
         document.body.style.overflow = 'hidden';
+    }
+
+    cacNut.forEach(function (n) {
+        n.addEventListener('click', function () {
+            mo(n.getAttribute('data-nx-video'));
+        });
     });
 
     document.addEventListener('keydown', function (e) {
@@ -443,54 +448,115 @@ window.NX.tienTuTrieu = function (trieu) {
     });
 })();
 
-// --- Thanh tab: to sang muc dang xem ----------------------------------------
-// Dung IntersectionObserver chu khong nghe su kien cuon: trinh duyet tu bao
-// khi mot khoi vao vung nhin, khong phai tinh lai vi tri moi khung hinh.
+// --- Thanh tab: DOI NOI DUNG trong khung ------------------------------------
+// Ban thiet ke lam thanh tab kieu switcher: bam mot muc thi khung ben duoi
+// doi noi dung tai cho, khong truot xuong. Trang van gui ra day du moi khoi
+// va chi giau bot bang class is-tab, nen khong co JS thi doc duoc het.
 (function () {
+    var khung = document.getElementById('khung-tab');
     var muc = document.querySelectorAll('[data-nx-tab]');
 
-    if (!muc.length || !('IntersectionObserver' in window)) return;
+    if (!khung || !muc.length) return;
 
-    var theo = {};
-    var khoi = [];
+    var o = {};
 
-    muc.forEach(function (m) {
-        var id = m.getAttribute('data-nx-tab');
-        var k = document.getElementById(id);
-
-        if (!k) return;
-
-        theo[id] = m;
-        khoi.push(k);
+    khung.querySelectorAll('[data-nx-pane]').forEach(function (k) {
+        o[k.getAttribute('data-nx-pane')] = k;
     });
 
-    if (!khoi.length) return;
+    if (!Object.keys(o).length) return;
 
-    // Dang thay: khoi nao co phan nam trong dai giua man hinh thi tinh la
-    // dang xem. Lay khoi TREN CUNG trong so do de khi hai khoi cung lot vao
-    // thi tab khong nhay qua lai.
-    var dangThay = {};
+    khung.classList.add('is-tab');
 
-    var nguoiXem = new IntersectionObserver(function (ds) {
-        ds.forEach(function (d) {
-            dangThay[d.target.id] = d.isIntersecting;
+    function chon(ma, keoLen) {
+        if (!o[ma]) return;
+
+        Object.keys(o).forEach(function (k) {
+            o[k].classList.toggle('is-hien', k === ma);
         });
 
-        var chon = null;
+        muc.forEach(function (m) {
+            var la = m.getAttribute('data-nx-tab') === ma;
+            m.classList.toggle('is-chon', la);
+            m.setAttribute('aria-selected', la ? 'true' : 'false');
+        });
 
-        for (var i = 0; i < khoi.length; i++) {
-            if (dangThay[khoi[i].id]) { chon = khoi[i].id; break; }
+        // Chi keo man hinh khi khung dang nam KHUAT TREN dinh - bam mot tab
+        // ma trang tu nhay mot doan la kho chiu.
+        if (keoLen) {
+            var tren = khung.getBoundingClientRect().top;
+            if (tren < 120) {
+                window.scrollTo({ top: window.scrollY + tren - 130, behavior: 'smooth' });
+            }
         }
 
-        Object.keys(theo).forEach(function (id) {
-            theo[id].classList.toggle('is-chon', id === chon);
-        });
-    // Dai nhan biet: bat dau ngay duoi dau trang + thanh tab (130px) va keo
-    // xuong giua man hinh. Khong tru phan tren thi khoi vua truot len gam
-    // thanh tab van con duoc tinh la "dang xem".
-    }, { rootMargin: '-130px 0px -45% 0px' });
+        if (window.history && history.replaceState) {
+            history.replaceState(null, '', '#tab-' + ma);
+        }
+    }
 
-    khoi.forEach(function (k) { nguoiXem.observe(k); });
+    muc.forEach(function (m) {
+        m.addEventListener('click', function (e) {
+            e.preventDefault();
+            chon(m.getAttribute('data-nx-tab'), true);
+        });
+    });
+
+    // Cac nut o khoi khac tro sang mot tab: "Xem anh thuc te", "Xem tat ca".
+    document.querySelectorAll('[data-nx-mo-tab]').forEach(function (n) {
+        n.addEventListener('click', function () {
+            var ma = n.getAttribute('data-nx-mo-tab');
+            if (!o[ma]) return;
+            chon(ma, false);
+            khung.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+
+    // Vao thang bang duong dan #tab-xxx thi mo dung tab do.
+    var neo = (location.hash || '').replace('#tab-', '');
+    if (neo && o[neo]) chon(neo, false);
 })();
+
+// --- Hop bat len dung chung (tien do day du, danh sach tu van vien) ---------
+// Mot bo xu ly cho moi hop: nut mo mang data-nx-mo="<id cua hop>", con nut
+// dong va lop nen mang data-nx-dong.
+(function () {
+    var dangMo = null;
+
+    function dong() {
+        if (!dangMo) return;
+        dangMo.hidden = true;
+        dangMo = null;
+        document.body.style.overflow = '';
+    }
+
+    function mo(hop) {
+        dong();
+        hop.hidden = false;
+        dangMo = hop;
+        document.body.style.overflow = 'hidden';
+
+        var nut = hop.querySelector('.nx-hop__dong');
+        if (nut) nut.focus();
+    }
+
+    document.querySelectorAll('[data-nx-mo]').forEach(function (n) {
+        n.addEventListener('click', function () {
+            var hop = document.getElementById(n.getAttribute('data-nx-mo'));
+            if (hop) mo(hop);
+        });
+    });
+
+    document.querySelectorAll('.nx-hop').forEach(function (hop) {
+        hop.addEventListener('click', function (e) {
+            if (e.target.closest('[data-nx-dong]')) dong();
+        });
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') dong();
+    });
+})();
+
 </script>
 @stack('script')

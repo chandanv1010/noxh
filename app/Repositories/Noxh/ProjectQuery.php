@@ -168,8 +168,33 @@ class ProjectQuery
     }
 
     /** Du an cung tinh, bo chinh du an dang xem. */
+    /**
+     * Du an tuong tu.
+     *
+     * Uu tien danh sach quan tri tu chon o form du an (bang product_related).
+     * Chua chon thi moi tu doc ra du an cung tinh - de mot du an vua tao xong
+     * cung co khoi nay chu khong trong tron.
+     */
     public function tuongTu($duAn, int $soLuong = 3)
     {
+        $chon = \Illuminate\Support\Facades\DB::table('product_related')
+            ->where('product_id', $duAn->id)
+            ->orderBy('order')
+            ->pluck('related_id')
+            ->all();
+
+        if (count($chon)) {
+            $dong = $this->co()
+                ->whereIn('p.id', $chon)
+                ->limit($soLuong)
+                ->get(self::COT);
+
+            // Giu dung thu tu quan tri da xep chu khong theo thu tu id.
+            $thuTu = array_flip($chon);
+
+            return $dong->sortBy(fn ($d) => $thuTu[$d->id] ?? 999)->values();
+        }
+
         return $this->co()
             ->where('p.id', '!=', $duAn->id)
             ->when($duAn->province_code, fn($q) => $q->where('p.province_code', $duAn->province_code))

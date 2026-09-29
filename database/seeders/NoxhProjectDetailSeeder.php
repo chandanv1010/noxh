@@ -24,6 +24,8 @@ class NoxhProjectDetailSeeder extends Seeder
         $chu = [
             // --- dai dau trang -----------------------------------------------
             'projectdetail_hero_slogan' => "An cư hôm nay\nKiến tạo tương lai",
+            // Anh nen bau troi ve san, de quan tri thay bang anh that sau.
+            'projectdetail_hero_bg' => '/uploads/noxh/nen-dau-trang.jpg',
             'projectdetail_video_text' => 'Xem video dự án',
             'projectdetail_gallery_more' => '+ {so} ảnh',
 
@@ -62,39 +64,63 @@ class NoxhProjectDetailSeeder extends Seeder
             'projectdetail_point_4_icon' => 'verified',
 
             // --- cac khoi noi dung ---------------------------------------------
+            // Muoi tab dung thu tu ban ve. Hinh tren tab la hinh boc ra tu
+            // ban ve, khai o day de quan tri doi duoc.
             'projectdetail_overview_heading' => 'TỔNG QUAN DỰ ÁN',
             'projectdetail_overview_tab' => 'Tổng quan',
+            'projectdetail_overview_icon' => 'tab-overview',
             'projectdetail_overview_photo_text' => 'Xem ảnh thực tế',
 
-            'projectdetail_units_heading' => 'CÁC LOẠI CĂN HỘ',
+            'projectdetail_location_heading' => 'VỊ TRÍ DỰ ÁN',
+            'projectdetail_location_tab' => 'Vị trí',
+            'projectdetail_location_icon' => 'tab-location',
+            'projectdetail_location_button' => 'Xem trên Google Maps',
+
+            'projectdetail_units_heading' => 'MẶT BẰNG DỰ ÁN',
             'projectdetail_units_tab' => 'Mặt bằng',
+            'projectdetail_units_icon' => 'tab-plan',
+            'projectdetail_units_block_heading' => 'CÁC LOẠI CĂN HỘ',
             'projectdetail_units_all_text' => 'Xem tất cả',
             'projectdetail_units_detail_text' => 'XEM CHI TIẾT',
             'projectdetail_units_area_label' => 'Diện tích:',
             'projectdetail_units_price_label' => 'Giá dự kiến:',
 
-            'projectdetail_location_heading' => 'VỊ TRÍ DỰ ÁN',
-            'projectdetail_location_tab' => 'Vị trí',
-            'projectdetail_location_button' => 'Xem trên Google Maps',
+            'projectdetail_amenity_heading' => 'TIỆN ÍCH DỰ ÁN',
+            'projectdetail_amenity_tab' => 'Tiện ích',
+            'projectdetail_amenity_icon' => 'tab-amenity',
+
+            'projectdetail_price_heading' => 'GIÁ BÁN DỰ KIẾN',
+            'projectdetail_price_tab' => 'Giá bán',
+            'projectdetail_price_icon' => 'tab-price',
+            'projectdetail_price_col_name' => 'Loại căn hộ',
+            'projectdetail_price_col_area' => 'Diện tích',
+            'projectdetail_price_col_price' => 'Giá dự kiến',
 
             'projectdetail_progress_heading' => 'TIẾN ĐỘ DỰ ÁN',
             'projectdetail_progress_tab' => 'Tiến độ',
+            'projectdetail_progress_icon' => 'tab-progress',
             'projectdetail_progress_button' => 'Xem cập nhật tiến độ',
-
-            'projectdetail_amenity_heading' => 'TIỆN ÍCH DỰ ÁN',
-            'projectdetail_amenity_tab' => 'Tiện ích',
+            'projectdetail_progress_modal_heading' => 'TOÀN BỘ TIẾN ĐỘ DỰ ÁN',
 
             'projectdetail_legal_heading' => 'PHÁP LÝ DỰ ÁN',
             'projectdetail_legal_tab' => 'Pháp lý',
+            'projectdetail_legal_icon' => 'tab-legal',
 
-            'projectdetail_gallery_heading' => 'HÌNH ẢNH DỰ ÁN',
+            'projectdetail_gallery_heading' => 'HÌNH ẢNH - VIDEO DỰ ÁN',
             'projectdetail_gallery_tab' => 'Hình ảnh - Video',
+            'projectdetail_gallery_icon' => 'tab-gallery',
+            'projectdetail_gallery_video_text' => 'Xem video dự án',
 
-            'projectdetail_content_heading' => 'GIỚI THIỆU CHI TIẾT',
-            'projectdetail_content_tab' => 'Giới thiệu',
+            'projectdetail_doc_heading' => 'TÀI LIỆU DỰ ÁN',
+            'projectdetail_doc_tab' => 'Tài liệu',
+            'projectdetail_doc_icon' => 'tab-doc',
 
             'projectdetail_faq_heading' => 'CÂU HỎI THƯỜNG GẶP',
             'projectdetail_faq_tab' => 'Hỏi đáp',
+            'projectdetail_faq_icon' => 'tab-faq',
+
+            'projectdetail_content_heading' => 'GIỚI THIỆU CHI TIẾT',
+            'projectdetail_empty_text' => 'Đang cập nhật',
 
             // Nhan tung dong cua bang Tong quan.
             'projectdetail_row_name' => 'Tên dự án',
@@ -113,7 +139,6 @@ class NoxhProjectDetailSeeder extends Seeder
 
             'projectdetail_similar_price_prefix' => 'Từ',
             'projectdetail_similar_heading' => 'DỰ ÁN TƯƠNG TỰ TẠI {tinh}',
-            'projectdetail_similar_tab' => 'Dự án tương tự',
             'projectdetail_similar_all_text' => 'Xem tất cả',
 
             // --- cot phai: tu van nhanh ------------------------------------------
@@ -124,6 +149,7 @@ class NoxhProjectDetailSeeder extends Seeder
 
             // --- cot phai: danh sach tu van ---------------------------------------
             'projectlead_staff_heading' => 'DANH SÁCH TƯ VẤN HỖ TRỢ',
+            'projectlead_staff_modal_heading' => 'TƯ VẤN VIÊN PHỤ TRÁCH DỰ ÁN',
             'projectlead_staff_note' => 'Đội ngũ tư vấn hỗ trợ khách hàng tại {tinh}',
             'projectlead_staff_verify' => '(Thông tin được xác minh bởi NOXH.vn)',
             'projectlead_staff_role' => 'Tư vấn nhà ở NOXH',

@@ -872,6 +872,21 @@ if (!function_exists('khoang_so')) {
         $b = so_gon($den, $soLe);
 
         if ($a !== '' && $b !== '' && $a !== $b) {
+            // Hai dau CUNG CO phan thap phan thi phai cung so chu so le.
+            // so_gon() cat so 0 cuoi cua tung so rieng le nen "1,075 - 1,180"
+            // se thanh "1,075 - 1,18", nhin nhu mot loi danh may.
+            //
+            // Mot dau tron (21) thi de nguyen - ban thiet ke viet "19,55 - 21 m2"
+            // chu khong phai "19,55 - 21,00 m2".
+            $leA = strlen((string) strstr($a, ',')) - 1;
+            $leB = strlen((string) strstr($b, ',')) - 1;
+
+            if ($leA > 0 && $leB > 0 && $leA !== $leB) {
+                $le = max($leA, $leB);
+                $a = number_format((float) $tu, $le, ',', '.');
+                $b = number_format((float) $den, $le, ',', '.');
+            }
+
             // Gach NGANG (en dash) chu khong phai dau tru: ban thiet ke viet
             // "32 - 70 m2" bang gach ngang, va dau tru dung giua hai so
             // trong nhu phep tinh.

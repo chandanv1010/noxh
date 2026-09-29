@@ -19,6 +19,11 @@ import { fileURLToPath } from 'node:url';
 
 const goc = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const kho = resolve(goc, 'node_modules/@material-symbols/svg-400/rounded');
+
+// Ban NET DAY (weight 700). Ban thiet ke ve mot vai hinh - ro nhat la ong
+// nghe dien thoai - day han cac hinh con lai; dung ban 400 vao thi hinh
+// mong manh han so voi ban ve.
+const khoDay = resolve(goc, 'node_modules/@material-symbols/svg-700/rounded');
 const dich = resolve(goc, 'resources/views/frontend/noxh/component/icon.blade.php');
 
 // Ten trong ma nguon => ten icon cua Material Symbols.
@@ -37,7 +42,7 @@ const BANG = {
     'eye': 'visibility',
 
     // --- lien he ---
-    'phone': 'call',
+    'phone': 'call:day',      // ong nghe - ban ve dung net day han mac dinh
     'mail': 'mail',
     'send': 'send',
     'chat': 'chat_bubble',
@@ -109,22 +114,56 @@ const BANG = {
     'directions': 'directions:net',       // bien chi duong - "Xem tren Google Maps"
     'floor-plan': 'foundation:net',       // mat bang - tab "Mat bang"
     'door': 'meeting_room:net',           // cua mo - the loai can ho
+
+    // --- 10 o tren thanh tab cua trang chi tiet du an ---
+    // Doi chieu tung hinh voi product-detail-fix.jpg (phong to 8 lan) roi
+    // chon hinh Material trung khop nhat; hinh nao khong co san thi ve tay
+    // o bang VE_TAY ben duoi.
+    'tab-overview': 'dashboard',           // bon o vuong 2x2
+    'tab-location': 'location_on:net',     // ghim ban do ve vien
+    'tab-plan': 'apartment',               // toa nha nhieu cua so
+    'tab-amenity': 'nx_diamond',           // hai hinh thoi long nhau - ve tay
+    'tab-price': 'request_quote',          // to giay bao gia
+    'tab-progress': 'autorenew',           // hai mui ten xoay vong
+    'tab-legal': 'license:net',            // huy hieu co duoi ruy bang
+    'tab-gallery': 'photo_camera_back',    // may anh co phong canh ben trong
+    'tab-doc': 'description',              // to tai lieu co dong ke
+    'tab-faq': 'help:net',                 // vong tron co dau hoi
+
+    'bullet': 'expand_circle_down',        // tron dac co mui nhon - gach dau dong the can ho
+    'gallery': 'photo_library:net',        // chong anh - nut xem album
+    'video': 'smart_display',              // man hinh co nut phat - nut xem video
 };
 
-// Ten co the kem hau to ":net" - lay ban VE VIEN thay vi ban to dac. Ban
+// Hinh khong co trong Material Symbols thi ve tay theo dung ban thiet ke.
+// Luoi giong Material: viewBox "0 -960 960 960", toa do y am.
+const VE_TAY = {
+    // Hai hinh thoi long nhau, o tab "Tien ich". Vong ngoai la mot vanh
+    // (dung fill-rule evenodd de khoet ruot), giua la mot hinh thoi dac.
+    'nx_diamond': '<path fill-rule="evenodd" d="M480-872 872-480 480-88 88-480 480-872Zm0 116L204-480l276 276 276-276-276-276Z"/>'
+        + '<path d="M480-616 616-480 480-344 344-480 480-616Z"/>',
+};
+
+// Ten co the kem hau to ":day" - lay ban net day (weight 700). Va hau to ":net" - lay ban VE VIEN thay vi ban to dac. Ban
 // thiet ke trang danh sach du an dung hinh net manh cho dai so lieu va bo
 // loc, de hinh to dac vao thi nang han so voi ban ve.
 function doc(ten) {
+    if (VE_TAY[ten]) return `<svg viewBox="0 -960 960 960">${VE_TAY[ten]}</svg>`;
+
+    const day = ten.endsWith(':day');
+    if (day) ten = ten.slice(0, -4);
+
     const net = ten.endsWith(':net');
     const goc = net ? ten.slice(0, -4) : ten;
     const thu = net ? [`${goc}.svg`] : [`${goc}-fill.svg`, `${goc}.svg`];
+    const thuMuc = day ? khoDay : kho;
 
     for (const f of thu) {
-        const p = resolve(kho, f);
+        const p = resolve(thuMuc, f);
         if (existsSync(p)) return readFileSync(p, 'utf8');
     }
 
-    throw new Error(`Khong tim thay icon "${goc}" trong ${kho}`);
+    throw new Error(`Khong tim thay icon "${goc}" trong ${thuMuc}`);
 }
 
 function ruot(svg) {

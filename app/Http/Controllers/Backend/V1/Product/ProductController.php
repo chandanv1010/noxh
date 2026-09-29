@@ -200,7 +200,24 @@ class ProductController extends Controller
             'trangThaiDuAn' => \App\Models\Product::TRANG_THAI_DU_AN,
             'tinhThanh' => \App\Models\Province::select('code', 'name')->orderBy('name')->get(),
             'nhanVienKinhDoanh' => $this->nhanVienKinhDoanh(),
+            'duAnKhac' => $this->duAnKhac(),
         ];
+    }
+
+    /**
+     * Danh sach du an de chon vao khoi "Du an tuong tu" cua trang chi tiet.
+     *
+     * Lay ten tu ban dich (product_language) chu khong phai cot products.name:
+     * cot do la ten noi bo, ten hien ra website nam o ban dich.
+     */
+    private function duAnKhac()
+    {
+        return \App\Models\Product::join('product_language as pl', function ($j) {
+                $j->on('pl.product_id', '=', 'products.id')->where('pl.language_id', 1);
+            })
+            ->whereNull('products.deleted_at')
+            ->orderBy('pl.name')
+            ->get(['products.id', 'pl.name', 'products.code']);
     }
 
     /**

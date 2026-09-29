@@ -42,4 +42,22 @@ class NoxhDashboardSmokeTest extends TestCase
     {
         $this->actingAs($this->quanTri())->get('/' . $uri)->assertOk();
     }
+
+    /**
+     * Form SUA du an - khac form them o cho no doc cac quan he da luu
+     * (nhan vien phu trach, du an tuong tu), nen phai mo thu rieng.
+     */
+    public function test_form_sua_du_an_mo_duoc(): void
+    {
+        $id = \Illuminate\Support\Facades\DB::table('products')
+            ->whereNull('deleted_at')->value('id');
+
+        if (!$id) {
+            $this->markTestSkipped('Chua co du an nao.');
+        }
+
+        $this->actingAs($this->quanTri())->get('/product/' . $id . '/edit')
+            ->assertOk()
+            ->assertSee('Dự án tương tự', false);
+    }
 }

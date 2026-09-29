@@ -29,7 +29,8 @@ class ProjectDocumentService extends BaseService
         return $this->documentRepository->phanTrang(
             $request->integer('product_id') ?: null,
             $keyword !== '' ? $keyword : null,
-            $perPage
+            $perPage,
+            in_array($request->input('group'), ['legal', 'doc'], true) ? $request->input('group') : null
         );
     }
 
@@ -78,6 +79,10 @@ class ProjectDocumentService extends BaseService
     private function duLieu($request): array
     {
         $payload = $request->except(['_token', 'send']);
+
+        // Nhom quyet dinh giay to nay hien o tab nao. Gui bua thi ve mac dinh
+        // chu khong de lot mot gia tri la vao co so du lieu.
+        $payload['group'] = in_array($payload['group'] ?? '', ['legal', 'doc'], true) ? $payload['group'] : 'legal';
 
         $payload['issued_date'] = empty($payload['issued_date']) ? null : $payload['issued_date'];
         $payload['order'] = $request->integer('order');

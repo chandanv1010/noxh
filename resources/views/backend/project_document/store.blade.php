@@ -28,7 +28,18 @@
                         </div>
                     </div>
                     <div class="row mb15">
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
+                            <div class="form-row">
+                                <label class="control-label text-left">Thuộc khối <span class="text-danger">(*)</span></label>
+                                    <select name="group" class="form-control">
+                                        @foreach(\App\Models\ProjectDocument::NHOM as $ma => $ten)
+                                            <option value="{{ $ma }}" {{ old('group', ($document->group) ?? request('group', 'legal')) === $ma ? 'selected' : '' }}>{{ $ten }}</option>
+                                        @endforeach
+                                    </select>
+                                    <small class="text-muted">Quyết định giấy tờ này hiện ở tab "Pháp lý" hay tab "Tài liệu" của trang chi tiết dự án.</small>
+                            </div>
+                        </div>
+                        <div class="col-lg-8">
                             <div class="form-row">
                                 <label class="control-label text-left">Tên hồ sơ <span class="text-danger">(*)</span></label>
                                     <input type="text" name="title" value="{{ old('title', ($document->title) ?? '') }}" class="form-control" autocomplete="off">
