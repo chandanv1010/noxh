@@ -2464,7 +2464,20 @@
 
     &__icon {
         flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
         color: $nx-red;
+
+        // Duoi hinh dinh dang file (PDF, DOC...) de nguoi doc biet truoc
+        // bam vao se mo ra cai gi.
+        i {
+            font-size: 9px;
+            font-style: normal;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
     }
 
     strong {
@@ -2475,11 +2488,35 @@
         line-height: 1.4;
     }
 
-    span {
+    // Chi cac dong chu PHU moi xam. Truoc day chon chung "span" nen o hinh
+    // (cung la mot span) bi keo theo, khong bao gio do duoc.
+    &__chu span {
         display: block;
         margin-top: 3px;
         color: $nx-muted;
         font-size: 12px;
+    }
+
+    // Hinh con mat o goc phai - dau hieu "bam vao se mo sang tab moi".
+    &__mo {
+        flex: none;
+        margin-left: auto;
+        align-self: center;
+        color: $nx-blue;
+    }
+
+    // Chua dinh kem file: khong phai lien ket, khong doi vien khi ro chuot.
+    &.la-trong {
+        cursor: default;
+
+        &:hover { border-color: $nx-line; }
+
+        .nx-doc__icon { color: $nx-muted; }
+    }
+
+    &__chua {
+        color: $nx-muted;
+        font-style: italic;
     }
 }
 

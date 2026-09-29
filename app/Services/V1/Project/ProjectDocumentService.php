@@ -84,6 +84,13 @@ class ProjectDocumentService extends BaseService
         // chu khong de lot mot gia tri la vao co so du lieu.
         $payload['group'] = in_array($payload['group'] ?? '', ['legal', 'doc'], true) ? $payload['group'] : 'legal';
 
+        // Dinh dang file tu doc tu duoi ten file: form khong co o nay, ma
+        // bat quan tri go "pdf" bang tay thi som muon cung co dong go sai.
+        $payload['file'] = trim((string) ($payload['file'] ?? '')) ?: null;
+        $payload['file_type'] = $payload['file']
+            ? mb_strtolower(pathinfo($payload['file'], PATHINFO_EXTENSION)) ?: null
+            : null;
+
         $payload['issued_date'] = empty($payload['issued_date']) ? null : $payload['issued_date'];
         $payload['order'] = $request->integer('order');
         $payload['publish'] = $request->integer('publish') ?: 2;

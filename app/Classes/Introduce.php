@@ -432,6 +432,11 @@ class Introduce
             'price_col_area' => ['type' => 'text', 'label' => 'Tab Giá bán - tên cột diện tích'],
             'price_col_price' => ['type' => 'text', 'label' => 'Tab Giá bán - tên cột giá dự kiến'],
             'gallery_video_text' => ['type' => 'text', 'label' => 'Tab Hình ảnh - chữ trên nút mở video'],
+            'doc_empty_file' => [
+                'type' => 'text',
+                'label' => 'Tab Pháp lý / Tài liệu - chữ khi giấy tờ chưa có file',
+                'title' => 'Ví dụ: Chưa đính kèm file',
+            ],
             'empty_text' => [
                 'type' => 'text',
                 'label' => 'Chữ hiện khi một tab chưa có dữ liệu',

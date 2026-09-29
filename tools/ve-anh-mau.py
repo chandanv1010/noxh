@@ -303,8 +303,70 @@ def nen_dau_trang():
     luu(im, 'nen-dau-trang.jpg', q=88)
 
 
+# =============================================================================
+# FILE TAI LIEU MAU (.pdf)
+# =============================================================================
+# The giay to o tab "Phap ly" / "Tai lieu" mo file trong tab moi. Khong co
+# file thi bam vao khong ra gi, nen du lieu mau can vai file that.
+TAI_LIEU = [
+    ('van-ban-mau.pdf', 'VĂN BẢN PHÁP LÝ (BẢN MẪU)', [
+        'Đây là văn bản mẫu dùng để xem thử giao diện.',
+        'Tải văn bản thật lên ở màn hình',
+        'QL Dự án NOXH → Hồ sơ pháp lý.',
+    ]),
+    ('tai-lieu-bang-gia.pdf', 'BẢNG GIÁ BÁN DỰ KIẾN (BẢN MẪU)', [
+        'Căn 1PN - 1WC     19,55 – 21 m²      1,075 – 1,180 tỷ',
+        'Căn 2PN - 1WC     25 – 28 m²         1,180 – 1,260 tỷ',
+        'Căn 2PN - 2WC     32 – 36 m²         1,280 – 1,420 tỷ',
+        '',
+        'Giá chưa bao gồm phí bảo trì và các khoản phí khác.',
+    ]),
+    ('tai-lieu-mau-don.pdf', 'ĐƠN ĐĂNG KÝ MUA NHÀ Ở XÃ HỘI (BẢN MẪU)', [
+        'Họ và tên: ..........................................',
+        'Số CCCD: ...........................................',
+        'Nơi thường trú: ..................................',
+        'Thu nhập bình quân: ...........................',
+        'Loại căn hộ đăng ký: ...........................',
+    ]),
+    ('tai-lieu-huong-dan.pdf', 'HƯỚNG DẪN HỒ SƠ VAY GÓI ƯU ĐÃI (BẢN MẪU)', [
+        '1. Đơn đề nghị vay vốn theo mẫu của ngân hàng.',
+        '2. Giấy tờ tùy thân và giấy tờ cư trú.',
+        '3. Giấy tờ chứng minh thu nhập.',
+        '4. Hợp đồng mua bán căn hộ.',
+        '5. Giấy tờ chứng minh đã nộp phần vốn tự có.',
+    ]),
+]
+
+
+def tai_lieu():
+    W5, H5 = 1240, 1754      # A4 o 150 dpi
+
+    for ten, tieuDe, dong in TAI_LIEU:
+        im = Image.new('RGB', (W5, H5), 'white')
+        d = ImageDraw.Draw(im)
+
+        d.rectangle([0, 0, W5, 120], fill=(21, 101, 216))
+        d.text((90, 44), 'NOXH.vn', font=font(40), fill='white')
+
+        d.text((90, 210), tieuDe, font=font(34), fill=(16, 42, 90))
+        d.line([90, 272, W5 - 90, 272], fill=(200, 212, 228), width=3)
+
+        y = 330
+        for t in dong:
+            d.text((90, y), t, font=font(26, dam=False), fill=(40, 46, 58))
+            y += 58
+
+        d.text((90, H5 - 90), 'Bản mẫu do tools/ve-anh-mau.py sinh ra.',
+               font=font(20, dam=False), fill=(130, 138, 150))
+
+        os.makedirs(DICH, exist_ok=True)
+        im.save(os.path.join(DICH, ten), 'PDF', resolution=150)
+        print(ten)
+
+
 if __name__ == '__main__':
     mat_bang()
     tong_the()
     ban_do()
     nen_dau_trang()
+    tai_lieu()

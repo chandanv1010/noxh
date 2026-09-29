@@ -47,6 +47,7 @@ class NoxhProjectDetailDemoSeeder extends Seeder
         $themCan = 0;
         $themIch = 0;
         $themAnh = 0;
+        $themMoc = 0;
         $themGiay = 0;
         $themNguoi = 0;
 
@@ -58,6 +59,7 @@ class NoxhProjectDetailDemoSeeder extends Seeder
         foreach ($duAn as $id) {
             $themCan += $this->loaiCanHo($id);
             $themIch += $this->tienIch($id);
+            $themMoc += $this->tienDo($id);
             $themAnh += $this->anhMau($id);
             $themGiay += $this->giayTo($id);
             $this->toaDo($id);
@@ -68,7 +70,7 @@ class NoxhProjectDetailDemoSeeder extends Seeder
             }
         }
 
-        $this->command?->info("Du lieu mau: {$themCan} loai can ho, {$themIch} o tien ich, {$themGiay} giay to, {$themAnh} du an duoc gan anh, {$themNguoi} luot gan nhan vien.");
+        $this->command?->info("Du lieu mau: {$themCan} loai can ho, {$themIch} o tien ich, {$themMoc} moc tien do, {$themGiay} giay to, {$themAnh} du an duoc gan anh, {$themNguoi} luot gan nhan vien.");
     }
 
     private function loaiCanHo(int $duAnId): int
@@ -217,6 +219,42 @@ class NoxhProjectDetailDemoSeeder extends Seeder
     }
 
     /**
+     * Moc tien do mau.
+     *
+     * Khoi "TIEN DO DU AN" dat canh khoi Vi tri chi ve ra khi du an co moc -
+     * khong co moc nao thi cho do bo trong, trong nhu bi thieu mot khoi.
+     * Moi du an mot tien do rieng, quan tri sua o QL Du an NOXH -> Tien do.
+     */
+    private function tienDo(int $duAnId): int
+    {
+        if (DB::table('project_milestones')->where('product_id', $duAnId)->exists()) {
+            return 0;
+        }
+
+        $mau = [
+            ['Quý II/2024', '2024-04-01', 'Khởi công xây dựng', 'done'],
+            ['Quý IV/2024', '2024-10-01', 'Hoàn thành phần móng', 'done'],
+            ['Quý II/2025', '2025-04-01', 'Thi công phần thân', 'done'],
+            ['Quý IV/2026', '2026-10-01', 'Dự kiến bàn giao', 'pending'],
+        ];
+
+        foreach ($mau as $i => $m) {
+            DB::table('project_milestones')->insert([
+                'product_id' => $duAnId,
+                'date_label' => $m[0],
+                'sort_date' => $m[1],
+                'title' => $m[2],
+                'status' => $m[3],
+                'order' => $i,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        return count($mau);
+    }
+
+    /**
      * Giay to mau cho hai tab "Phap ly" va "Tai lieu".
      *
      * Hai tab do doc chung bang project_documents, khac nhau o cot group -
@@ -229,14 +267,16 @@ class NoxhProjectDetailDemoSeeder extends Seeder
         $daCo = DB::table('project_documents')->where('product_id', $duAnId)
             ->distinct()->pluck('group')->all();
 
+        // Cot cuoi la file mau do tools/ve-anh-mau.py sinh ra. Khong co file
+        // thi the giay to chi la mot o chu, bam khong ra gi.
         $mau = [
-            ['legal', 'Quyết định chấp thuận chủ trương đầu tư', '1234/QĐ-UBND', 'UBND tỉnh'],
-            ['legal', 'Giấy chứng nhận quyền sử dụng đất', 'CX 123456', 'Sở Tài nguyên và Môi trường'],
-            ['legal', 'Giấy phép xây dựng', '88/GPXD', 'Sở Xây dựng'],
-            ['legal', 'Văn bản nghiệm thu phòng cháy chữa cháy', '45/NT-PCCC', 'Công an tỉnh'],
-            ['doc', 'Bảng giá bán dự kiến', null, null],
-            ['doc', 'Mẫu đơn đăng ký mua nhà ở xã hội', null, null],
-            ['doc', 'Hướng dẫn hồ sơ vay gói ưu đãi', null, null],
+            ['legal', 'Quyết định chấp thuận chủ trương đầu tư', '1234/QĐ-UBND', 'UBND tỉnh', 'van-ban-mau.pdf'],
+            ['legal', 'Giấy chứng nhận quyền sử dụng đất', 'CX 123456', 'Sở Tài nguyên và Môi trường', 'van-ban-mau.pdf'],
+            ['legal', 'Giấy phép xây dựng', '88/GPXD', 'Sở Xây dựng', 'van-ban-mau.pdf'],
+            ['legal', 'Văn bản nghiệm thu phòng cháy chữa cháy', '45/NT-PCCC', 'Công an tỉnh', 'van-ban-mau.pdf'],
+            ['doc', 'Bảng giá bán dự kiến', null, null, 'tai-lieu-bang-gia.pdf'],
+            ['doc', 'Mẫu đơn đăng ký mua nhà ở xã hội', null, null, 'tai-lieu-mau-don.pdf'],
+            ['doc', 'Hướng dẫn hồ sơ vay gói ưu đãi', null, null, 'tai-lieu-huong-dan.pdf'],
         ];
 
         $them = 0;
@@ -255,6 +295,8 @@ class NoxhProjectDetailDemoSeeder extends Seeder
                 'doc_number' => $m[2],
                 'issuer' => $m[3],
                 'issued_date' => $m[0] === 'legal' ? now()->subMonths(6 + $i)->toDateString() : null,
+                'file' => '/uploads/noxh/' . $m[4],
+                'file_type' => 'pdf',
                 'publish' => 2,
                 'order' => $i,
                 'created_at' => now(),

@@ -111,6 +111,7 @@ class NoxhProjectDetailSeeder extends Seeder
             'projectdetail_gallery_icon' => 'tab-gallery',
             'projectdetail_gallery_video_text' => 'Xem video dự án',
 
+            'projectdetail_doc_empty_file' => 'Chưa đính kèm file',
             'projectdetail_doc_heading' => 'TÀI LIỆU DỰ ÁN',
             'projectdetail_doc_tab' => 'Tài liệu',
             'projectdetail_doc_icon' => 'tab-doc',
