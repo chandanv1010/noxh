@@ -63,6 +63,14 @@ return [
                     'route' => 'project/milestone/index'
                 ],
                 [
+                    'title' => 'Loại căn hộ',
+                    'route' => 'project/unit/index'
+                ],
+                [
+                    'title' => 'Điểm nhấn dự án',
+                    'route' => 'project/highlight/index'
+                ],
+                [
                     'title' => 'Hồ sơ pháp lý dự án',
                     'route' => 'project/document/index'
                 ],

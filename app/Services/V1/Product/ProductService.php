@@ -536,6 +536,14 @@ class ProductService extends BaseService
             'handover_date',
             'timeline_label',
             'is_featured',
+
+            // Anh va lien ket rieng cua trang chi tiet du an.
+            'video_url',
+            'site_plan_image',
+            'progress_image',
+            'progress_url',
+            'map_image',
+            'map_url',
         ];
     }
 

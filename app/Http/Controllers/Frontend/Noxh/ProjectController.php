@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers\Frontend\Noxh;
 
+use App\Classes\Introduce;
 use App\Classes\NoxhIcon;
 use App\Http\Controllers\FrontendController;
 use App\Http\ViewComposers\NoxhComposer;
 use App\Models\Product;
 use App\Models\ProjectDocument;
 use App\Models\ProjectFaq;
+use App\Models\ProjectHighlight;
 use App\Models\ProjectMilestone;
+use App\Models\ProjectUnit;
 use App\Models\User;
 use App\Models\Province;
 use App\Repositories\Noxh\PostQuery;
@@ -194,6 +197,12 @@ class ProjectController extends FrontendController
         return $o;
     }
 
+    /** So loai can ho ve tren trang chi tiet (ban thiet ke ve 3 the). */
+    public const SO_LOAI_CAN_HO = 3;
+
+    /** So nguoi trong khoi "Danh sach tu van ho tro" (ban thiet ke ve 6). */
+    public const SO_TU_VAN = 6;
+
     public function show(string $canonical)
     {
         $duAn = $this->projectQuery->theoCanonical($canonical);
@@ -202,13 +211,14 @@ class ProjectController extends FrontendController
             abort(404);
         }
 
-        // Anh phu luu chuoi JSON, du lieu do quan tri nhap nen phai chap nhan
-        // ca truong hop JSON hong ma khong lam vo trang.
-        $album = [];
-        if (!empty($duAn->album)) {
-            $decoded = json_decode($duAn->album, true);
-            $album = is_array($decoded) ? array_filter($decoded) : [];
-        }
+        $tienDo = ProjectMilestone::where('product_id', $duAn->id)->orderBy('order')->get();
+        $hoSo = ProjectDocument::where('product_id', $duAn->id)->where('publish', 2)->orderBy('order')->get();
+        $faq = ProjectFaq::where('product_id', $duAn->id)->where('publish', 2)->orderBy('order')->get();
+        $loaiCanHo = ProjectUnit::where('product_id', $duAn->id)
+            ->where('publish', 2)->orderBy('order')->orderBy('id')->get();
+
+        $anh = $this->anhDuAn($duAn);
+        $tenTinh = nx_ten_dia_gioi_ngan($duAn->province_name);
 
         return view('frontend.noxh.project.show', [
             'system' => $this->system,
@@ -219,12 +229,24 @@ class ProjectController extends FrontendController
                 'canonical' => url('/du-an/' . $duAn->canonical),
             ],
             'duAn' => $duAn,
-            'album' => $album,
-            'tienDo' => ProjectMilestone::where('product_id', $duAn->id)->orderBy('order')->get(),
-            'hoSo' => ProjectDocument::where('product_id', $duAn->id)->where('publish', 2)->orderBy('order')->get(),
-            'faq' => ProjectFaq::where('product_id', $duAn->id)->where('publish', 2)->orderBy('order')->get(),
+            'tenTinh' => $tenTinh,
+            'anh' => $anh,
+            'album' => $anh['phu'],
+            'thongSo' => $this->oThongSo($duAn),
+            'diemNhan' => $this->oDiemNhan($duAn),
+            'tienIch' => ProjectHighlight::where('product_id', $duAn->id)
+                ->where('group', 'amenity')
+                ->orderBy('order')->orderBy('id')->get(),
+            'bangTongQuan' => $this->bangTongQuan($duAn),
+            'nhanTrangThai' => $this->nhanTrangThai(),
+            'loaiCanHo' => $loaiCanHo->take(self::SO_LOAI_CAN_HO),
+            'conLoaiCanHo' => max(0, $loaiCanHo->count() - self::SO_LOAI_CAN_HO),
+            'banDoUrl' => $this->banDoUrl($duAn),
+            'tienDo' => $tienDo,
+            'hoSo' => $hoSo,
+            'faq' => $faq,
             'tuongTu' => $this->projectQuery->tuongTu($duAn, 3),
-            'nhanVien' => $this->nhanVienPhuTrach($duAn->id),
+            'nhanVien' => $this->nhanVienPhuTrach($duAn->id, self::SO_TU_VAN),
         ]);
     }
 
@@ -234,14 +256,211 @@ class ProjectController extends FrontendController
      * Chi lay nguoi con hieu luc (publish == 2): nhan vien nghi viec bi khoa
      * tai khoan la tu bien khoi moi trang du an, khong phai vao go tay tung cai.
      */
-    private function nhanVienPhuTrach(int $duAnId)
+    private function nhanVienPhuTrach(int $duAnId, ?int $soLuong = null)
     {
-        return User::whereHas('duAnPhuTrach', function ($q) use ($duAnId) {
-                $q->where('products.id', $duAnId);
-            })
+        // Xep theo thu tu quan tri dat luc gan nguoi vao du an, roi moi den
+        // ten. Khoi o trang chi tiet chi ve 6 nguoi nen thu tu nay quyet dinh
+        // ai duoc hien - de mac cho ten tu xep la quan tri khong dieu duoc.
+        $query = User::join('product_user as pu', 'pu.user_id', '=', 'users.id')
+            ->where('pu.product_id', $duAnId)
             ->where('users.publish', 2)
+            ->orderBy('pu.order')
             ->orderBy('users.name')
-            ->get();
+            ->select('users.*');
+
+        if ($soLuong) {
+            $query->limit($soLuong);
+        }
+
+        return $query->get();
+    }
+
+    /**
+     * Anh chinh va dai anh nho o dau trang chi tiet.
+     *
+     * Album luu chuoi JSON do quan tri nhap, nen phai chap nhan ca truong hop
+     * JSON hong ma khong lam vo trang.
+     */
+    private function anhDuAn($duAn): array
+    {
+        $phu = [];
+
+        if (!empty($duAn->album)) {
+            $giai = json_decode($duAn->album, true);
+            $phu = is_array($giai) ? array_values(array_filter($giai)) : [];
+        }
+
+        // Anh dai dien co the trung voi anh dau album; bo trung de dai anh nho
+        // khong hien hai o giong het nhau.
+        $chinh = trim((string) $duAn->image);
+        if ($chinh !== '') {
+            $phu = array_values(array_filter($phu, fn ($a) => trim((string) $a) !== $chinh));
+        }
+
+        return ['chinh' => $chinh, 'phu' => $phu];
+    }
+
+    /**
+     * Bon o thong so trong the gia.
+     *
+     * Nhan va hinh do quan tri dat trong Cau hinh chung; CON SO thi lay thang
+     * tu du an. O nao khong co so lieu thi bo han, de the gia khong con o
+     * trong mang chu "Dang cap nhat".
+     */
+    private function oThongSo($duAn): array
+    {
+        $gia = [
+            1 => $duAn->total_land_area
+                ? rtrim(rtrim(number_format((float) $duAn->total_land_area, 2, ',', '.'), '0'), ',') . ' ha'
+                : null,
+            2 => $duAn->total_units
+                ? number_format((int) $duAn->total_units, 0, ',', '.') . ' căn'
+                : null,
+            3 => $duAn->apartment_types ?: null,
+            4 => $duAn->timeline_label
+                ?: ($duAn->handover_date ? nx_quy_nam($duAn->handover_date) : null),
+        ];
+
+        $mac = [1 => 'Quy mô', 2 => 'Số căn hộ', 3 => 'Loại hình', 4 => 'Bàn giao'];
+        $o = [];
+
+        foreach ($gia as $i => $giaTri) {
+            if (!$giaTri) {
+                continue;
+            }
+
+            $o[] = [
+                'icon' => $this->intro["projectdetail_spec_{$i}_icon"] ?? 'building',
+                'nhan' => $this->intro["projectdetail_spec_{$i}_label"] ?? $mac[$i],
+                'gia' => $giaTri,
+            ];
+        }
+
+        return $o;
+    }
+
+    /**
+     * Bon o diem nhan duoi bang thong so.
+     *
+     * Uu tien cai du an tu khai (bang project_highlights); du an chua khai gi
+     * thi dung bon o mac dinh trong Cau hinh chung.
+     */
+    private function oDiemNhan($duAn): array
+    {
+        $rieng = ProjectHighlight::where('product_id', $duAn->id)
+            ->where('group', 'price')
+            ->orderBy('order')->orderBy('id')->get();
+
+        if ($rieng->count()) {
+            return $rieng->map(fn ($d) => [
+                'icon' => $d->icon ?: 'check-circle',
+                'nhan' => $d->title,
+                'gia' => $d->subtitle,
+            ])->all();
+        }
+
+        $o = [];
+
+        for ($i = 1; $i <= 4; $i++) {
+            $nhan = trim((string) ($this->intro["projectdetail_point_{$i}_title"] ?? ''));
+
+            if ($nhan === '') {
+                continue;
+            }
+
+            $o[] = [
+                'icon' => $this->intro["projectdetail_point_{$i}_icon"] ?? 'check-circle',
+                'nhan' => $nhan,
+                'gia' => $this->intro["projectdetail_point_{$i}_sub"] ?? '',
+            ];
+        }
+
+        return $o;
+    }
+
+    /**
+     * Bang "Tong quan du an".
+     *
+     * Gia tri lay tu cot cua du an, NHAN lay tu Cau hinh chung. Dong nao
+     * khong co gia tri - hoac quan tri xoa trang nhan - thi khong ve ra:
+     * mot bang ngan gon hon la mot bang day dong "Dang cap nhat".
+     */
+    private function bangTongQuan($duAn): array
+    {
+        $noi = array_filter([
+            $duAn->ward_name ?: null,
+            nx_ten_dia_gioi_ngan($duAn->province_name) ?: null,
+        ]);
+
+        $gia = [
+            'name' => $duAn->name,
+            'place' => $duAn->address ?: (count($noi) ? implode(', ', $noi) : null),
+            'investor' => $duAn->investor_name ?? null,
+            'land' => $duAn->total_land_area
+                ? rtrim(rtrim(number_format((float) $duAn->total_land_area, 2, ',', '.'), '0'), ',') . ' ha'
+                : null,
+            'scale' => $duAn->scale_description ?: null,
+            'units' => $duAn->total_units
+                ? number_format((int) $duAn->total_units, 0, ',', '.') . ' căn hộ'
+                : null,
+            'types' => $duAn->apartment_types ?: null,
+            'area' => khoang_so($duAn->area_from, $duAn->area_to, ' m²', '') ?: null,
+            'price' => khoang_so($duAn->price_from, $duAn->price_to, ' triệu/m²', '') ?: null,
+            'ownership' => $duAn->ownership_type ?: null,
+            'start' => $duAn->start_date ? nx_quy_nam($duAn->start_date) : null,
+            'handover' => $duAn->timeline_label
+                ?: ($duAn->handover_date ? nx_quy_nam($duAn->handover_date) : null),
+        ];
+
+        $dong = [];
+
+        foreach ($gia as $ma => $giaTri) {
+            if ($giaTri === null || $giaTri === '') {
+                continue;
+            }
+
+            $nhan = trim((string) ($this->intro["projectdetail_row_{$ma}"]
+                ?? Introduce::DONG_TONG_QUAN[$ma]));
+
+            if ($nhan === '') {
+                continue;
+            }
+
+            $dong[$nhan] = $giaTri;
+        }
+
+        return $dong;
+    }
+
+    /** Nhan cua dong "Trang thai" - ve rieng vi gia tri la mot the mau. */
+    private function nhanTrangThai(): string
+    {
+        return trim((string) ($this->intro['projectdetail_row_status']
+            ?? Introduce::DONG_TONG_QUAN['status']));
+    }
+
+    /**
+     * Duong dan mo vi tri du an tren Google Maps.
+     *
+     * Quan tri dan san link thi dung link do; khong thi dung tu toa do, cuoi
+     * cung moi dung dia chi chu - toa do chinh xac hon han dia chi go tay.
+     */
+    private function banDoUrl($duAn): ?string
+    {
+        if (!empty($duAn->map_url)) {
+            return $duAn->map_url;
+        }
+
+        if ($duAn->latitude !== null && $duAn->longitude !== null) {
+            return 'https://www.google.com/maps/search/?api=1&query='
+                . rawurlencode($duAn->latitude . ',' . $duAn->longitude);
+        }
+
+        $noi = array_filter([$duAn->name, $duAn->address, $duAn->province_name]);
+
+        return count($noi)
+            ? 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode(implode(', ', $noi))
+            : null;
     }
 
     /** Trang "Theo tinh/thanh" - moi tinh mot the, lam trang dich SEO. */

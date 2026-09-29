@@ -784,6 +784,18 @@ return [
         'edit' => ['title' => 'Cập nhật hồ sơ pháp lý'],
         'delete' => ['title' => 'Xóa hồ sơ pháp lý'],
     ],
+    'projectUnit' => [
+        'index' => ['title' => 'Loại căn hộ của dự án', 'table' => 'Danh sách loại căn hộ'],
+        'create' => ['title' => 'Thêm loại căn hộ'],
+        'edit' => ['title' => 'Cập nhật loại căn hộ'],
+        'delete' => ['title' => 'Xóa loại căn hộ'],
+    ],
+    'projectHighlight' => [
+        'index' => ['title' => 'Điểm nhấn của dự án', 'table' => 'Các ô điểm nhấn trong thẻ giá'],
+        'create' => ['title' => 'Thêm ô điểm nhấn'],
+        'edit' => ['title' => 'Cập nhật ô điểm nhấn'],
+        'delete' => ['title' => 'Xóa ô điểm nhấn'],
+    ],
     'projectFaq' => [
         'index' => ['title' => 'Câu hỏi thường gặp của dự án', 'table' => 'Danh sách câu hỏi'],
         'create' => ['title' => 'Thêm câu hỏi'],

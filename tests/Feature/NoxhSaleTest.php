@@ -382,10 +382,21 @@ class NoxhSaleTest extends TestCase
 
     public function test_nhan_vien_hien_ra_trang_chi_tiet_du_an(): void
     {
-        $duAn = DB::table('product_language')->where('canonical', 'noxh-tuc-duyen')->first();
+        // Chon mot du an CHUA gan ai. Khoi "Danh sách tư vấn hỗ trợ" chi ve
+        // 6 nguoi dau, nen neu chen vao mot du an da co san nguoi thi bai
+        // kiem tra hong vi thu tu chu khong phai vi ma nguon sai.
+        $duAn = DB::table('product_language as pl')
+            ->join('products as p', 'p.id', '=', 'pl.product_id')
+            ->whereNull('p.deleted_at')
+            ->where('p.publish', 2)
+            ->whereNotExists(function ($q) {
+                $q->selectRaw(1)->from('product_user')
+                  ->whereColumn('product_user.product_id', 'p.id');
+            })
+            ->first(['p.id as product_id', 'pl.canonical']);
 
         if (!$duAn) {
-            $this->markTestSkipped('Không tìm thấy dự án mẫu noxh-tuc-duyen.');
+            $this->markTestSkipped('Mọi dự án đều đã được gán nhân viên.');
         }
 
         DB::table('product_user')->insert([
@@ -396,16 +407,23 @@ class NoxhSaleTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $html = $this->get('/du-an/noxh-tuc-duyen')->assertOk()->getContent();
+        $duong = '/du-an/' . $duAn->canonical;
+        $html = $this->get($duong)->assertOk()->getContent();
 
-        $this->assertStringContainsString('Nhân viên kinh doanh phụ trách', $html);
+        // Tieu de khoi do quan tri dat, doc thang tu CSDL de doi ten khong
+        // lam hong bai kiem tra.
+        $tieuDe = DB::table('introduces')
+            ->where('keyword', 'projectlead_staff_heading')->where('language_id', 1)
+            ->value('content');
+
+        $this->assertStringContainsString($tieuDe ?: 'DANH SÁCH TƯ VẤN HỖ TRỢ', $html);
         $this->assertStringContainsString($this->sale->name, $html);
         $this->assertStringContainsString('Chuyên viên tư vấn', $html);
 
         // Khoa tai khoan thi bien khoi trang, khong phai go tay tung du an.
         $this->sale->update(['publish' => 1]);
 
-        $html = $this->get('/du-an/noxh-tuc-duyen')->assertOk()->getContent();
+        $html = $this->get($duong)->assertOk()->getContent();
         $this->assertStringNotContainsString($this->sale->name, $html,
             'Nhân viên đã bị khóa vẫn hiện ngoài website');
     }

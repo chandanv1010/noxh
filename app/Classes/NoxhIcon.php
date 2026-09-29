@@ -66,6 +66,15 @@ class NoxhIcon
         'area' => 'Khung bốn góc (diện tích)',
         'units' => 'Ba khối xếp (số căn)',
         'sort' => 'Mũi tên lên xuống',
+
+        // Trang chi tiết dự án
+        'headset' => 'Tai nghe hỗ trợ',
+        'play' => 'Nút phát video',
+        'photo' => 'Khung ảnh có dấu cộng',
+        'update' => 'Đồng hồ cập nhật',
+        'directions' => 'Biển chỉ đường',
+        'floor-plan' => 'Mặt bằng tầng',
+        'door' => 'Cửa mở (căn hộ)',
     ];
 
     /** Dung lam 'option' cho o chon kieu select trong trang cau hinh. */

@@ -14,6 +14,8 @@ use App\Http\Controllers\Backend\V1\Noxh\QaQuestionController;
 use App\Http\Controllers\Backend\V1\Noxh\ProjectMilestoneController;
 use App\Http\Controllers\Backend\V1\Noxh\ProjectDocumentController;
 use App\Http\Controllers\Backend\V1\Noxh\ProjectFaqController;
+use App\Http\Controllers\Backend\V1\Noxh\ProjectUnitController;
+use App\Http\Controllers\Backend\V1\Noxh\ProjectHighlightController;
 
 /*
 |--------------------------------------------------------------------------
@@ -143,6 +145,24 @@ Route::group(['middleware' => ['admin', 'locale', 'backend_default_locale']], fu
         Route::post('{id}/update', [ProjectDocumentController::class, 'update'])->where(['id' => '[0-9]+'])->name('project.document.update');
         Route::get('{id}/delete', [ProjectDocumentController::class, 'delete'])->where(['id' => '[0-9]+'])->name('project.document.delete');
         Route::delete('{id}/destroy', [ProjectDocumentController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('project.document.destroy');
+    });
+    Route::group(['prefix' => 'project/unit'], function () {
+        Route::get('index', [ProjectUnitController::class, 'index'])->name('project.unit.index');
+        Route::get('create', [ProjectUnitController::class, 'create'])->name('project.unit.create');
+        Route::post('store', [ProjectUnitController::class, 'store'])->name('project.unit.store');
+        Route::get('{id}/edit', [ProjectUnitController::class, 'edit'])->where(['id' => '[0-9]+'])->name('project.unit.edit');
+        Route::post('{id}/update', [ProjectUnitController::class, 'update'])->where(['id' => '[0-9]+'])->name('project.unit.update');
+        Route::get('{id}/delete', [ProjectUnitController::class, 'delete'])->where(['id' => '[0-9]+'])->name('project.unit.delete');
+        Route::delete('{id}/destroy', [ProjectUnitController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('project.unit.destroy');
+    });
+    Route::group(['prefix' => 'project/highlight'], function () {
+        Route::get('index', [ProjectHighlightController::class, 'index'])->name('project.highlight.index');
+        Route::get('create', [ProjectHighlightController::class, 'create'])->name('project.highlight.create');
+        Route::post('store', [ProjectHighlightController::class, 'store'])->name('project.highlight.store');
+        Route::get('{id}/edit', [ProjectHighlightController::class, 'edit'])->where(['id' => '[0-9]+'])->name('project.highlight.edit');
+        Route::post('{id}/update', [ProjectHighlightController::class, 'update'])->where(['id' => '[0-9]+'])->name('project.highlight.update');
+        Route::get('{id}/delete', [ProjectHighlightController::class, 'delete'])->where(['id' => '[0-9]+'])->name('project.highlight.delete');
+        Route::delete('{id}/destroy', [ProjectHighlightController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('project.highlight.destroy');
     });
     Route::group(['prefix' => 'project/faq'], function () {
         Route::get('index', [ProjectFaqController::class, 'index'])->name('project.faq.index');

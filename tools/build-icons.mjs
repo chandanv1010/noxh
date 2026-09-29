@@ -100,6 +100,15 @@ const BANG = {
     'map': 'map:net',              // ban do gap - khoi "Ban do du an"
     'news': 'newspaper:net',       // to bao - khoi "Tin tuc noi bat"
     'bulb-rays': 'emoji_objects',  // bong den co tia - khoi "Co du an phu hop"
+
+    // --- trang chi tiet du an (product-detail-fix.jpg) ---
+    'headset': 'support_agent:net',       // tai nghe - khoi "Tu van nhanh"
+    'play': 'play_arrow',                 // tam giac phat - nut "Xem video du an"
+    'photo': 'add_photo_alternate:net',   // khung anh co dau cong - "Xem anh thuc te"
+    'update': 'update:net',               // dong ho co mui ten - "Xem cap nhat tien do"
+    'directions': 'directions:net',       // bien chi duong - "Xem tren Google Maps"
+    'floor-plan': 'foundation:net',       // mat bang - tab "Mat bang"
+    'door': 'meeting_room:net',           // cua mo - the loai can ho
 };
 
 // Ten co the kem hau to ":net" - lay ban VE VIEN thay vi ban to dac. Ban

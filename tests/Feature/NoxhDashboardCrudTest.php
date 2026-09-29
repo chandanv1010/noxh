@@ -10,6 +10,8 @@ use App\Models\Expert;
 use App\Models\Investor;
 use App\Models\LegalDocument;
 use App\Models\LoanPackage;
+use App\Models\ProjectHighlight;
+use App\Models\ProjectUnit;
 use App\Models\User;
 use Tests\TestCase;
 
@@ -225,5 +227,113 @@ class NoxhDashboardCrudTest extends TestCase
             ->assertSessionHasErrors('name');
 
         $this->assertNull(Investor::where('name', '')->first());
+    }
+
+    public function test_them_sua_xoa_loai_can_ho(): void
+    {
+        $u = $this->quanTri();
+        $duAnId = \Illuminate\Support\Facades\DB::table('products')
+            ->whereNull('deleted_at')->value('id');
+
+        if (!$duAnId) {
+            $this->markTestSkipped('Chua co du an nao.');
+        }
+
+        $this->actingAs($u)->post('/project/unit/store', [
+            'product_id' => $duAnId,
+            'name' => 'Can thu nghiem tu dong',
+            'area_from' => 19.55,
+            'area_to' => 21,
+            'price_from' => 1.075,
+            'price_to' => 1.18,
+            'price_unit' => 'tỷ',
+            'bullets' => "Gach mot\nGach hai",
+            'publish' => 2,
+            'order' => 0,
+        ])->assertRedirect(route('project.unit.index'));
+
+        $o = ProjectUnit::where('name', 'Can thu nghiem tu dong')->first();
+        $this->assertNotNull($o, 'Khong luu duoc loai can ho');
+        $this->assertSame(['Gach mot', 'Gach hai'], $o->diem);
+
+        $this->actingAs($u)->post("/project/unit/{$o->id}/update", [
+            'product_id' => $duAnId,
+            'name' => 'Can da doi ten',
+            'publish' => 1,
+            'order' => 3,
+        ])->assertRedirect(route('project.unit.index'));
+
+        $o->refresh();
+        $this->assertSame('Can da doi ten', $o->name);
+        // O so bo trong phai thanh NULL chu khong phai 0.
+        $this->assertNull($o->area_from);
+
+        $this->actingAs($u)->delete("/project/unit/{$o->id}/destroy")
+            ->assertRedirect(route('project.unit.index'));
+
+        $this->assertNull(ProjectUnit::find($o->id));
+    }
+
+    public function test_dien_tich_den_nho_hon_tu_thi_bi_chan(): void
+    {
+        $u = $this->quanTri();
+        $duAnId = \Illuminate\Support\Facades\DB::table('products')
+            ->whereNull('deleted_at')->value('id');
+
+        if (!$duAnId) {
+            $this->markTestSkipped('Chua co du an nao.');
+        }
+
+        $this->actingAs($u)
+            ->from('/project/unit/create')
+            ->post('/project/unit/store', [
+                'product_id' => $duAnId,
+                'name' => 'Can khoang nguoc',
+                'area_from' => 50,
+                'area_to' => 30,
+            ])
+            ->assertSessionHasErrors('area_to');
+
+        $this->assertNull(ProjectUnit::where('name', 'Can khoang nguoc')->first());
+    }
+
+    public function test_them_sua_xoa_diem_nhan(): void
+    {
+        $u = $this->quanTri();
+        $duAnId = \Illuminate\Support\Facades\DB::table('products')
+            ->whereNull('deleted_at')->value('id');
+
+        if (!$duAnId) {
+            $this->markTestSkipped('Chua co du an nao.');
+        }
+
+        $this->actingAs($u)->post('/project/highlight/store', [
+            'product_id' => $duAnId,
+            'group' => 'amenity',
+            'icon' => 'verified',
+            'title' => 'Diem nhan thu nghiem',
+            'subtitle' => 'dong duoi',
+            'order' => 0,
+        ])->assertRedirect(route('project.highlight.index'));
+
+        $o = ProjectHighlight::where('title', 'Diem nhan thu nghiem')->first();
+        $this->assertNotNull($o, 'Khong luu duoc diem nhan');
+        $this->assertSame('amenity', $o->group);
+
+        // Nhom la thu quyet dinh o nay hien o KHOI NAO, gui bua thi phai bi
+        // chan chu khong duoc am tham nhet vao khoi khac.
+        $this->actingAs($u)
+            ->from("/project/highlight/{$o->id}/edit")
+            ->post("/project/highlight/{$o->id}/update", [
+                'product_id' => $duAnId,
+                'group' => 'linh tinh',
+                'title' => 'Diem nhan thu nghiem',
+            ])
+            ->assertSessionHasErrors('group');
+
+        $this->actingAs($u)->delete("/project/highlight/{$o->id}/destroy")
+            ->assertRedirect(route('project.highlight.index'));
+
+        $this->assertNull(ProjectHighlight::find($o->id));
     }
 }

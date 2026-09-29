@@ -36,6 +36,7 @@ class LeadController extends FrontendController
                 'phone' => 'required|string|max:20',
                 'email' => 'nullable|email|max:191',
                 'interest' => 'nullable|string|max:191',
+                'buy_timeline' => 'nullable|string|max:100',
                 'message' => 'nullable|string|max:5000',
                 'source' => 'nullable|string|max:40',
                 'product_id' => 'nullable|integer',
@@ -141,6 +142,7 @@ class LeadController extends FrontendController
                 'gender' => 0,
                 'message' => $duLieu['message'] ?? null,
                 'interest' => $duLieu['interest'] ?? null,
+                'buy_timeline' => $duLieu['buy_timeline'] ?? null,
                 'source' => $duLieu['source'] ?? 'website',
                 'product_id' => $duLieu['product_id'] ?? null,
                 'province_code' => $duLieu['province_code'] ?? null,
@@ -166,6 +168,7 @@ class LeadController extends FrontendController
             'Điện thoại' => $duLieu['phone'],
             'Email' => $duLieu['email'] ?? null,
             'Quan tâm' => $duLieu['interest'] ?? null,
+            'Dự kiến mua' => $duLieu['buy_timeline'] ?? null,
             'Từ trang' => $duLieu['source'] ?? 'website',
             'Lời nhắn' => $duLieu['message'] ?? null,
         ]);

@@ -65,6 +65,14 @@ class Product extends Model
         'handover_date',
         'timeline_label',
         'is_featured',
+
+        // Cac o phuc vu man hinh chi tiet du an (product-detail-fix.jpg).
+        'video_url',
+        'site_plan_image',
+        'progress_image',
+        'progress_url',
+        'map_image',
+        'map_url',
     ];
 
     protected $casts = [
@@ -181,5 +189,22 @@ class Product extends Model
             ->withPivot('order')
             ->withTimestamps()
             ->orderBy('product_user.order');
+    }
+
+    /** Cac loai can ho - khoi "CAC LOAI CAN HO" o trang chi tiet. */
+    public function loaiCanHo()
+    {
+        return $this->hasMany(ProjectUnit::class, 'product_id', 'id')
+            ->where('publish', 2)
+            ->orderBy('order')
+            ->orderBy('id');
+    }
+
+    /** Bon o diem nhan trong the gia o dau trang chi tiet. */
+    public function diemNhan()
+    {
+        return $this->hasMany(ProjectHighlight::class, 'product_id', 'id')
+            ->orderBy('order')
+            ->orderBy('id');
     }
 }

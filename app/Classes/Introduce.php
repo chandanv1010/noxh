@@ -188,12 +188,31 @@ class Introduce
                     'label' => 'Banner tư vấn - đường dẫn nút',
                     'title' => 'Để trống thì nút gọi vào số Hotline trong Cấu hình hệ thống.',
                 ],
+                'banner_bg' => [
+                    'type' => 'images',
+                    'label' => 'Banner tư vấn - ảnh nền cả khối',
+                    'title' => 'Ảnh NGANG phủ kín banner (khoảng 560x420). Có ảnh này thì ảnh người tư vấn ở dưới không dùng nữa. Để trống thì dùng nền xanh + hình vẽ sẵn.',
+                ],
                 'banner_image' => [
                     'type' => 'images',
                     'label' => 'Banner tư vấn - ảnh người tư vấn',
                     'title' => 'Ảnh DỌC đã tách nền, đặt sát mép phải của banner. Để trống thì banner chỉ có chữ.',
                 ],
             ],
+        ];
+
+        // --- Trang chi tiet du an: phan chinh ---------------------------------
+        $data['projectdetail'] = [
+            'label' => 'Khối 4c: Trang chi tiết dự án - phần chính',
+            'description' => 'Thẻ giá ở đầu trang, và tiêu đề của các khối Tổng quan / Loại căn hộ / Vị trí / Tiến độ / Dự án tương tự',
+            'value' => $this->oChiTietDuAn($icon),
+        ];
+
+        // --- Trang chi tiet du an: cot phai -----------------------------------
+        $data['projectlead'] = [
+            'label' => 'Khối 4d: Trang chi tiết dự án - cột phải & form đăng ký',
+            'description' => 'Khối "Tư vấn nhanh", danh sách tư vấn hỗ trợ và form đăng ký nhận thông tin dự án',
+            'value' => $this->oCotPhaiChiTiet($icon),
         ];
 
         // --- Sau o thong tin huu ich ------------------------------------------
@@ -281,6 +300,213 @@ class Introduce
         }
 
         return $data;
+    }
+
+    /**
+     * Cac dong cua bang "Tong quan du an", theo dung thu tu ban thiet ke.
+     *
+     * Khoa o day trung voi khoa ma ProjectController::bangTongQuan() dung,
+     * hai cho phai khop nhau thi nhan moi gan dung gia tri.
+     */
+    public const DONG_TONG_QUAN = [
+        'name' => 'Tên dự án',
+        'place' => 'Vị trí',
+        'investor' => 'Chủ đầu tư',
+        'land' => 'Tổng diện tích',
+        'scale' => 'Quy mô',
+        'units' => 'Tổng số căn',
+        'types' => 'Loại hình căn hộ',
+        'area' => 'Diện tích căn hộ',
+        'price' => 'Giá bán dự kiến',
+        'ownership' => 'Hình thức sở hữu',
+        'start' => 'Khởi công',
+        'handover' => 'Dự kiến bàn giao',
+        'status' => 'Trạng thái',
+    ];
+
+    /**
+     * Cac o chu cua phan chinh trang chi tiet du an.
+     *
+     * Bon o thong so trong the gia (Quy mo / So can ho / Loai hinh / Ban giao)
+     * chi khai NHAN va HINH o day - con so thi lay thang tu du an, nen quan
+     * tri doi ten nhan ma khong so lech so lieu.
+     *
+     * Bon o diem nhan ben duoi la MAC DINH dung chung: du an nao muon khac thi
+     * khai rieng o man hinh "Điểm nhấn dự án".
+     */
+    private function oChiTietDuAn(array $icon): array
+    {
+        $o = [
+            'hero_slogan' => [
+                'type' => 'textarea',
+                'label' => 'Khẩu hiệu viết tay ở góc phải trên',
+                'title' => 'Mỗi dòng một câu. Ví dụ: "An cư hôm nay" / "Kiến tạo tương lai". Để trống thì không hiện.',
+            ],
+            'hero_bg' => [
+                'type' => 'images',
+                'label' => 'Ảnh nền dải đầu trang',
+                'title' => 'Ảnh NGANG làm nền cho vùng tiêu đề (bầu trời). Để trống thì dùng nền xanh nhạt vẽ sẵn.',
+            ],
+            'video_text' => ['type' => 'text', 'label' => 'Ảnh lớn - chữ trên nút xem video'],
+            'gallery_more' => [
+                'type' => 'text',
+                'label' => 'Dải ảnh nhỏ - chữ trên ô cuối',
+                'title' => 'Gõ {so} để thay bằng số ảnh còn lại. Ví dụ: + {so} ảnh',
+            ],
+
+            'price_label' => ['type' => 'text', 'label' => 'Thẻ giá - nhãn phía trên giá'],
+            'price_note' => ['type' => 'text', 'label' => 'Thẻ giá - ghi chú dưới giá'],
+            'price_empty' => [
+                'type' => 'text',
+                'label' => 'Thẻ giá - chữ thay thế khi chưa có giá',
+                'title' => 'Hiện khi dự án chưa công bố giá.',
+            ],
+            'price_button' => ['type' => 'text', 'label' => 'Thẻ giá - chữ trên nút đăng ký'],
+            'trust_1' => ['type' => 'text', 'label' => 'Thẻ giá - dòng cam kết, ý 1'],
+            'trust_2' => ['type' => 'text', 'label' => 'Thẻ giá - dòng cam kết, ý 2'],
+            'trust_3' => ['type' => 'text', 'label' => 'Thẻ giá - dòng cam kết, ý 3'],
+            'trust_icon' => ['type' => 'select', 'label' => 'Thẻ giá - hình đầu dòng cam kết', 'option' => $icon],
+
+            'similar_heading' => [
+                'type' => 'text',
+                'label' => 'Khối Dự án tương tự - tiêu đề',
+                'title' => 'Gõ {tinh} để thay bằng tên tỉnh/thành của dự án đang xem.',
+            ],
+        ];
+
+        // Bon o thong so: chi nhan + hinh, con so lay tu du an.
+        $nhanMac = [1 => 'Quy mô', 2 => 'Số căn hộ', 3 => 'Loại hình', 4 => 'Bàn giao'];
+        foreach ($nhanMac as $i => $ten) {
+            $o["spec_{$i}_label"] = ['type' => 'text', 'label' => "Thẻ giá - ô thông số {$i}, nhãn (mặc định: {$ten})"];
+            $o["spec_{$i}_icon"] = ['type' => 'select', 'label' => "Thẻ giá - ô thông số {$i}, hình", 'option' => $icon];
+        }
+
+        // Bon o diem nhan mac dinh.
+        for ($i = 1; $i <= 4; $i++) {
+            $o["point_{$i}_title"] = ['type' => 'text', 'label' => "Thẻ giá - ô điểm nhấn {$i}, dòng trên"];
+            $o["point_{$i}_sub"] = ['type' => 'text', 'label' => "Thẻ giá - ô điểm nhấn {$i}, dòng dưới"];
+            $o["point_{$i}_icon"] = ['type' => 'select', 'label' => "Thẻ giá - ô điểm nhấn {$i}, hình", 'option' => $icon];
+        }
+
+        $o += [
+            'overview_photo_text' => ['type' => 'text', 'label' => 'Khối Tổng quan - chữ trên nút xem ảnh thực tế'],
+
+            'units_all_text' => ['type' => 'text', 'label' => 'Khối Loại căn hộ - chữ liên kết góc phải'],
+            'units_detail_text' => ['type' => 'text', 'label' => 'Khối Loại căn hộ - chữ trên nút của mỗi thẻ'],
+            'units_area_label' => ['type' => 'text', 'label' => 'Khối Loại căn hộ - nhãn dòng diện tích'],
+            'units_price_label' => ['type' => 'text', 'label' => 'Khối Loại căn hộ - nhãn dòng giá'],
+
+            'location_button' => ['type' => 'text', 'label' => 'Khối Vị trí - chữ trên nút mở bản đồ'],
+            'progress_button' => ['type' => 'text', 'label' => 'Khối Tiến độ - chữ trên nút xem cập nhật'],
+            'similar_all_text' => ['type' => 'text', 'label' => 'Khối Dự án tương tự - chữ liên kết góc phải'],
+        ];
+
+        // Moi khoi noi dung co HAI o chu: tieu de in dam tren khoi, va nhan
+        // ngan tren thanh tab dinh o dau trang. Thanh tab chi liet ke nhung
+        // khoi THUC SU co du lieu, nen khong can o bat/tat rieng.
+        $khoi = [
+            'overview' => 'Tổng quan',
+            'units' => 'Loại căn hộ',
+            'location' => 'Vị trí',
+            'amenity' => 'Tiện ích',
+            'progress' => 'Tiến độ',
+            'legal' => 'Pháp lý',
+            'gallery' => 'Hình ảnh - Video',
+            'content' => 'Giới thiệu chi tiết',
+            'faq' => 'Hỏi đáp',
+            'similar' => 'Dự án tương tự',
+        ];
+
+        foreach ($khoi as $ma => $ten) {
+            // Tieu de khoi "Du an tuong tu" da khai o tren (co dau {tinh}).
+            if (!isset($o["{$ma}_heading"])) {
+                $o["{$ma}_heading"] = ['type' => 'text', 'label' => "Khối {$ten} - tiêu đề"];
+            }
+            $o["{$ma}_tab"] = ['type' => 'text', 'label' => "Khối {$ten} - nhãn trên thanh tab"];
+        }
+
+        // Nhan tung dong cua bang Tong quan. Gia tri thi lay tu du an, day
+        // chi la chu o cot trai - de quan tri doi duoc "Tổng số căn" thanh
+        // "Số lượng căn hộ" ma khong phai sua ma nguon.
+        foreach (self::DONG_TONG_QUAN as $ma => $ten) {
+            $o["row_{$ma}"] = [
+                'type' => 'text',
+                'label' => "Bảng Tổng quan - nhãn dòng \"{$ten}\"",
+                'title' => 'Để trống thì dòng này không hiện ra trang.',
+            ];
+        }
+
+        $o['similar_price_prefix'] = [
+            'type' => 'text',
+            'label' => 'Khối Dự án tương tự - chữ đứng trước giá',
+            'title' => 'Ví dụ: Từ',
+        ];
+
+        return $o;
+    }
+
+    /**
+     * Cac o chu cua cot phai trang chi tiet du an.
+     *
+     * Danh sach nguoi trong khoi "Danh sách tư vấn hỗ trợ" KHONG khai o day:
+     * no lay tu nhung nhan vien duoc gan vao dung du an dang xem.
+     */
+    private function oCotPhaiChiTiet(array $icon): array
+    {
+        return [
+            'quick_heading' => ['type' => 'text', 'label' => 'Tư vấn nhanh - tiêu đề'],
+            'quick_note' => ['type' => 'text', 'label' => 'Tư vấn nhanh - mô tả ngắn'],
+            'quick_channel' => [
+                'type' => 'text',
+                'label' => 'Tư vấn nhanh - dòng dưới số điện thoại',
+                'title' => 'Ví dụ: (Zalo / Call / SMS)',
+            ],
+            'quick_icon' => ['type' => 'select', 'label' => 'Tư vấn nhanh - hình bên trái tiêu đề', 'option' => $icon],
+
+            'staff_heading' => ['type' => 'text', 'label' => 'Danh sách tư vấn - tiêu đề'],
+            'staff_note' => [
+                'type' => 'text',
+                'label' => 'Danh sách tư vấn - mô tả',
+                'title' => 'Gõ {tinh} để thay bằng tên tỉnh/thành của dự án đang xem.',
+            ],
+            'staff_verify' => ['type' => 'text', 'label' => 'Danh sách tư vấn - dòng xác minh trong ngoặc'],
+            'staff_role' => [
+                'type' => 'text',
+                'label' => 'Danh sách tư vấn - chức danh mặc định',
+                'title' => 'Dùng khi tài khoản nhân viên chưa khai chức danh.',
+            ],
+            'staff_area' => [
+                'type' => 'text',
+                'label' => 'Danh sách tư vấn - dòng khu vực',
+                'title' => 'Gõ {tinh} để thay bằng tên tỉnh/thành của dự án. Để trống thì không hiện dòng này.',
+            ],
+            'staff_button' => ['type' => 'text', 'label' => 'Danh sách tư vấn - chữ trên nút của mỗi người'],
+            'staff_more' => ['type' => 'text', 'label' => 'Danh sách tư vấn - chữ trên nút cuối khối'],
+            'staff_empty' => [
+                'type' => 'text',
+                'label' => 'Danh sách tư vấn - chữ khi dự án chưa gán ai',
+                'title' => 'Hiện khi dự án chưa được gán nhân viên phụ trách nào.',
+            ],
+
+            'form_heading' => ['type' => 'text', 'label' => 'Form đăng ký - tiêu đề'],
+            'form_note' => ['type' => 'textarea', 'label' => 'Form đăng ký - mô tả'],
+            'form_name' => ['type' => 'text', 'label' => 'Form đăng ký - nhãn ô họ tên'],
+            'form_phone' => ['type' => 'text', 'label' => 'Form đăng ký - nhãn ô số điện thoại'],
+            'form_interest' => ['type' => 'text', 'label' => 'Form đăng ký - nhãn ô nhu cầu quan tâm'],
+            'form_interest_options' => [
+                'type' => 'textarea',
+                'label' => 'Form đăng ký - các lựa chọn của ô nhu cầu quan tâm',
+                'title' => 'Mỗi dòng một lựa chọn. Để trống thì ô này không hiện.',
+            ],
+            'form_timeline' => ['type' => 'text', 'label' => 'Form đăng ký - nhãn ô thời gian dự kiến mua'],
+            'form_timeline_options' => [
+                'type' => 'textarea',
+                'label' => 'Form đăng ký - các lựa chọn của ô thời gian dự kiến mua',
+                'title' => 'Mỗi dòng một lựa chọn. Để trống thì ô này không hiện.',
+            ],
+            'form_button' => ['type' => 'text', 'label' => 'Form đăng ký - chữ trên nút'],
+            'form_privacy' => ['type' => 'text', 'label' => 'Form đăng ký - dòng cam kết bảo mật'],
+        ];
     }
 
     /** Bon dong so lieu canh banner - moi dong co gia tri, nhan va hinh. */

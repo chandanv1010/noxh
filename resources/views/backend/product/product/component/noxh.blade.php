@@ -204,9 +204,63 @@
             </div>
         </div>
 
+        {{-- Cac o chi phuc vu trang chi tiet du an. Bo trong o nao thi khoi
+             tuong ung ngoai trang tu an di, khong de lai cho trong. --}}
+        <h4 class="mt20 mb10">Ảnh và liên kết của trang chi tiết</h4>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="form-row">
+                    <label class="control-label text-left">Video giới thiệu</label>
+                    <input type="text" name="video_url" value="{{ old('video_url', ($duAn->video_url) ?? '') }}"
+                           class="form-control" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off">
+                    <small class="text-muted">Có link thì ảnh lớn ở đầu trang hiện nút "Xem video dự án".</small>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-row">
+                    <label class="control-label text-left">Đường dẫn "Xem cập nhật tiến độ"</label>
+                    <input type="text" name="progress_url" value="{{ old('progress_url', ($duAn->progress_url) ?? '') }}"
+                           class="form-control" placeholder="Ví dụ: /tin-tuc/tien-do-thang-9" autocomplete="off">
+                    <small class="text-muted">Để trống thì khối Tiến độ không có nút này.</small>
+                </div>
+            </div>
+        </div>
+        <div class="row mt10">
+            <div class="col-lg-6">
+                <div class="form-row">
+                    <label class="control-label text-left">Đường dẫn Google Maps</label>
+                    <input type="text" name="map_url" value="{{ old('map_url', ($duAn->map_url) ?? '') }}"
+                           class="form-control" placeholder="https://maps.google.com/..." autocomplete="off">
+                    <small class="text-muted">Để trống thì trang tự dựng link từ vĩ độ / kinh độ ở trên.</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt15">
+            @foreach([
+                'site_plan_image' => ['Ảnh mặt bằng tổng thể', 'Hiện bên phải bảng Tổng quan. Ảnh NGANG.'],
+                'map_image' => ['Ảnh bản đồ vị trí', 'Hiện trong khối "Vị trí dự án". Để trống thì khối này không hiện.'],
+                'progress_image' => ['Ảnh công trường', 'Hiện bên phải các mốc trong khối "Tiến độ dự án".'],
+            ] as $o => $mo)
+                <div class="col-lg-4">
+                    <div class="form-row">
+                        <label class="control-label text-left mb10">{{ $mo[0] }}</label>
+                        <span class="image img-cover image-target"
+                              style="height:150px;padding:16px;text-align:center;border:1px dashed #b8b2b2;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                            <img src="{{ old($o, ($duAn->$o) ?? '') ?: 'backend/img/image.svg' }}" alt="" style="max-width:100%;max-height:100%;object-fit:contain;">
+                        </span>
+                        <input type="hidden" name="{{ $o }}" value="{{ old($o, ($duAn->$o) ?? '') }}">
+                        <small class="text-muted">{{ $mo[1] }}</small>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
         @if(($config['method'] ?? '') === 'edit' && isset($product->id))
             <div class="alert alert-info mt20 mb0">
-                <strong>Tiến độ, hồ sơ pháp lý và câu hỏi thường gặp</strong> của dự án này nhập ở màn hình riêng:
+                <strong>Các khối nhiều dòng</strong> của dự án này nhập ở màn hình riêng:
+                <a href="{{ route('project.unit.index', ['product_id' => $product->id]) }}">Loại căn hộ</a> ·
+                <a href="{{ route('project.highlight.index', ['product_id' => $product->id]) }}">Điểm nhấn</a> ·
                 <a href="{{ route('project.milestone.index', ['product_id' => $product->id]) }}">Tiến độ</a> ·
                 <a href="{{ route('project.document.index', ['product_id' => $product->id]) }}">Hồ sơ pháp lý</a> ·
                 <a href="{{ route('project.faq.index', ['product_id' => $product->id]) }}">Câu hỏi thường gặp</a>

@@ -1,9 +1,17 @@
 {{--
     Banner "Can tu van du an phu hop?" o duoi bo loc, cot trai.
 
-    Chu va anh lay tu module Gioi thieu (nhom "Khoi 4b"). Anh de trong thi
-    lay anh cua chuyen gia mac dinh ($chuyenGia do NoxhComposer cap); van
-    trong nua thi banner chi co chu, khong de o anh rong.
+    Hai cach dat anh, quan tri chon mot:
+
+      1. "Anh nen ca khoi" (banner_bg) - mot anh NGANG phu kin banner. Dung
+         khi ben thiet ke giao ca tam anh da ghep san nguoi + nen. Chu van
+         nam de len tren, phia sau chu co mot lop mo de con doc duoc.
+
+      2. "Anh nguoi tu van" (banner_image) - anh DOC da tach nen, dat sat mep
+         phai tren nen xanh chuyen mau.
+
+    Khong co anh nao thi dung hinh ve san
+    public/images/noxh/tu-van-vien.svg, de banner khong bi trong mot nua.
 
     Nut: co duong dan rieng thi theo duong dan do, khong thi goi vao Hotline.
 --}}
@@ -14,12 +22,16 @@
         $intro['projectaside_banner_point_3'] ?? null,
     ]));
 
-    // Chua co anh nao thi lay hinh ve mac dinh - de trong thi banner
+    $anhNen = trim((string) ($intro['projectaside_banner_bg'] ?? ''));
+
+    // Chua co anh nguoi nao thi lay hinh ve mac dinh - de trong thi banner
     // trong trong hon han ban thiet ke.
-    $anh = nx_anh(
-        trim((string) ($intro['projectaside_banner_image'] ?? '')) ?: ($chuyenGia->image ?? ''),
-        'tu-van'
-    );
+    $anhNguoi = $anhNen === ''
+        ? nx_anh(
+            trim((string) ($intro['projectaside_banner_image'] ?? '')) ?: ($chuyenGia->image ?? ''),
+            'tu-van'
+        )
+        : null;
 
     $duongDan = trim((string) ($intro['projectaside_banner_url'] ?? ''));
     $hotline = nx_hotline_dau($system['contact_hotline'] ?? '');
@@ -35,7 +47,8 @@
     $nut = $intro['projectaside_banner_button'] ?? 'LIÊN HỆ NGAY';
 @endphp
 
-<section class="nx-tu-van-banner co-anh">
+<section class="nx-tu-van-banner {{ $anhNen !== '' ? 'co-nen' : 'co-anh' }}"
+         @if($anhNen !== '') style="--nx-nen: url('{{ e($anhNen) }}')" @endif>
     <div class="nx-tu-van-banner__chu">
         <h2>{{ $intro['projectaside_banner_heading'] ?? 'Cần tư vấn dự án phù hợp?' }}</h2>
 
@@ -58,6 +71,8 @@
         @endif
     </div>
 
-    <img class="nx-tu-van-banner__anh" src="{{ $anh }}"
-         alt="{{ $chuyenGia->name ?? 'Chuyên viên tư vấn' }}" loading="lazy" decoding="async">
+    @if($anhNguoi)
+        <img class="nx-tu-van-banner__anh" src="{{ $anhNguoi }}"
+             alt="{{ $chuyenGia->name ?? 'Chuyên viên tư vấn' }}" loading="lazy" decoding="async">
+    @endif
 </section>

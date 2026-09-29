@@ -26,6 +26,7 @@ class NoxhDashboardSmokeTest extends TestCase
             'dossier/set', 'dossier/item',
             'eligibility/question', 'eligibility/option',
             'project/milestone', 'project/document', 'project/faq',
+            'project/unit', 'project/highlight',
         ] as $p) {
             $ds[$p . ' index'] = [$p . '/index'];
             $ds[$p . ' create'] = [$p . '/create'];

@@ -157,6 +157,9 @@ class ProjectQuery
                 'p.address', 'p.latitude', 'p.longitude', 'p.ward_code',
                 'p.ownership_type', 'p.apartment_types', 'p.start_date', 'p.handover_date',
                 'p.album', 'p.investor_id',
+                // Anh va lien ket rieng cua trang chi tiet.
+                'p.video_url', 'p.site_plan_image', 'p.progress_image',
+                'p.progress_url', 'p.map_image', 'p.map_url',
                 'pl.content', 'pl.meta_title', 'pl.meta_description',
                 'iv.name as investor_name', 'iv.hotline as investor_hotline',
                 'iv.email as investor_email', 'iv.website as investor_website',

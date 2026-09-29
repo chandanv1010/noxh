@@ -3,236 +3,334 @@
 @section('content')
 @php
     $tt = \App\Models\Product::TRANG_THAI_DU_AN[$duAn->status] ?? null;
+    $thay = ['{tinh}' => $tenTinh ?: 'khu vực'];
 
-    $thongSo = array_filter([
-        ['icon' => 'users', 'nhan' => 'Chủ đầu tư', 'giaTri' => $duAn->investor_name],
-        ['icon' => 'home', 'nhan' => 'Loại hình', 'giaTri' => 'Nhà ở xã hội'],
-        ['icon' => 'ruler', 'nhan' => 'Tổng diện tích', 'giaTri' => $duAn->total_land_area ? so_gon($duAn->total_land_area) . ' ha' : null],
-        ['icon' => 'layers', 'nhan' => 'Quy mô', 'giaTri' => $duAn->total_units ? number_format($duAn->total_units, 0, ',', '.') . ' căn' : null],
-        ['icon' => 'calendar', 'nhan' => 'Thời gian triển khai', 'giaTri' => $duAn->start_date ? \Illuminate\Support\Carbon::parse($duAn->start_date)->format('Y') . ($duAn->handover_date ? ' – ' . \Illuminate\Support\Carbon::parse($duAn->handover_date)->format('Y') : '') : null],
-        ['icon' => 'check-circle', 'nhan' => 'Bàn giao dự kiến', 'giaTri' => $duAn->timeline_label],
-    ], fn($o) => !empty($o['giaTri']));
+    $anhNen = trim((string) ($intro['projectdetail_hero_bg'] ?? ''));
+
+    // Khau hieu viet tay o goc phai: moi dong mot cau.
+    $khauHieu = array_values(array_filter(array_map(
+        'trim',
+        preg_split('/\r\n|\r|\n/', (string) ($intro['projectdetail_hero_slogan'] ?? '')) ?: []
+    ), fn ($d) => $d !== ''));
+
+    $noiDuAn = trim(($duAn->address ? $duAn->address . ', ' : '')
+        . implode(', ', array_filter([$duAn->ward_name, $duAn->province_name])), ', ');
+
+    // Duong dan dieu huong co them mot cap tinh/thanh so voi cac trang khac -
+    // ban thiet ke ve "Trang chu > Du an > Thai Nguyen > NOXH Tuc Duyen".
+    $duongDan = ['Dự án' => url('/du-an')];
+
+    if ($tenTinh !== '' && $duAn->province_code) {
+        $duongDan[$tenTinh] = url('/du-an/ban-do?province_code=' . $duAn->province_code);
+    }
+
+    $duongDan[$duAn->name] = '';
+
+    // Thanh tab chi liet ke khoi CO du lieu. Them mot khoi moi thi them mot
+    // dong o day, khong phai sua cho nao khac.
+    $khoi = [
+        ['id' => 'tong-quan', 'ma' => 'overview', 'icon' => 'grid', 'co' => count($bangTongQuan)],
+        ['id' => 'mat-bang', 'ma' => 'units', 'icon' => 'floor-plan', 'co' => $loaiCanHo->count()],
+        ['id' => 'vi-tri', 'ma' => 'location', 'icon' => 'pin', 'co' => !empty($duAn->map_image) || $banDoUrl],
+        ['id' => 'tien-ich', 'ma' => 'amenity', 'icon' => 'bulb-rays', 'co' => $tienIch->count()],
+        ['id' => 'tien-do', 'ma' => 'progress', 'icon' => 'update', 'co' => $tienDo->count()],
+        ['id' => 'phap-ly', 'ma' => 'legal', 'icon' => 'file', 'co' => $hoSo->count()],
+        ['id' => 'hinh-anh', 'ma' => 'gallery', 'icon' => 'photo', 'co' => count($album)],
+        ['id' => 'gioi-thieu', 'ma' => 'content', 'icon' => 'news', 'co' => !empty($duAn->content)],
+        ['id' => 'hoi-dap', 'ma' => 'faq', 'icon' => 'question', 'co' => $faq->count()],
+    ];
+
+    $tab = [];
+    $tieuDe = [];
+
+    foreach ($khoi as $k) {
+        $tieuDe[$k['ma']] = strtr((string) ($intro['projectdetail_' . $k['ma'] . '_heading'] ?? ''), $thay);
+
+        if ($k['co']) {
+            $tab[] = [
+                'id' => $k['id'],
+                'icon' => $k['icon'],
+                'ten' => $intro['projectdetail_' . $k['ma'] . '_tab'] ?? $tieuDe[$k['ma']],
+            ];
+        }
+    }
 @endphp
 
-@include('frontend.noxh.component.crumb', [
-    'crumbs' => ['Dự án' => url('/du-an'), $duAn->name => ''],
-])
+<div class="nx-pd">
 
-<div class="nx__container">
-    <section class="nx-detail-hero">
-        @if(!empty($duAn->image))
-            <div class="nx-detail-hero__media">
-                <img src="{{ $duAn->image }}" alt="{{ $duAn->name }}" fetchpriority="high" decoding="async">
-            </div>
-        @endif
+    {{-- ĐẦU TRANG: tiêu đề + ảnh + thẻ giá ------------------------------ --}}
+    <div class="nx-pd__dau{{ $anhNen !== '' ? ' co-nen' : '' }}"
+         @if($anhNen !== '') style="--nx-nen: url('{{ e($anhNen) }}')" @endif>
+        <div class="nx__container">
+            @include('frontend.noxh.component.crumb', ['crumbs' => $duongDan])
 
-        <div class="nx-detail-hero__inner">
-            @if($tt)
-                <span class="nx-badge nx-badge--{{ $duAn->status }}">{{ $tt }}</span>
-            @endif
-
-            <h1 class="nx-detail-hero__title">{{ $duAn->name }}</h1>
-
-            @if($duAn->address || $duAn->province_name)
-                <div class="nx-detail-hero__place">
-                    @include('frontend.noxh.component.icon', ['name' => 'pin', 'size' => 16])
-                    {{ trim(($duAn->address ? $duAn->address . ', ' : '') . $duAn->province_name, ', ') }}
-                </div>
-            @endif
-
-            @if($duAn->description)
-                <p class="nx-detail-hero__description">{{ strip_tags($duAn->description) }}</p>
-            @endif
-        </div>
-    </section>
-
-    @if(count($thongSo))
-        <dl class="nx-spec-strip">
-            @foreach($thongSo as $o)
+            <div class="nx-pd__head">
                 <div>
-                    <dt>
-                        @include('frontend.noxh.component.icon', ['name' => $o['icon'], 'size' => 14])
-                        {{ $o['nhan'] }}
-                    </dt>
-                    <dd>{{ $o['giaTri'] }}</dd>
+                    <h1 class="nx-pd__ten">
+                        {{ $duAn->name }}
+                        @if($tt)
+                            <span class="nx-badge nx-badge--{{ $duAn->status }}">{{ $tt }}</span>
+                        @endif
+                    </h1>
+
+                    @if($noiDuAn !== '')
+                        <p class="nx-pd__noi">
+                            @include('frontend.noxh.component.icon', ['name' => 'pin', 'size' => 18])
+                            {{ $noiDuAn }}
+                        </p>
+                    @endif
                 </div>
-            @endforeach
-        </dl>
-    @endif
-</div>
 
-<div class="nx-detail">
-    <div>
-        {{-- TỔNG QUAN ------------------------------------------------------- --}}
-        <div class="nx-panel">
-            <h2 class="nx-panel__title">Tổng quan dự án</h2>
+                @if(count($khauHieu))
+                    <p class="nx-pd__khau" aria-hidden="true">
+                        @foreach($khauHieu as $d)
+                            <span>{{ $d }}</span>
+                        @endforeach
+                    </p>
+                @endif
+            </div>
 
-            <table class="nx-table">
-                <tbody>
-                    <tr><th>Tên dự án</th><td>{{ $duAn->name }}</td></tr>
-                    @if($duAn->address || $duAn->province_name)
-                        <tr><th>Vị trí</th><td>{{ trim(($duAn->address ? $duAn->address . ', ' : '') . $duAn->province_name, ', ') }}</td></tr>
-                    @endif
-                    @if($duAn->investor_name)
-                        <tr><th>Chủ đầu tư</th><td>{{ $duAn->investor_name }}</td></tr>
-                    @endif
-                    @if($duAn->total_land_area)
-                        <tr><th>Tổng diện tích</th><td>{{ so_gon($duAn->total_land_area) }} ha</td></tr>
-                    @endif
-                    @if($duAn->scale_description)
-                        <tr><th>Quy mô</th><td>{{ $duAn->scale_description }}</td></tr>
-                    @endif
-                    @if($duAn->total_units)
-                        <tr><th>Tổng số căn</th><td>{{ number_format($duAn->total_units, 0, ',', '.') }} căn</td></tr>
-                    @endif
-                    @if($duAn->apartment_types)
-                        <tr><th>Loại hình căn hộ</th><td>{{ $duAn->apartment_types }}</td></tr>
-                    @endif
-                    <tr><th>Diện tích căn hộ</th><td>{{ khoang_so($duAn->area_from, $duAn->area_to, ' m²') }}</td></tr>
-                    <tr><th>Giá bán dự kiến</th><td>{{ khoang_gia($duAn->price_from, $duAn->price_to) }} triệu/m²</td></tr>
-                    @if($duAn->ownership_type)
-                        <tr><th>Hình thức sở hữu</th><td>{{ $duAn->ownership_type }}</td></tr>
-                    @endif
-                    @if($duAn->timeline_label)
-                        <tr><th>Dự kiến bàn giao</th><td>{{ $duAn->timeline_label }}</td></tr>
-                    @endif
-                    @if($tt)
-                        <tr><th>Trạng thái</th><td><span class="nx-badge nx-badge--{{ $duAn->status }}">{{ $tt }}</span></td></tr>
-                    @endif
-                </tbody>
-            </table>
+            <div class="nx-pd__tren">
+                @include('frontend.noxh.component.pd-gallery')
+                @include('frontend.noxh.component.pd-price')
+            </div>
         </div>
-
-        {{-- HÌNH ẢNH -------------------------------------------------------- --}}
-        @if(count($album))
-            <div class="nx-panel">
-                <h2 class="nx-panel__title">Hình ảnh dự án</h2>
-                <div class="nx-unit-grid">
-                    @foreach($album as $anh)
-                        <div class="nx-unit__media" style="border-radius:10px;overflow:hidden;aspect-ratio:4/3">
-                            <img src="{{ $anh }}" alt="{{ $duAn->name }}" loading="lazy"
-                                 style="width:100%;height:100%;object-fit:cover">
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
-
-        {{-- NỘI DUNG -------------------------------------------------------- --}}
-        @if($duAn->content)
-            <div class="nx-panel">
-                <h2 class="nx-panel__title">Giới thiệu chi tiết</h2>
-                <div class="nx-prose">{!! $duAn->content !!}</div>
-            </div>
-        @endif
-
-        {{-- TIẾN ĐỘ --------------------------------------------------------- --}}
-        @if($tienDo->count())
-            <div class="nx-panel">
-                <h2 class="nx-panel__title">Tiến độ dự án</h2>
-                <ul class="nx-timeline">
-                    @foreach($tienDo as $moc)
-                        <li class="{{ $moc->status === 'done' ? 'is-done' : ($moc->status === 'doing' ? 'is-doing' : '') }}">
-                            <strong>{{ $moc->title }}</strong>
-                            <span>{{ $moc->date_label ?: ($moc->sort_date ? \Illuminate\Support\Carbon::parse($moc->sort_date)->format('m/Y') : '') }}</span>
-                            @if($moc->description)
-                                <span>{{ $moc->description }}</span>
-                            @endif
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        {{-- PHÁP LÝ --------------------------------------------------------- --}}
-        @if($hoSo->count())
-            <div class="nx-panel">
-                <h2 class="nx-panel__title">Pháp lý dự án</h2>
-                <div class="nx-doc-grid">
-                    @foreach($hoSo as $hs)
-                        <a href="{{ $hs->file ?: '#' }}" class="nx-doc" @if($hs->file) target="_blank" rel="noopener" @endif>
-                            <span class="nx-doc__icon">
-                                @include('frontend.noxh.component.icon', ['name' => 'file-text', 'size' => 22])
-                            </span>
-                            <span>
-                                <strong>{{ $hs->title }}</strong>
-                                @if($hs->doc_number)<span>Số: {{ $hs->doc_number }}</span>@endif
-                                @if($hs->issued_date)<span>Ngày: {{ \Illuminate\Support\Carbon::parse($hs->issued_date)->format('d/m/Y') }}</span>@endif
-                            </span>
-                        </a>
-                    @endforeach
-                </div>
-            </div>
-        @endif
-
-        {{-- CÂU HỎI THƯỜNG GẶP ---------------------------------------------- --}}
-        @if($faq->count())
-            <div class="nx-panel">
-                <h2 class="nx-panel__title">Câu hỏi thường gặp</h2>
-                @foreach($faq as $ch)
-                    <details class="nx-faq">
-                        <summary>{{ $ch->question }}</summary>
-                        <div class="nx-faq__body">{!! nl2br(e(strip_tags($ch->answer))) !!}</div>
-                    </details>
-                @endforeach
-            </div>
-        @endif
-
-        {{-- DỰ ÁN TƯƠNG TỰ -------------------------------------------------- --}}
-        @if($tuongTu->count())
-            <div class="nx-panel">
-                <h2 class="nx-panel__title">Dự án cùng khu vực</h2>
-                <div class="nx-project-grid nx-project-grid--3">
-                    @foreach($tuongTu as $d)
-                        @include('frontend.noxh.component.project-card', ['duAn' => $d])
-                    @endforeach
-                </div>
-            </div>
-        @endif
     </div>
 
-    {{-- CỘT PHẢI --------------------------------------------------------- --}}
-    <aside id="dang-ky">
-        @include('frontend.noxh.component.lead-form', [
-            'tieuDe' => 'Bạn quan tâm dự án?',
-            'moTa' => 'Để lại thông tin, chúng tôi sẽ liên hệ hỗ trợ bạn sớm nhất.',
-            'nguon' => 'project',
-            'duAnId' => $duAn->id,
-        ])
+    @include('frontend.noxh.component.pd-tabs', ['tab' => $tab])
 
-        @if($duAn->investor_name)
-            <div class="nx-panel">
-                <h2 class="nx-panel__title">Thông tin liên hệ dự án</h2>
-                <table class="nx-table">
-                    <tbody>
-                        <tr><th>Chủ đầu tư</th><td>{{ $duAn->investor_name }}</td></tr>
-                        @if($duAn->investor_hotline)
-                            <tr><th>Hotline</th><td><a href="tel:{{ preg_replace('/[^0-9+]/', '', $duAn->investor_hotline) }}">{{ $duAn->investor_hotline }}</a></td></tr>
-                        @endif
-                        @if($duAn->investor_email)
-                            <tr><th>Email</th><td>{{ $duAn->investor_email }}</td></tr>
-                        @endif
-                        @if($duAn->investor_website)
-                            <tr><th>Website</th><td>{{ $duAn->investor_website }}</td></tr>
-                        @endif
-                        @if($duAn->investor_address)
-                            <tr><th>Địa chỉ</th><td>{{ $duAn->investor_address }}</td></tr>
-                        @endif
-                    </tbody>
-                </table>
-            </div>
-        @endif
+    <div class="nx__container nx-pd__than">
 
-        @include('frontend.noxh.component.sale-staff')
+        {{-- CỘT TRÁI ---------------------------------------------------- --}}
+        <div class="nx-pd__chinh">
 
-        @include('frontend.noxh.component.expert-box')
+            {{-- TỔNG QUAN --}}
+            @if(count($bangTongQuan))
+                <section class="nx-panel nx-pd-tq" id="tong-quan">
+                    <h2 class="nx-pd__tieude">{{ $tieuDe['overview'] ?: 'TỔNG QUAN DỰ ÁN' }}</h2>
 
-        <div class="nx-panel">
-            <h2 class="nx-panel__title">Bạn đã đủ điều kiện mua?</h2>
-            <p class="nx__subheading">Trả lời 8 câu hỏi ngắn để biết khả năng đáp ứng điều kiện mua NOXH.</p>
-            <a href="{{ url('/kiem-tra-dieu-kien') }}" class="nx-btn nx-btn--block">KIỂM TRA ĐIỀU KIỆN</a>
+                    <div class="nx-pd-tq__trong">
+                        <table class="nx-pd-bang">
+                            <tbody>
+                                @foreach($bangTongQuan as $nhan => $giaTri)
+                                    <tr><th>{{ $nhan }}</th><td>{{ $giaTri }}</td></tr>
+                                @endforeach
+                                @if($tt && $nhanTrangThai !== '')
+                                    <tr>
+                                        <th>{{ $nhanTrangThai }}</th>
+                                        <td><span class="nx-badge nx-badge--{{ $duAn->status }}">{{ $tt }}</span></td>
+                                    </tr>
+                                @endif
+                            </tbody>
+                        </table>
+
+                        @if(!empty($duAn->site_plan_image))
+                            <figure class="nx-pd-tq__so-do">
+                                <img src="{{ $duAn->site_plan_image }}"
+                                     alt="Mặt bằng tổng thể {{ $duAn->name }}" loading="lazy" decoding="async">
+                                @if(count($album))
+                                    <a href="#hinh-anh" class="nx-pd-tq__nut">
+                                        @include('frontend.noxh.component.icon', ['name' => 'photo', 'size' => 18])
+                                        {{ $intro['projectdetail_overview_photo_text'] ?? 'Xem ảnh thực tế' }}
+                                    </a>
+                                @endif
+                            </figure>
+                        @endif
+                    </div>
+                </section>
+            @endif
+
+            {{-- CÁC LOẠI CĂN HỘ --}}
+            @if($loaiCanHo->count())
+                <section class="nx-panel" id="mat-bang">
+                    <h2 class="nx-pd__tieude nx-pd__tieude--co-nut">
+                        {{ $tieuDe['units'] ?: 'CÁC LOẠI CĂN HỘ' }}
+                        @if($conLoaiCanHo > 0)
+                            <a href="#dang-ky">
+                                {{ $intro['projectdetail_units_all_text'] ?? 'Xem tất cả' }}
+                                @include('frontend.noxh.component.icon', ['name' => 'arrow-right', 'size' => 15])
+                            </a>
+                        @endif
+                    </h2>
+
+                    <div class="nx-pd-can-luoi">
+                        @foreach($loaiCanHo as $can)
+                            @include('frontend.noxh.component.pd-unit', ['can' => $can])
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
+            {{-- VỊ TRÍ + TIẾN ĐỘ: hai khối cạnh nhau như bản vẽ --}}
+            @if((!empty($duAn->map_image) || $banDoUrl) || $tienDo->count())
+                <div class="nx-pd-doi">
+                    @if(!empty($duAn->map_image) || $banDoUrl)
+                        <section class="nx-panel nx-pd-vitri" id="vi-tri">
+                            <h2 class="nx-pd__tieude">{{ $tieuDe['location'] ?: 'VỊ TRÍ DỰ ÁN' }}</h2>
+
+                            <div class="nx-pd-vitri__khung">
+                                @if(!empty($duAn->map_image))
+                                    <img src="{{ $duAn->map_image }}"
+                                         alt="Bản đồ vị trí {{ $duAn->name }}" loading="lazy" decoding="async">
+                                    <span class="nx-pd-vitri__ghim">
+                                        @include('frontend.noxh.component.icon', ['name' => 'pin', 'size' => 18])
+                                        {{ $duAn->name }}
+                                    </span>
+                                @endif
+
+                                @if($banDoUrl)
+                                    <a href="{{ $banDoUrl }}" class="nx-pd-vitri__nut"
+                                       target="_blank" rel="noopener nofollow">
+                                        @include('frontend.noxh.component.icon', ['name' => 'directions', 'size' => 18])
+                                        {{ $intro['projectdetail_location_button'] ?? 'Xem trên Google Maps' }}
+                                    </a>
+                                @endif
+                            </div>
+                        </section>
+                    @endif
+
+                    @if($tienDo->count())
+                        <section class="nx-panel nx-pd-tiendo" id="tien-do">
+                            <h2 class="nx-pd__tieude">{{ $tieuDe['progress'] ?: 'TIẾN ĐỘ DỰ ÁN' }}</h2>
+
+                            <div class="nx-pd-tiendo__trong">
+                                <ol class="nx-pd-moc">
+                                    @foreach($tienDo as $moc)
+                                        <li class="{{ $moc->status === 'done' ? 'is-xong' : ($moc->status === 'doing' ? 'is-lam' : '') }}">
+                                            <span class="nx-pd-moc__dau">
+                                                @include('frontend.noxh.component.icon', ['name' => 'check-circle', 'size' => 18])
+                                            </span>
+                                            <span class="nx-pd-moc__chu">
+                                                <strong>{{ $moc->date_label ?: nx_quy_nam($moc->sort_date) }}</strong>
+                                                <span>{{ $moc->title }}</span>
+                                            </span>
+                                        </li>
+                                    @endforeach
+                                </ol>
+
+                                @if(!empty($duAn->progress_image))
+                                    <figure class="nx-pd-tiendo__anh">
+                                        <img src="{{ $duAn->progress_image }}"
+                                             alt="Hình ảnh thi công {{ $duAn->name }}" loading="lazy" decoding="async">
+                                    </figure>
+                                @endif
+                            </div>
+
+                            @if(!empty($duAn->progress_url))
+                                <a href="{{ nx_url($duAn->progress_url) }}" class="nx-pd-tiendo__nut">
+                                    @include('frontend.noxh.component.icon', ['name' => 'update', 'size' => 18])
+                                    {{ $intro['projectdetail_progress_button'] ?? 'Xem cập nhật tiến độ' }}
+                                </a>
+                            @endif
+                        </section>
+                    @endif
+                </div>
+            @endif
+
+            {{-- TIỆN ÍCH --}}
+            @if($tienIch->count())
+                <section class="nx-panel" id="tien-ich">
+                    <h2 class="nx-pd__tieude">{{ $tieuDe['amenity'] ?: 'TIỆN ÍCH DỰ ÁN' }}</h2>
+
+                    <div class="nx-pd-tienich">
+                        @foreach($tienIch as $ti)
+                            <div class="nx-pd-o">
+                                @include('frontend.noxh.component.icon', [
+                                    'name' => $ti->icon ?: 'check-circle', 'size' => 24,
+                                ])
+                                <span>
+                                    <span class="nx-pd-o__nhan">{{ $ti->title }}</span>
+                                    @if($ti->subtitle)<strong>{{ $ti->subtitle }}</strong>@endif
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
+            {{-- PHÁP LÝ --}}
+            @if($hoSo->count())
+                <section class="nx-panel" id="phap-ly">
+                    <h2 class="nx-pd__tieude">{{ $tieuDe['legal'] ?: 'PHÁP LÝ DỰ ÁN' }}</h2>
+                    <div class="nx-doc-grid">
+                        @foreach($hoSo as $hs)
+                            <a href="{{ $hs->file ?: '#' }}" class="nx-doc" @if($hs->file) target="_blank" rel="noopener" @endif>
+                                <span class="nx-doc__icon">
+                                    @include('frontend.noxh.component.icon', ['name' => 'file', 'size' => 22])
+                                </span>
+                                <span>
+                                    <strong>{{ $hs->title }}</strong>
+                                    @if($hs->doc_number)<span>Số: {{ $hs->doc_number }}</span>@endif
+                                    @if($hs->issued_date)<span>Ngày: {{ \Illuminate\Support\Carbon::parse($hs->issued_date)->format('d/m/Y') }}</span>@endif
+                                </span>
+                            </a>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
+            {{-- HÌNH ẢNH --}}
+            @if(count($album))
+                <section class="nx-panel" id="hinh-anh">
+                    <h2 class="nx-pd__tieude">{{ $tieuDe['gallery'] ?: 'HÌNH ẢNH DỰ ÁN' }}</h2>
+                    <div class="nx-pd-album">
+                        @foreach($album as $a)
+                            <a href="{{ $a }}" target="_blank" rel="noopener">
+                                <img src="{{ $a }}" alt="{{ $duAn->name }}" loading="lazy" decoding="async">
+                            </a>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
+            {{-- GIỚI THIỆU CHI TIẾT --}}
+            @if($duAn->content)
+                <section class="nx-panel" id="gioi-thieu">
+                    <h2 class="nx-pd__tieude">{{ $tieuDe['content'] ?: 'GIỚI THIỆU CHI TIẾT' }}</h2>
+                    <div class="nx-prose">{!! $duAn->content !!}</div>
+                </section>
+            @endif
+
+            {{-- HỎI ĐÁP --}}
+            @if($faq->count())
+                <section class="nx-panel" id="hoi-dap">
+                    <h2 class="nx-pd__tieude">{{ $tieuDe['faq'] ?: 'CÂU HỎI THƯỜNG GẶP' }}</h2>
+                    @foreach($faq as $ch)
+                        <details class="nx-faq">
+                            <summary>{{ $ch->question }}</summary>
+                            <div class="nx-faq__body">{!! nl2br(e(strip_tags($ch->answer))) !!}</div>
+                        </details>
+                    @endforeach
+                </section>
+            @endif
+
+            {{-- DỰ ÁN TƯƠNG TỰ --}}
+            @if($tuongTu->count())
+                <section class="nx-panel" id="tuong-tu">
+                    <h2 class="nx-pd__tieude nx-pd__tieude--co-nut">
+                        {{ strtr($intro['projectdetail_similar_heading'] ?? 'DỰ ÁN TƯƠNG TỰ', $thay) }}
+                        <a href="{{ $duAn->province_code ? url('/du-an?province_code=' . $duAn->province_code) : url('/du-an') }}">
+                            {{ $intro['projectdetail_similar_all_text'] ?? 'Xem tất cả' }}
+                            @include('frontend.noxh.component.icon', ['name' => 'arrow-right', 'size' => 15])
+                        </a>
+                    </h2>
+
+                    <div class="nx-pd-tt-luoi">
+                        @foreach($tuongTu as $d)
+                            @include('frontend.noxh.component.pd-similar', ['d' => $d])
+                        @endforeach
+                    </div>
+                </section>
+            @endif
         </div>
-    </aside>
+
+        {{-- CỘT PHẢI ---------------------------------------------------- --}}
+        <aside class="nx-pd__phu">
+            @include('frontend.noxh.component.pd-quick')
+            @include('frontend.noxh.component.pd-advisors')
+            @include('frontend.noxh.component.pd-lead')
+        </aside>
+    </div>
 </div>
 
 @include('frontend.noxh.component.advisor-modal', ['duAnId' => $duAn->id])

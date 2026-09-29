@@ -836,15 +836,18 @@ if (!function_exists('so_gon')) {
     /**
      * In mot so thap phan theo kieu Viet Nam, bo phan le khi bang khong.
      * 19.55 -> "19,55"   32.00 -> "32"   null -> ""
+     *
+     * $soLe: gia can ho tinh bang ty can BA chu so le ("1,075 ty"), lam tron
+     * hai chu so la mat 5 trieu dong ma nguoi doc khong he biet.
      */
-    function so_gon($so): string
+    function so_gon($so, int $soLe = 2): string
     {
         if ($so === null || $so === '') {
             return '';
         }
 
         $so = (float) $so;
-        $chuoi = number_format($so, 2, ',', '.');
+        $chuoi = number_format($so, $soLe, ',', '.');
 
         return rtrim(rtrim($chuoi, '0'), ',');
     }
@@ -855,13 +858,18 @@ if (!function_exists('khoang_so')) {
      * Gop hai dau thanh mot khoang: "32 - 70 m2".
      *
      * Thieu mot dau thi in dau con lai kem tu "Tu"/"Den" chu khong in dau
-     * gach cut lung. Thieu ca hai thi tra ve dau gach - de o trong se lam vo
-     * bo cuc the du an.
+     * gach cut lung.
+     *
+     * $khiTrong: thieu ca hai dau thi tra ve chuoi nay. Mac dinh la dau gach,
+     * vi the du an de o trong se vo bo cuc; nhung cho nao muon TU AN khoi di
+     * (vi du the gia o trang chi tiet) thi truyen '' de con phan biet duoc.
+     *
+     * $soLe: so chu so thap phan, xem so_gon().
      */
-    function khoang_so($tu, $den, string $donVi = ''): string
+    function khoang_so($tu, $den, string $donVi = '', string $khiTrong = '—', int $soLe = 2): string
     {
-        $a = so_gon($tu);
-        $b = so_gon($den);
+        $a = so_gon($tu, $soLe);
+        $b = so_gon($den, $soLe);
 
         if ($a !== '' && $b !== '' && $a !== $b) {
             // Gach NGANG (en dash) chu khong phai dau tru: ban thiet ke viet
@@ -878,7 +886,7 @@ if (!function_exists('khoang_so')) {
             return $b . $donVi;
         }
 
-        return '—';
+        return $khiTrong;
     }
 }
 
@@ -1269,5 +1277,31 @@ if (!function_exists('nx_ban_do_diem')) {
             'x' => round(($lng - $k['lng_min']) / ($k['lng_max'] - $k['lng_min']) * $k['rong'], 1),
             'y' => round(($k['lat_max'] - $lat) / ($k['lat_max'] - $k['lat_min']) * $k['cao'], 1),
         ];
+    }
+}
+
+if (!function_exists('nx_quy_nam')) {
+    /**
+     * Doi mot ngay thanh "Quy IV/2026".
+     *
+     * Du an bat dong san cong bo moc thoi gian theo quy chu khong theo ngay:
+     * in ra "15/10/2026" la sai voi cach nguoi mua doc. Quan tri van nhap
+     * ngay (de con sap xep duoc), trang tu quy doi khi hien.
+     */
+    function nx_quy_nam($ngay): string
+    {
+        if (empty($ngay)) {
+            return '';
+        }
+
+        try {
+            $d = \Illuminate\Support\Carbon::parse($ngay);
+        } catch (\Exception $e) {
+            return '';
+        }
+
+        $so = ['I', 'II', 'III', 'IV'][intdiv($d->month - 1, 3)];
+
+        return 'Quý ' . $so . '/' . $d->year;
     }
 }

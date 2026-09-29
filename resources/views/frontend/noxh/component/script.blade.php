@@ -347,5 +347,147 @@ window.NX.tienTuTrieu = function (trieu) {
 
     document.querySelectorAll('select[data-nx-chon]').forEach(taoOChon);
 })();
+
+// =============================================================================
+// TRANG CHI TIET DU AN
+// =============================================================================
+
+// --- Dai anh nho: bam mot o thi doi anh lon ---------------------------------
+// Moi o van la mot the <a> tro thang den file anh, nen khong co JS thi bam
+// vao van mo duoc anh - chi mat phan doi anh tai cho.
+(function () {
+    var chinh = document.getElementById('nx-pd-anh-chinh');
+    var oAnh = document.querySelectorAll('[data-nx-anh]');
+
+    if (!chinh || !oAnh.length) return;
+
+    var goc = chinh.getAttribute('src');
+
+    oAnh.forEach(function (o) {
+        o.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            var duong = o.getAttribute('data-nx-anh');
+
+            // Bam lai dung o dang xem thi tra ve anh dai dien.
+            if (chinh.getAttribute('src') === duong) {
+                chinh.setAttribute('src', goc);
+                o.classList.remove('is-chon');
+                return;
+            }
+
+            chinh.setAttribute('src', duong);
+            oAnh.forEach(function (k) { k.classList.remove('is-chon'); });
+            o.classList.add('is-chon');
+        });
+    });
+})();
+
+// --- Nut "Xem video du an" --------------------------------------------------
+// Chi dung mot lop phu duy nhat, tao luc bam lan dau. Dong lai thi GO HAN
+// the iframe chu khong chi an di - de an thi YouTube van chay tieng ngam.
+(function () {
+    var nut = document.querySelector('[data-nx-video]');
+
+    if (!nut) return;
+
+    var lop = null;
+
+    // Doi link YouTube/Vimeo thuong thanh dang nhung duoc. Link khac thi tra
+    // ve null de mo sang tab moi, khong nhoi bua vao iframe.
+    function duongNhung(url) {
+        var m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/);
+        if (m) return 'https://www.youtube.com/embed/' + m[1] + '?autoplay=1';
+
+        m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+        if (m) return 'https://player.vimeo.com/video/' + m[1] + '?autoplay=1';
+
+        return null;
+    }
+
+    function dong() {
+        if (!lop) return;
+        lop.remove();
+        lop = null;
+        document.body.style.overflow = '';
+    }
+
+    nut.addEventListener('click', function () {
+        var url = nut.getAttribute('data-nx-video');
+        var nhung = duongNhung(url);
+
+        if (!nhung) {
+            window.open(url, '_blank', 'noopener');
+            return;
+        }
+
+        lop = document.createElement('div');
+        lop.className = 'nx-pd-video';
+        lop.innerHTML =
+            '<div class="nx-pd-video__hop">' +
+            '<button type="button" class="nx-pd-video__dong" aria-label="Đóng">&times;</button>' +
+            '<iframe allow="autoplay; fullscreen" allowfullscreen></iframe>' +
+            '</div>';
+        lop.querySelector('iframe').setAttribute('src', nhung);
+
+        lop.addEventListener('click', function (e) {
+            if (e.target === lop || e.target.closest('.nx-pd-video__dong')) dong();
+        });
+
+        document.body.appendChild(lop);
+        document.body.style.overflow = 'hidden';
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') dong();
+    });
+})();
+
+// --- Thanh tab: to sang muc dang xem ----------------------------------------
+// Dung IntersectionObserver chu khong nghe su kien cuon: trinh duyet tu bao
+// khi mot khoi vao vung nhin, khong phai tinh lai vi tri moi khung hinh.
+(function () {
+    var muc = document.querySelectorAll('[data-nx-tab]');
+
+    if (!muc.length || !('IntersectionObserver' in window)) return;
+
+    var theo = {};
+    var khoi = [];
+
+    muc.forEach(function (m) {
+        var id = m.getAttribute('data-nx-tab');
+        var k = document.getElementById(id);
+
+        if (!k) return;
+
+        theo[id] = m;
+        khoi.push(k);
+    });
+
+    if (!khoi.length) return;
+
+    // Dang thay: khoi nao co phan nam trong dai giua man hinh thi tinh la
+    // dang xem. Lay khoi TREN CUNG trong so do de khi hai khoi cung lot vao
+    // thi tab khong nhay qua lai.
+    var dangThay = {};
+
+    var nguoiXem = new IntersectionObserver(function (ds) {
+        ds.forEach(function (d) {
+            dangThay[d.target.id] = d.isIntersecting;
+        });
+
+        var chon = null;
+
+        for (var i = 0; i < khoi.length; i++) {
+            if (dangThay[khoi[i].id]) { chon = khoi[i].id; break; }
+        }
+
+        Object.keys(theo).forEach(function (id) {
+            theo[id].classList.toggle('is-chon', id === chon);
+        });
+    }, { rootMargin: '-72px 0px -55% 0px' });
+
+    khoi.forEach(function (k) { nguoiXem.observe(k); });
+})();
 </script>
 @stack('script')
