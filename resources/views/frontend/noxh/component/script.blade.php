@@ -485,7 +485,10 @@ window.NX.tienTuTrieu = function (trieu) {
         Object.keys(theo).forEach(function (id) {
             theo[id].classList.toggle('is-chon', id === chon);
         });
-    }, { rootMargin: '-72px 0px -55% 0px' });
+    // Dai nhan biet: bat dau ngay duoi dau trang + thanh tab (130px) va keo
+    // xuong giua man hinh. Khong tru phan tren thi khoi vua truot len gam
+    // thanh tab van con duoc tinh la "dang xem".
+    }, { rootMargin: '-130px 0px -45% 0px' });
 
     khoi.forEach(function (k) { nguoiXem.observe(k); });
 })();

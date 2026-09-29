@@ -1070,6 +1070,12 @@
 .nx-pd {
     padding-bottom: 40px;
 
+    // Bam mot muc tren thanh tab thi khoi tuong ung phai dung DUOI ca dau
+    // trang (67px) lan thanh tab (51px), khong thi tieu de khoi bi che mat.
+    section[id] {
+        scroll-margin-top: 130px;
+    }
+
     // --- Dai dau trang: nen troi, duong dan, ten du an, anh, the gia -------
     &__dau {
         // Do tai (300,40)-(420,60) ra #b8dcfc, tai (120,130)-(200,140) ra
@@ -1445,7 +1451,10 @@
 // --- Thanh tab dinh -----------------------------------------------------------
 .nx-pd-tab {
     position: sticky;
-    top: 0;
+    // Dau trang cung dinh (.nx-header, cao 67px) va nam tren (z-index 100),
+    // nen thanh tab phai dung ngay DUOI no - de top: 0 thi no truot vao gam
+    // dau trang va mat hut.
+    top: 67px;
     z-index: 20;
     background: #fff;
     border-bottom: 1px solid $nx-line;
