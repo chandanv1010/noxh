@@ -263,6 +263,242 @@ $nx-sm: 480px;
 }
 
 // =============================================================================
+// O CHON TU VE
+// =============================================================================
+//
+// Danh sach option cua the <select> do he dieu hanh ve nen CSS khong voi toi;
+// tren Windows no ra mot khung xam vuong chu nho, lech han voi trang. Khoi
+// nay la phan nhin thay duoc, con the <select> that van nam trong DOM (an di)
+// de form gui dung va trang khong co JS van dung duoc.
+//
+// Ma dung o frontend/noxh/component/script.blade.php.
+.nx-chon {
+    position: relative;
+    width: 100%;
+
+    // The <select> that: an khoi mat nhung KHONG dung display:none - lam the
+    // thi trinh duyet bo qua thuoc tinh required va khong nhay toi duoc o loi.
+    &__that {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        inset: 0;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    &__nut {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        width: 100%;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: $nx-ink;
+        font-family: inherit;
+        font-size: 13.5px;
+        line-height: 1.5;
+        text-align: left;
+        cursor: pointer;
+
+        // Mui ten xuong, ve bang vien cua mot o vuong xoay 45 do.
+        &::after {
+            content: '';
+            flex: none;
+            width: 7px;
+            height: 7px;
+            margin-bottom: 3px;
+            border-right: 1.6px solid #9aa4b5;
+            border-bottom: 1.6px solid #9aa4b5;
+            transform: rotate(45deg);
+            transition: transform 0.15s ease;
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+        }
+    }
+
+    &__nhan {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    // Chua chon gi: chu to nhat di, giong chu mo cua o nhap lieu.
+    &.is-trong &__nhan {
+        color: #8a93a3;
+    }
+
+    &.is-khoa {
+        opacity: 0.6;
+    }
+
+    &.is-mo &__nut::after {
+        transform: rotate(-135deg);
+        margin-bottom: -2px;
+        border-color: $nx-blue;
+    }
+
+    // --- Bang danh sach ------------------------------------------------------
+    &__bang {
+        position: absolute;
+        z-index: 60;
+        top: calc(100% + 10px);
+        left: -13px;
+        right: -13px;
+        min-width: 200px;
+        padding: 6px;
+        border: 1px solid $nx-line;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 18px 40px rgba(11, 40, 80, 0.16);
+
+        &[hidden] {
+            display: none;
+        }
+    }
+
+    &__tim {
+        width: 100%;
+        margin-bottom: 6px;
+        padding: 8px 11px;
+        border: 1px solid $nx-line;
+        border-radius: 8px;
+        background: #f7fafe;
+        color: $nx-ink;
+        font-family: inherit;
+        font-size: 13px;
+
+        &:focus {
+            border-color: $nx-blue;
+            background: #fff;
+            outline: none;
+        }
+
+        &[hidden] {
+            display: none;
+        }
+    }
+
+    &__ds {
+        max-height: 264px;
+        margin: 0;
+        padding: 0;
+        overflow-y: auto;
+        list-style: none;
+        // Thanh cuon manh, cung ho mau voi trang.
+        scrollbar-width: thin;
+        scrollbar-color: #c6d7ec transparent;
+
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            border: 2px solid #fff;
+            border-radius: 99px;
+            background: #c6d7ec;
+        }
+    }
+
+    &__muc {
+        position: relative;
+        padding: 9px 12px 9px 12px;
+        border-radius: 8px;
+        color: $nx-ink;
+        font-size: 13.5px;
+        line-height: 1.4;
+        cursor: pointer;
+
+        // is-sang la muc con tro hoac ban phim dang dung o do; is-chon la
+        // muc dang duoc chon that. Hai trang thai khac nhau nen mau khac
+        // nhau, neu khong nguoi dung khong biet minh dang o dau.
+        &.is-sang {
+            background: #f0f6ff;
+        }
+
+        &.is-chon {
+            background: $nx-blue-soft;
+            color: $nx-heading;
+            font-weight: 600;
+            padding-right: 30px;
+
+            // Dau tich o cuoi dong cho muc dang chon.
+            &::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                right: 12px;
+                width: 5px;
+                height: 10px;
+                margin-top: -6px;
+                border-right: 2px solid $nx-heading;
+                border-bottom: 2px solid $nx-heading;
+                transform: rotate(45deg);
+            }
+        }
+    }
+
+    &__trong {
+        padding: 12px;
+        color: $nx-muted;
+        font-size: 13px;
+        text-align: center;
+    }
+}
+
+// --- Dat trong thanh tim du an ----------------------------------------------
+//
+// O day nhan ("Tinh / Thanh pho") nam ben trong khung vien, ngay tren gia
+// tri - nen nut chon phai an mui ten rieng va dung mui ten cua khung.
+.nx-tim__o .nx-chon {
+    &__nut::after {
+        display: none;
+    }
+
+    &__bang {
+        left: -13px;
+        right: -13px;
+    }
+}
+
+// --- Dat trong dai dang ky nhan tin ------------------------------------------
+.nx-subscribe__form .nx-chon {
+    &__nut {
+        min-height: 41px;
+        padding: 11px 13px;
+        border: 1px solid #fff;
+        border-radius: 8px;
+        background: #fff;
+    }
+
+    &__bang {
+        left: 0;
+        right: 0;
+    }
+}
+
+// --- Dat trong o chon khu vuc cua doi tu van ---------------------------------
+.nx-chon-khu-vuc .nx-chon {
+    min-width: 160px;
+
+    &__nut {
+        padding: 9px 12px;
+        border: 1px solid $nx-line;
+        border-radius: 9px;
+        background: #fff;
+    }
+
+    &__bang {
+        left: 0;
+        right: 0;
+    }
+}
+
+// =============================================================================
 // ANH DAI DIEN CHU CAI
 // =============================================================================
 //

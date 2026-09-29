@@ -109,6 +109,31 @@ class ProjectQuery
             ->get(['p.province_code', 'pr.name as province_name', DB::raw('COUNT(*) as so_du_an')]);
     }
 
+    /**
+     * TAT CA tinh/thanh, kem so du an cua tung tinh (0 neu chua co).
+     *
+     * Dung cho o chon trong thanh tim kiem: chi do ra tinh dang co du an thi
+     * nguoi dung khong tim duoc tinh cua minh, ma khong tim duoc thi khong
+     * biet la chua co du an hay trang bi loi. Cho chon het roi tra ve trang
+     * "khong tim thay" ro rang hon.
+     *
+     * Danh sach lay tu vn_provinces - bo 34 tinh/thanh nap tu API bang lenh
+     * `php artisan noxh:dia-gioi`.
+     */
+    public function moiTinhThanh()
+    {
+        $dem = $this->co()
+            ->whereNotNull('p.province_code')
+            ->groupBy('p.province_code')
+            ->pluck(DB::raw('COUNT(*)'), 'p.province_code');
+
+        return DB::table('vn_provinces')
+            ->orderBy('order')
+            ->orderBy('name')
+            ->get(['code as province_code', 'name as province_name'])
+            ->each(fn ($t) => $t->so_du_an = (int) ($dem[$t->province_code] ?? 0));
+    }
+
     public function tongSoDuAn(): int
     {
         return $this->co()->count();

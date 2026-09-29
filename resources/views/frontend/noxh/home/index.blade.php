@@ -150,10 +150,13 @@
 
         <div class="nx-tim__o">
             <label for="tim-tinh">Tỉnh / Thành phố</label>
-            <select id="tim-tinh" name="province_code" data-nx-tinh>
+            <select id="tim-tinh" name="province_code" data-nx-tinh data-nx-chon>
                 <option value="">Chọn tỉnh/thành phố</option>
                 @foreach($tinhThanh as $t)
-                    <option value="{{ $t->province_code }}">{{ $t->province_name }} ({{ $t->so_du_an }})</option>
+                    {{-- Chi ghi so khi tinh do THUC SU co du an: in "(0)" sau
+                         ba chuc dong lam danh sach roi ram ma khong them tin
+                         gi. --}}
+                    <option value="{{ $t->province_code }}">{{ nx_ten_dia_gioi_ngan($t->province_name) }}@if($t->so_du_an > 0) ({{ $t->so_du_an }})@endif</option>
                 @endforeach
             </select>
         </div>
@@ -163,14 +166,14 @@
              ma goi rieng khi nguoi dung chon tinh. --}}
         <div class="nx-tim__o">
             <label for="tim-xa">Phường / Xã</label>
-            <select id="tim-xa" name="ward_code" data-nx-xa disabled>
+            <select id="tim-xa" name="ward_code" data-nx-xa data-nx-chon disabled>
                 <option value="">Chọn tỉnh/thành trước</option>
             </select>
         </div>
 
         <div class="nx-tim__o">
             <label for="tim-gia">Khoảng giá</label>
-            <select id="tim-gia" name="gia[]">
+            <select id="tim-gia" name="gia[]" data-nx-chon>
                 <option value="">Chọn khoảng giá</option>
                 @foreach($khoangGia as $g)
                     <option value="{{ $g['value'] }}">{{ $g['label'] }}</option>
@@ -180,7 +183,7 @@
 
         <div class="nx-tim__o">
             <label for="tim-trang-thai">Trạng thái</label>
-            <select id="tim-trang-thai" name="status[]">
+            <select id="tim-trang-thai" name="status[]" data-nx-chon>
                 <option value="">Tất cả</option>
                 @foreach(\App\Models\Product::TRANG_THAI_DU_AN as $ma => $ten)
                     <option value="{{ $ma }}">{{ $ten }}</option>
@@ -320,7 +323,7 @@
                 @if($khuVuc->count() > 1)
                     <div class="nx-chon-khu-vuc">
                         <label for="chon-khu-vuc">Chọn khu vực</label>
-                        <select id="chon-khu-vuc" data-nx-loc-khu-vuc>
+                        <select id="chon-khu-vuc" data-nx-loc-khu-vuc data-nx-chon>
                             <option value="">Tất cả khu vực</option>
                             @foreach($khuVuc as $kv)
                                 <option value="{{ $kv }}">{{ $kv }}</option>
@@ -367,10 +370,10 @@
             <input type="hidden" name="source" value="newsletter">
             <input type="text" name="name" placeholder="Họ và tên *" required>
             <input type="tel" name="phone" placeholder="Số điện thoại *" required>
-            <select name="province_code" aria-label="Chọn tỉnh/thành">
+            <select name="province_code" aria-label="Chọn tỉnh/thành" data-nx-chon>
                 <option value="">Chọn tỉnh/thành</option>
                 @foreach($tinhThanh as $t)
-                    <option value="{{ $t->province_code }}">{{ $t->province_name }}</option>
+                    <option value="{{ $t->province_code }}">{{ nx_ten_dia_gioi_ngan($t->province_name) }}</option>
                 @endforeach
             </select>
             <button type="submit" class="nx-btn">{{ $intro['subscribe_button'] ?? 'ĐĂNG KÝ NGAY' }}</button>

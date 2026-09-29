@@ -58,7 +58,7 @@ class HomeController extends FrontendController
                 'canonical' => url('/'),
             ],
             'duAnNoiBat' => $this->projectQuery->noiBat(self::SO_DU_AN_NOI_BAT),
-            'tinhThanh' => $this->projectQuery->tinhCoDuAn(),
+            'tinhThanh' => $this->projectQuery->moiTinhThanh(),
             'tinTuc' => $this->tinMoi(),
             'nhanVien' => $this->tuVanVien(),
         ]);
