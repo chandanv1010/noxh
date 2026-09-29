@@ -1,28 +1,47 @@
 // =============================================================================
 // NOXH.vn - bo style cua frontend
 //
-// Mau lay tu 9 man hinh mo phong: xanh duong lam mau chinh, nen trang, the bo
-// goc mem voi vien rat nhat. Xanh la cho gia, cam cho trang thai "sap mo ban".
+// BANG MAU do thang tu ban thiet ke noxh_image/home-fix.jpg (anh 1312x1199).
+// Anh do ChatGPT ve nen mau bi nhieu vai don vi theo tung diem; moi gia tri
+// duoi day la mau chiem nhieu nhat cua mot vung PHANG trong anh (ghi kem toa
+// do de sau con do lai duoc), chu khong phai mau cua mot diem le.
+//
+// Y nghia tung mau:
+//   $nx-blue     xanh sang  - nut bam, dai xanh, link, icon
+//   $nx-heading  xanh vua   - tieu de khoi (DU AN ... NOI BAT, TIN TUC ...)
+//   $nx-navy     xanh tham  - tieu de lon cua banner va ten du an
+// Ba mau nay KHAC nhau trong ban thiet ke, khong duoc gop lam mot.
 // =============================================================================
 
-$nx-blue: #1668e3;
-$nx-blue-dark: #0f52b8;
-$nx-blue-soft: #eaf2ff;
-$nx-blue-pale: #f4f8ff;
-$nx-ink: #12243b;
-$nx-text: #4a5a70;
-$nx-muted: #8695aa;
-$nx-line: #e3ebf6;
-$nx-bg: #f6f9fe;
-$nx-green: #16a34a;
-$nx-amber: #f59e0b;
+$nx-blue: #0a78f5;        // do tai (100,222)-(300,252): nut "TIM DU AN NGAY"
+$nx-blue-dark: #0b5fd0;   // ban dam hon, dung cho trang thai :hover
+$nx-blue-deep: #0a63de;   // do tai (250,1105)-(600,1170): nen chan trang
+$nx-heading: #0b60ce;     // do tai (40,460)-(300,479): "DU AN ... NOI BAT"
+$nx-navy: #122578;        // do tai (92,100)-(420,140): "NHA O XA HOI"
+$nx-blue-soft: #e8f1fd;   // nen o icon
+$nx-blue-pale: #f3f8ff;   // nen o thong tin huu ich
+$nx-ink: #13224a;
+$nx-text: #6e7991;        // do tai (52,333)-(232,344): dong chu phu
+$nx-muted: #8e929e;       // do tai (785,824)-(848,837): ngay thang tin tuc
+$nx-line: #dce7f5;
+$nx-bg: #f4f8fd;
+$nx-green: #2f9e46;       // nhan "Dang mo ban"
+$nx-green-light: #45b45c;
+$nx-amber: #f79f0a;       // nut "KIEM TRA NGAY", do tai (1060,392)-(1240,422)
+$nx-amber-light: #ffb42a;
 $nx-red: #dc2626;
 
-// Trang chu rong hon cac trang con - dung theo ban thiet ke. De o bien CSS
-// chu khong phai bien SCSS vi tri so doi theo tung trang, ma bien SCSS thi
-// duoc thay ngay luc bien dich, khong doi duoc theo lop tren the <body>.
+// --- Khung noi dung ----------------------------------------------------------
+//
+// Trong ban thiet ke, noi dung chay tu x=35 den x=1277 tren khung rong 1312 -
+// tuc la chiem 94,8% be ngang, le hai ben moi ben 2,67%. Ban cu de le co dinh
+// 16px nen tren man hinh 1400px tro len khoi noi dung tran gan sat mep.
+//
+// Gio le co gian theo be ngang man hinh (2,67vw) nhung khong duoi 16px tren
+// dien thoai va khong qua 35px tren man hinh rong.
 $nx-container: 1280px;
 $nx-container-home: 1400px;
+$nx-gutter: clamp(16px, 2.67vw, 35px);
 
 $nx-lg: 1024px;
 $nx-md: 768px;
@@ -32,7 +51,7 @@ $nx-sm: 480px;
     width: 100%;
     max-width: var(--nx-container, #{$nx-container});
     margin: 0 auto;
-    padding-inline: 16px;
+    padding-inline: $nx-gutter;
 }
 
 @mixin nx-card {
@@ -71,10 +90,12 @@ $nx-sm: 480px;
         }
     }
 
-    // Tieu de khoi: chu hoa, mau xanh dam - dung nhu ban mo phong.
+    // Tieu de khoi: chu hoa, mau xanh vua - dung nhu ban thiet ke. KHONG dung
+    // $nx-navy o day: navy danh cho tieu de banner va ten du an, hai mau nay
+    // trong ban thiet ke la khac nhau.
     &__heading {
         margin: 0 0 4px;
-        color: $nx-ink;
+        color: $nx-heading;
         font-size: 24px;
         font-weight: 800;
         text-transform: uppercase;
@@ -91,13 +112,24 @@ $nx-sm: 480px;
         font-size: 14px;
     }
 
+    // Tieu de khoi - ben trai la ten khoi, ben phai la bo loc va lien ket
+    // "xem tat ca". Ba phan nam tren MOT hang nhu ban thiet ke; chi khi man
+    // hinh khong con du 900px moi cho xuong dong.
     &__head {
         display: flex;
-        align-items: flex-end;
+        align-items: center;
         justify-content: space-between;
-        gap: 16px;
-        margin-bottom: 18px;
-        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 16px;
+
+        > *:first-child {
+            margin-right: auto;
+        }
+
+        @media (max-width: 900px) {
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
     }
 
     &__more {
@@ -206,21 +238,23 @@ $nx-sm: 480px;
 // =============================================================================
 // NHAN TRANG THAI
 // =============================================================================
+// Trong ban thiet ke nhan trang thai nam DE LEN anh du an, nen la vien tron
+// TO DAC chu chu trang, khong phai nhan nhat chu mau nhu truoc.
 .nx-badge {
     display: inline-flex;
     align-items: center;
-    padding: 4px 11px;
+    padding: 5px 13px;
     border-radius: 999px;
     font-size: 12px;
     font-weight: 600;
     line-height: 1.5;
-    background: rgba(22, 163, 74, 0.12);
-    color: $nx-green;
+    background: linear-gradient(135deg, $nx-green-light 0%, $nx-green 100%);
+    color: #fff;
 
-    &--receiving { background: rgba(22, 163, 74, 0.12); color: $nx-green; }
-    &--upcoming  { background: rgba(245, 158, 11, 0.16); color: #b45309; }
-    &--building  { background: rgba(22, 104, 227, 0.12); color: $nx-blue; }
-    &--handed    { background: rgba(134, 149, 170, 0.18); color: #56677e; }
+    &--receiving { background: linear-gradient(135deg, $nx-green-light 0%, $nx-green 100%); color: #fff; }
+    &--upcoming  { background: linear-gradient(135deg, $nx-amber-light 0%, $nx-amber 100%); color: #fff; }
+    &--building  { background: linear-gradient(135deg, #3d93ff 0%, $nx-blue 100%); color: #fff; }
+    &--handed    { background: linear-gradient(135deg, #8fa0b6 0%, #61748d 100%); color: #fff; }
 
     &--solid {
         background: $nx-blue;
@@ -242,10 +276,11 @@ $nx-sm: 480px;
         @include nx-container;
         display: flex;
         align-items: center;
-        gap: 24px;
-        min-height: 68px;
+        gap: 16px;
+        min-height: 66px;
     }
 
+    // --- Logo: o vuong bo goc + chu NOXH.VN + khau hieu ----------------------
     &__logo {
         display: flex;
         align-items: center;
@@ -254,35 +289,59 @@ $nx-sm: 480px;
         flex-shrink: 0;
 
         img {
-            height: 40px;
+            height: 42px;
             width: auto;
         }
     }
 
-    &__brand {
-        color: $nx-blue;
-        font-size: 22px;
-        font-weight: 800;
-        letter-spacing: -0.01em;
-        line-height: 1.1;
+    &__mark {
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: $nx-blue;
+        color: #fff;
+    }
 
-        span {
-            color: $nx-ink;
-        }
+    &__brand {
+        display: block;
+        color: $nx-blue;
+        font-size: 23px;
+        font-weight: 800;
+        letter-spacing: -0.015em;
+        line-height: 1.05;
+        text-transform: uppercase;
     }
 
     &__tagline {
         display: block;
-        color: $nx-muted;
-        font-size: 11px;
+        margin-top: 1px;
+        color: #5b7ba8;
+        font-size: 10.5px;
         font-weight: 500;
+        letter-spacing: 0.005em;
+        white-space: nowrap;
+
+        @media (max-width: $nx-sm) {
+            display: none;
+        }
     }
 
+    // --- Thanh dieu huong ----------------------------------------------------
+    // Trong ban thiet ke ca thanh dieu huong chiem khoang 40% khung noi
+    // dung, con lai danh cho o tim kiem va khoi so dien thoai.
     &__nav {
         display: flex;
         align-items: center;
-        gap: 22px;
-        margin-left: auto;
+        gap: 15px;
+        margin-inline: auto;
+
+        @media (max-width: 1360px) {
+            gap: 11px;
+        }
 
         @media (max-width: $nx-lg) {
             // Man hinh hep: menu truot tu tren xuong khi bam nut ba gach.
@@ -293,7 +352,8 @@ $nx-sm: 480px;
             flex-direction: column;
             align-items: stretch;
             gap: 0;
-            padding: 8px 16px 16px;
+            margin-inline: 0;
+            padding: 8px $nx-gutter 16px;
             background: #fff;
             border-bottom: 1px solid $nx-line;
             box-shadow: 0 16px 30px rgba(18, 36, 59, 0.08);
@@ -306,28 +366,31 @@ $nx-sm: 480px;
 
     &__link {
         position: relative;
-        color: $nx-ink;
-        font-size: 14px;
+        color: #1d2440;
+        font-size: 13.5px;
         font-weight: 600;
         text-decoration: none;
-        padding-block: 22px;
+        padding-block: 23px;
         white-space: nowrap;
 
         &:hover {
             color: $nx-blue;
         }
 
+        // Muc dang xem: chu xanh va mot gach ngan NGAY DUOI CHU - trong ban
+        // thiet ke gach nam cach chan chu vai diem, khong phai o day khung.
         &.is-active {
-            color: $nx-blue;
+            color: $nx-heading;
 
             &::after {
                 content: '';
                 position: absolute;
                 left: 0;
                 right: 0;
-                bottom: 14px;
-                height: 2px;
-                background: $nx-blue;
+                bottom: 16px;
+                height: 2.5px;
+                border-radius: 2px;
+                background: $nx-heading;
             }
         }
 
@@ -341,35 +404,126 @@ $nx-sm: 480px;
         }
     }
 
-    &__cta {
-        flex-shrink: 0;
+    // --- O tim kiem ----------------------------------------------------------
+    //
+    // Trong ban thiet ke o nay rong khoang 14,8% khung noi dung. De theo ti le
+    // chu khong phai so co dinh, de man hinh nao cung giu dung bo cuc do.
+    &__tim {
+        flex: 0 0 14.8%;
+        min-width: 160px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        height: 38px;
+        padding-inline: 13px;
+        border: 1px solid transparent;
+        border-radius: 999px;
+        background: #e9f0f7;
+        color: #848c98;
+
+        &:focus-within {
+            border-color: $nx-blue;
+            background: #fff;
+        }
+
+        button {
+            flex: none;
+            display: inline-flex;
+            padding: 0;
+            border: 0;
+            background: none;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        input {
+            width: 100%;
+            min-width: 0;
+            padding: 0;
+            border: 0;
+            background: none;
+            color: $nx-ink;
+            font-family: inherit;
+            font-size: 13px;
+
+            &::placeholder {
+                color: #848c98;
+            }
+
+            &:focus {
+                outline: none;
+            }
+        }
+
+        @media (max-width: 1280px) {
+            display: none;
+        }
+    }
+
+    // --- Khoi so dien thoai --------------------------------------------------
+    &__phone {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 7px 16px 7px 13px;
+        border-radius: 10px;
+        background: $nx-blue;
+        color: #fff;
+        text-decoration: none;
+
+        &:hover {
+            background: $nx-blue-dark;
+            color: #fff;
+        }
+
+        svg {
+            flex: none;
+        }
+
+        strong {
+            display: block;
+            font-size: 16.5px;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+        }
+
+        span span {
+            display: block;
+            font-size: 11px;
+            line-height: 1.25;
+            opacity: 0.92;
+        }
 
         @media (max-width: $nx-lg) {
             margin-left: auto;
         }
 
         @media (max-width: $nx-sm) {
-            display: none;
+            padding: 8px;
+
+            span {
+                display: none;
+            }
         }
     }
 
     &__toggle {
         display: none;
         width: 40px;
-        height: 36px;
+        height: 38px;
         padding: 0;
         border: 1px solid $nx-line;
-        border-radius: 8px;
+        border-radius: 9px;
         background: #fff;
         color: $nx-ink;
-        font-size: 18px;
         cursor: pointer;
 
         @media (max-width: $nx-lg) {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            margin-left: 8px;
         }
     }
 }
@@ -405,17 +559,19 @@ $nx-sm: 480px;
 // CHAN TRANG
 // =============================================================================
 .nx-footer {
-    background: $nx-blue;
-    color: rgba(255, 255, 255, 0.86);
+    background: $nx-blue-deep;
+    color: rgba(255, 255, 255, 0.88);
 
+    // Ban thiet ke chia chan trang thanh nam cot ngan cach bang vach dung mo:
+    // thuong hieu | hai cot lien ket | mang xa hoi | so dien thoai.
     &__inner {
         @include nx-container;
         display: grid;
-        grid-template-columns: 1.6fr repeat(3, 1fr);
-        gap: 32px;
-        padding-block: 44px;
+        grid-template-columns: 1.55fr 1fr 1fr 1.05fr auto;
+        gap: 30px;
+        padding-block: 34px;
 
-        @media (max-width: $nx-lg) {
+        @media (max-width: 1100px) {
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 26px;
         }
@@ -425,25 +581,76 @@ $nx-sm: 480px;
         }
     }
 
-    &__brand {
+    // Vach ngan giua cac cot. Dung ::before de khong phai them the rong.
+    &__cot {
+        position: relative;
+        min-width: 0;
+
+        + .nx-footer__cot::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            bottom: 2px;
+            left: -15px;
+            width: 1px;
+            background: rgba(255, 255, 255, 0.2);
+
+            @media (max-width: 1100px) {
+                display: none;
+            }
+        }
+    }
+
+    &__logo {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+
+        img {
+            height: 44px;
+            width: auto;
+        }
+    }
+
+    &__mark {
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.2);
         color: #fff;
-        font-size: 22px;
+    }
+
+    &__brand {
+        display: block;
+        color: #fff;
+        font-size: 24px;
         font-weight: 800;
-        margin-bottom: 4px;
+        line-height: 1.05;
+        text-transform: uppercase;
+    }
+
+    &__tagline {
+        display: block;
+        margin-top: 2px;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.82);
     }
 
     &__description {
-        margin: 12px 0 18px;
+        margin: 14px 0 0;
         font-size: 13px;
         line-height: 1.7;
     }
 
     &__title {
-        margin: 0 0 14px;
+        margin: 0 0 12px;
         color: #fff;
-        font-size: 14px;
+        font-size: 14.5px;
         font-weight: 700;
-        text-transform: uppercase;
     }
 
     &__list {
@@ -452,7 +659,7 @@ $nx-sm: 480px;
         list-style: none;
 
         li {
-            margin-bottom: 9px;
+            margin-bottom: 8px;
         }
 
         a {
@@ -462,6 +669,7 @@ $nx-sm: 480px;
 
             &:hover {
                 color: #fff;
+                text-decoration: underline;
             }
         }
     }
@@ -490,29 +698,73 @@ $nx-sm: 480px;
         }
     }
 
+    // Mang xa hoi: moi nut la mot dia tron mang DUNG mau cua nen tang do,
+    // giong ban thiet ke - khong phai icon trang tren nen mo.
     &__social {
         display: flex;
-        gap: 10px;
-        margin-top: 4px;
+        flex-wrap: wrap;
+        gap: 11px;
+        margin-top: 2px;
 
         a {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 34px;
-            height: 34px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.16);
-            color: #fff;
+            background: #fff;
+            color: #1877f2;
+            transition: transform 0.15s ease;
 
             &:hover {
-                background: rgba(255, 255, 255, 0.28);
+                transform: translateY(-2px);
             }
+
+            svg {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        &--youtube { background: #ff0000; color: #fff; }
+        &--zalo { background: #0068ff; color: #fff; }
+        &--tiktok { background: #000; color: #fff; }
+    }
+
+    // Khoi so dien thoai: the trang noi len nen xanh.
+    &__phone {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 18px 10px 14px;
+        border-radius: 12px;
+        background: #fff;
+        color: $nx-blue;
+        text-decoration: none;
+        white-space: nowrap;
+
+        &:hover {
+            background: #eef5ff;
+        }
+
+        strong {
+            display: block;
+            font-size: 19px;
+            font-weight: 800;
+            line-height: 1.15;
+        }
+
+        span span {
+            display: block;
+            color: $nx-text;
+            font-size: 11.5px;
         }
     }
 
     &__bottom {
         border-top: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(0, 0, 0, 0.07);
 
         > div {
             @include nx-container;
@@ -521,7 +773,7 @@ $nx-sm: 480px;
             align-items: center;
             justify-content: space-between;
             gap: 10px;
-            padding-block: 16px;
+            padding-block: 13px;
             font-size: 12.5px;
         }
     }
@@ -638,7 +890,6 @@ $nx-sm: 480px;
         position: absolute;
         top: 10px;
         left: 10px;
-        background: #fff;
     }
 
     &__body {
@@ -650,12 +901,12 @@ $nx-sm: 480px;
 
     &__title {
         margin: 0 0 6px;
-        font-size: 16px;
+        font-size: 16.5px;
         font-weight: 700;
-        line-height: 1.35;
+        line-height: 1.3;
 
         a {
-            color: $nx-ink;
+            color: $nx-navy;
             text-decoration: none;
 
             &:hover {
@@ -668,26 +919,36 @@ $nx-sm: 480px;
         display: flex;
         align-items: center;
         gap: 6px;
-        margin-bottom: 10px;
-        color: $nx-muted;
+        margin-bottom: 9px;
+        color: $nx-text;
         font-size: 13px;
-    }
 
-    &__price {
-        margin-bottom: 8px;
-        color: $nx-green;
-        font-size: 17px;
-        font-weight: 800;
-
-        small {
-            color: $nx-muted;
-            font-size: 12px;
-            font-weight: 500;
+        svg {
+            flex: none;
+            color: $nx-blue;
         }
     }
 
+    // Gia trong ban thiet ke la mau XANH, khong phai xanh la.
+    &__price {
+        margin-bottom: 11px;
+        color: $nx-heading;
+        font-size: 18px;
+        font-weight: 800;
+
+        small {
+            font-size: 18px;
+            font-weight: 800;
+        }
+    }
+
+    // Hai o thong tin xep NGANG canh nhau - dung nhu ban thiet ke, khong
+    // phai danh sach doc.
     &__meta {
-        margin: 0 0 14px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px 10px;
+        margin: 0 0 13px;
         padding: 0;
         list-style: none;
         color: $nx-text;
@@ -697,15 +958,17 @@ $nx-sm: 480px;
             display: flex;
             align-items: center;
             gap: 7px;
-            margin-bottom: 5px;
+            min-width: 0;
         }
 
-        strong {
-            color: $nx-ink;
-            font-weight: 600;
+        svg {
+            flex: none;
+            color: #7fb2ee;
         }
     }
 
+    // Nut "Xem chi tiet": vien xanh nhat, chu xanh, keo het be ngang the -
+    // dung nhu ban thiet ke.
     &__actions {
         display: flex;
         gap: 8px;
@@ -714,6 +977,10 @@ $nx-sm: 480px;
         .nx-btn {
             flex: 1;
             padding-inline: 8px;
+            border-color: #bcd9f8;
+            color: $nx-heading;
+            font-size: 12.5px;
+            letter-spacing: 0.02em;
             white-space: nowrap;
         }
     }

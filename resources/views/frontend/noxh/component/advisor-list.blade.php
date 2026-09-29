@@ -22,7 +22,7 @@
 
                 <div class="nx-advisor__than">
                     <p class="nx-advisor__ten">{{ $nv->name }}</p>
-                    <p class="nx-advisor__chuc">{{ $nv->title ?: 'Tư vấn hồ sơ NOXH' }}</p>
+                    <p class="nx-advisor__chuc">{{ $nv->title ?: ($intro['advisor_role'] ?? 'Tư vấn hồ sơ NOXH') }}</p>
                     @if($nv->address)
                         <p class="nx-advisor__khu">Khu vực: {{ $nv->address }}</p>
                     @endif

@@ -19,6 +19,7 @@ class PostCatalogue extends Model
         'level',
         'image',
         'icon',
+        'color',
         'album',
         'publish',
         'follow',

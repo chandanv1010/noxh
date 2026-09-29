@@ -1019,3 +1019,118 @@ if (!function_exists('nx_url')) {
         return $duongDan === '' ? url('/') : url('/' . $duongDan);
     }
 }
+
+if (!function_exists('nx_hotline_dau')) {
+    /**
+     * So dien thoai dau tien trong o "Hotline" cua Cau hinh he thong.
+     *
+     * O do cho phep ghi nhieu so cach nhau bang dau gach dung, vi du
+     * "0989 591 616 | 0942 141 686". Dau trang va chan trang chi du cho mot
+     * so nen lay so dau.
+     */
+    function nx_hotline_dau(?string $hotline): string
+    {
+        foreach (explode('|', (string) $hotline) as $so) {
+            $so = trim($so);
+
+            if ($so !== '') {
+                return $so;
+            }
+        }
+
+        return '';
+    }
+}
+
+if (!function_exists('nx_mau_chuyen_muc')) {
+    /**
+     * Ma mau cua mot chuyen muc tin tuc, lay tu o "Mau nhan" trong quan tri.
+     *
+     * Tra ve chuoi rong neu quan tri chua chon mau - noi goi se tu dung mau
+     * xanh mac dinh. Chi nhan dang #rgb va #rrggbb de gia tri tu CSDL khong
+     * chen duoc gi khac vao thuoc tinh style.
+     */
+    function nx_mau_chuyen_muc(?string $mau): string
+    {
+        $mau = trim((string) $mau);
+
+        return preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $mau) ? $mau : '';
+    }
+}
+
+if (!function_exists('nx_khoang_gia')) {
+    /**
+     * Tach o "Cac khoang gia" cua module Gioi thieu thanh danh sach lua chon.
+     *
+     * Quan tri go moi dong mot khoang theo dang  Nhan | tu-den , vi du:
+     *
+     *     Dưới 18 triệu/m²  | -18
+     *     18 - 20 triệu/m²  | 18-20
+     *     Trên 22 triệu/m²  | 22-
+     *
+     * De trong mot dau nghia la khong gioi han ben do. Dong sai dinh dang thi
+     * bo qua - mot dong go nham khong duoc lam vo ca o chon.
+     */
+    function nx_khoang_gia(?string $vanBan): array
+    {
+        $ket = [];
+
+        foreach (preg_split('/\R/', (string) $vanBan) as $dong) {
+            $dong = trim($dong);
+
+            if ($dong === '' || !str_contains($dong, '|')) {
+                continue;
+            }
+
+            [$nhan, $khoang] = array_map('trim', explode('|', $dong, 2));
+
+            // Chi nhan dang so-so, vi du "18-20", "-18", "22-".
+            if ($nhan === '' || !preg_match('/^\d*(?:[.,]\d+)?-\d*(?:[.,]\d+)?$/', $khoang)) {
+                continue;
+            }
+
+            $ket[] = ['label' => $nhan, 'value' => str_replace(',', '.', $khoang)];
+        }
+
+        return $ket;
+    }
+}
+
+if (!function_exists('nx_ten_dia_gioi_ngan')) {
+    /**
+     * Bo tien to loai don vi hanh chinh o dau ten.
+     *
+     * API tra ve ten day du ("Tinh Thai Nguyen", "Thanh pho Ha Noi",
+     * "Phuong Duc Xuan") - dung cho o chon va van ban hanh chinh. Nhung o
+     * the loc hay the du an thi ban thiet ke chi de ten ngan ("Thai Nguyen",
+     * "Ha Noi"), neu khong mot hang the chi vua duoc ba cai.
+     */
+    function nx_ten_dia_gioi_ngan(?string $ten): string
+    {
+        $ten = trim((string) $ten);
+
+        if ($ten === '') {
+            return '';
+        }
+
+        // Dat "Thanh pho truc thuoc trung uong" truoc "Thanh pho" - preg_replace
+        // lay mau dau tien khop nen mau dai phai dung truoc.
+        $bo = [
+            'Thành phố trực thuộc trung ương',
+            'Thành phố',
+            'Tỉnh',
+            'Đặc khu',
+            'Phường',
+            'Thị trấn',
+            'Xã',
+        ];
+
+        foreach ($bo as $tienTo) {
+            if (mb_strpos($ten, $tienTo . ' ') === 0) {
+                return trim(mb_substr($ten, mb_strlen($tienTo) + 1));
+            }
+        }
+
+        return $ten;
+    }
+}

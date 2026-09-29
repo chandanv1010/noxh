@@ -1,101 +1,110 @@
 {{--
     Chan trang. Cot lien ket lay tu bang menus (nhom footer-menu), thong tin
     lien he lay tu Cau hinh he thong.
+
+    Tieu de tung cot chinh la ten muc CHA trong nhom footer-menu, cac muc con
+    la lien ket ben duoi. Neu nhom menu chua chia cap (tat ca cung nam o cap
+    mot) thi cat doi danh sach lam hai cot khong tieu de - de ban cai cu
+    khong bi vo bo cuc.
 --}}
 @php
-    // Chia cot lien ket thanh hai cot cho can, thay vi mot cot dai loong ngoong.
     $lienKet = collect($menuChan ?? []);
-    $nua = (int) ceil($lienKet->count() / 2);
+    $coCap2 = $lienKet->contains(fn ($m) => count($m['children'] ?? []) > 0);
+
+    $cotLienKet = $coCap2
+        ? $lienKet->filter(fn ($m) => count($m['children'] ?? []) > 0)->take(2)->values()
+        : collect([
+            ['name' => '', 'children' => $lienKet->take((int) ceil($lienKet->count() / 2))->values()->all()],
+            ['name' => '', 'children' => $lienKet->slice((int) ceil($lienKet->count() / 2))->values()->all()],
+        ]);
 
     $mangXaHoi = array_filter([
-        'Facebook' => $system['social_facebook'] ?? '',
-        'YouTube' => $system['social_youtube'] ?? '',
-        'Zalo' => $system['social_zalo'] ?? '',
-        'TikTok' => $system['social_tiktok'] ?? '',
+        'facebook' => $system['social_facebook'] ?? '',
+        'youtube' => $system['social_youtube'] ?? '',
+        'zalo' => $system['social_zalo'] ?? '',
+        'tiktok' => $system['social_tiktok'] ?? '',
     ]);
+
+    $tenMang = [
+        'facebook' => 'Facebook',
+        'youtube' => 'YouTube',
+        'zalo' => 'Zalo',
+        'tiktok' => 'TikTok',
+    ];
+
+    $soHotline = nx_hotline_dau($system['contact_hotline'] ?? '');
 @endphp
 
 <footer class="nx-footer">
     <div class="nx-footer__inner">
-        <div>
-            <div class="nx-footer__brand">NOXH<span style="opacity:.75">.vn</span></div>
-            <div style="font-size:12px;opacity:.8">{{ $intro['brand_tagline'] ?? 'Rõ pháp lý – Đúng thông tin' }}</div>
+        <div class="nx-footer__cot">
+            <div class="nx-footer__logo">
+                @if(!empty($system['homepage_logo']))
+                    <img src="{{ $system['homepage_logo'] }}" alt="{{ $system['homepage_company'] ?? 'NOXH.vn' }}">
+                @else
+                    <span class="nx-footer__mark">
+                        @include('frontend.noxh.component.icon', ['name' => 'house', 'size' => 26])
+                    </span>
+                @endif
+                <span>
+                    <span class="nx-footer__brand">{{ $system['homepage_brand'] ?? 'NOXH.vn' }}</span>
+                    <span class="nx-footer__tagline">{{ $intro['brand_tagline'] ?? '' }}</span>
+                </span>
+            </div>
 
-            <p class="nx-footer__description">
-                {{ $intro['footer_description'] ?? 'NOXH.vn là cổng thông tin nhà ở xã hội uy tín, minh bạch và cập nhật liên tục trên toàn quốc.' }}
-            </p>
+            @if(!empty($intro['footer_description']))
+                <p class="nx-footer__description">{{ $intro['footer_description'] }}</p>
+            @endif
+        </div>
 
-            @if(count($mangXaHoi))
+        @foreach($cotLienKet as $cot)
+            @continue(!count($cot['children']))
+            <div class="nx-footer__cot">
+                @if($cot['name'] !== '')
+                    <h3 class="nx-footer__title">{{ $cot['name'] }}</h3>
+                @endif
+                <ul class="nx-footer__list">
+                    @foreach($cot['children'] as $muc)
+                        <li><a href="{{ $muc['url'] }}">{{ $muc['name'] }}</a></li>
+                    @endforeach
+                </ul>
+            </div>
+        @endforeach
+
+        @if(count($mangXaHoi))
+            <div class="nx-footer__cot">
+                <h3 class="nx-footer__title">{{ $intro['footer_social_heading'] ?? 'Kết nối với chúng tôi' }}</h3>
                 <div class="nx-footer__social">
-                    @foreach($mangXaHoi as $ten => $url)
-                        <a href="{{ $url }}" target="_blank" rel="noopener" aria-label="{{ $ten }}" title="{{ $ten }}">
-                            @include('frontend.noxh.component.icon', ['name' => 'globe', 'size' => 16])
+                    @foreach($mangXaHoi as $ma => $url)
+                        <a href="{{ $url }}" target="_blank" rel="noopener"
+                           class="nx-footer__social--{{ $ma }}"
+                           aria-label="{{ $tenMang[$ma] }}" title="{{ $tenMang[$ma] }}">
+                            @include('frontend.noxh.component.social-icon', ['ten' => $ma])
                         </a>
                     @endforeach
                 </div>
-            @endif
-        </div>
+            </div>
+        @endif
 
-        <div>
-            <h3 class="nx-footer__title">Liên kết nhanh</h3>
-            <ul class="nx-footer__list">
-                @foreach($lienKet->take($nua) as $muc)
-                    <li><a href="{{ $muc['url'] }}">{{ $muc['name'] }}</a></li>
-                @endforeach
-            </ul>
-        </div>
-
-        <div>
-            <h3 class="nx-footer__title">Hỗ trợ</h3>
-            <ul class="nx-footer__list">
-                @foreach($lienKet->slice($nua) as $muc)
-                    <li><a href="{{ $muc['url'] }}">{{ $muc['name'] }}</a></li>
-                @endforeach
-            </ul>
-        </div>
-
-        <div>
-            <h3 class="nx-footer__title">Liên hệ</h3>
-
-            @if(!empty($system['contact_hotline']))
-                <div class="nx-footer__contact">
-                    @include('frontend.noxh.component.icon', ['name' => 'phone', 'size' => 15])
+        @if($soHotline)
+            <div class="nx-footer__cot">
+                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $soHotline) }}" class="nx-footer__phone">
+                    @include('frontend.noxh.component.icon', ['name' => 'phone', 'size' => 24])
                     <span>
-                        @foreach(array_filter(array_map('trim', explode('|', $system['contact_hotline']))) as $i => $so)
-                            @if($i > 0)<span aria-hidden="true">·</span>@endif
-                            <a href="tel:{{ preg_replace('/[^0-9+]/', '', $so) }}">{{ $so }}</a>
-                        @endforeach
+                        <strong>{{ $soHotline }}</strong>
+                        <span>{{ $intro['header_phone_note'] ?? 'Tư vấn miễn phí 24/7' }}</span>
                     </span>
-                </div>
-            @endif
-
-            @if(!empty($system['contact_email']))
-                <div class="nx-footer__contact">
-                    @include('frontend.noxh.component.icon', ['name' => 'mail', 'size' => 15])
-                    <a href="mailto:{{ $system['contact_email'] }}">{{ $system['contact_email'] }}</a>
-                </div>
-            @endif
-
-            @if(!empty($system['contact_address']))
-                <div class="nx-footer__contact">
-                    @include('frontend.noxh.component.icon', ['name' => 'pin', 'size' => 15])
-                    <span>{{ $system['contact_address'] }}</span>
-                </div>
-            @endif
-
-            @if(!empty($system['contact_working_hours']))
-                <div class="nx-footer__contact">
-                    @include('frontend.noxh.component.icon', ['name' => 'clock', 'size' => 15])
-                    <span>{{ $system['contact_working_hours'] }}</span>
-                </div>
-            @endif
-        </div>
+                </a>
+            </div>
+        @endif
     </div>
 
     <div class="nx-footer__bottom">
         <div>
             <span>{{ $system['homepage_copyright'] ?? '© ' . date('Y') . ' NOXH.vn. All rights reserved.' }}</span>
-            <span>Vì cộng đồng – Vì một Việt Nam an cư</span>
+            @if(!empty($intro['footer_slogan']))
+                <span>{{ $intro['footer_slogan'] }}</span>
+            @endif
         </div>
     </div>
 </footer>

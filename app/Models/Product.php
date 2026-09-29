@@ -78,10 +78,10 @@ class Product extends Model
      * mot trong bon nhom cua bo loc ngoai website.
      */
     public const TRANG_THAI_DU_AN = [
-        'receiving' => 'Dang nhan ho so',
-        'upcoming' => 'Sap mo ban',
-        'building' => 'Dang trien khai',
-        'handed' => 'Da ban giao',
+        'receiving' => 'Đang nhận hồ sơ',
+        'upcoming' => 'Sắp mở bán',
+        'building' => 'Đang triển khai',
+        'handed' => 'Đã bàn giao',
     ];
 
     protected $table = 'products';

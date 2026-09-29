@@ -7,6 +7,18 @@
 @php
     $url = url('/du-an/' . $duAn->canonical);
     $trangThai = \App\Models\Product::TRANG_THAI_DU_AN[$duAn->status] ?? null;
+
+    // Hai o thong tin duoi gia: so can ho va moc ban giao - dung nhu ban
+    // thiet ke. O nao khong co so lieu thi bo han, khong in "dang cap nhat".
+    $oTin = [];
+
+    if (!empty($duAn->total_units)) {
+        $oTin[] = ['icon' => 'grid', 'text' => number_format($duAn->total_units, 0, ',', '.') . ' căn hộ'];
+    }
+
+    if (!empty($duAn->timeline_label)) {
+        $oTin[] = ['icon' => 'calendar', 'text' => $duAn->timeline_label];
+    }
 @endphp
 
 <article class="nx-project">
@@ -23,10 +35,18 @@
     <div class="nx-project__body">
         <h3 class="nx-project__title"><a href="{{ $url }}">{{ $duAn->name }}</a></h3>
 
-        @if(!empty($duAn->province_name))
+        @php
+            // Ban thiet ke ghi "phuong/xa, tinh". Ten rut gon (bo "Tinh",
+            // "Thanh pho", "Phuong") cho vua mot dong tren the.
+            $noiO = array_filter([
+                nx_ten_dia_gioi_ngan($duAn->ward_name ?? ''),
+                nx_ten_dia_gioi_ngan($duAn->province_name ?? ''),
+            ]);
+        @endphp
+        @if(count($noiO))
             <div class="nx-project__place">
-                @include('frontend.noxh.component.icon', ['name' => 'pin', 'size' => 14])
-                {{ $duAn->province_name }}
+                @include('frontend.noxh.component.icon', ['name' => 'pin', 'size' => 15])
+                {{ implode(', ', $noiO) }}
             </div>
         @endif
 
@@ -35,27 +55,22 @@
             <small>triệu/m²</small>
         </div>
 
-        <ul class="nx-project__meta">
-            <li>
-                @include('frontend.noxh.component.icon', ['name' => 'ruler', 'size' => 14])
-                Diện tích: <strong>{{ khoang_so($duAn->area_from, $duAn->area_to, ' m²') }}</strong>
-            </li>
-            @if($duAn->total_units)
-                <li>
-                    @include('frontend.noxh.component.icon', ['name' => 'layers', 'size' => 14])
-                    Số căn: <strong>{{ number_format($duAn->total_units, 0, ',', '.') }} căn</strong>
-                </li>
-            @endif
-            @if($trangThai)
-                <li>
-                    @include('frontend.noxh.component.icon', ['name' => 'building', 'size' => 14])
-                    Tiến độ: <strong>{{ $trangThai }}</strong>
-                </li>
-            @endif
-        </ul>
+        @if(count($oTin))
+            <ul class="nx-project__meta">
+                @foreach($oTin as $o)
+                    <li>
+                        @include('frontend.noxh.component.icon', ['name' => $o['icon'], 'size' => 16])
+                        {{ $o['text'] }}
+                    </li>
+                @endforeach
+            </ul>
+        @endif
 
         <div class="nx-project__actions">
-            <a href="{{ $url }}" class="nx-btn nx-btn--ghost nx-btn--sm">Xem chi tiết</a>
+            <a href="{{ $url }}" class="nx-btn nx-btn--ghost nx-btn--sm nx-btn--block">
+                XEM CHI TIẾT
+                @include('frontend.noxh.component.icon', ['name' => 'arrow-right', 'size' => 15])
+            </a>
         </div>
     </div>
 </article>

@@ -182,8 +182,11 @@ class NoxhFrontendContentSeeder extends Seeder
         $danhMuc = DB::table('product_catalogues')->orderBy('id')->value('id');
         $cdt = DB::table('investors')->orderBy('id')->value('id');
 
-        // Ma tinh lay tu bang provinces de bo loc theo tinh chay dung.
-        $tinh = DB::table('provinces')->pluck('code', 'name')->toArray();
+        // Ma tinh lay tu bang vn_provinces (34 tinh/thanh theo co cau hanh
+        // chinh moi) de bo loc theo tinh chay dung. Vai tinh cu da sap nhap:
+        // Bac Giang nay thuoc Bac Ninh, Binh Dinh nay thuoc Gia Lai - ten du
+        // an mau van giu ten dia phuong cu cho de nhan ra.
+        $tinh = DB::table('vn_provinces')->pluck('code', 'name')->toArray();
         $ma = function (string $ten) use ($tinh) {
             foreach ($tinh as $t => $c) {
                 if (str_contains($t, $ten)) {
@@ -196,8 +199,8 @@ class NoxhFrontendContentSeeder extends Seeder
         $duAn = [
             ['NOXH Túc Duyên', 'noxh-tuc-duyen', 'Thái Nguyên', 'building', 19.55, 23.99, 32, 70, 1042, 8.12, '04 khối chung cư cao 9 tầng', 'Quý IV/2026', 1],
             ['NOXH Hồng Tiến', 'noxh-hong-tien', 'Thái Nguyên', 'upcoming', 18.6, 22.5, 35, 68, 800, 5.4, '03 khối chung cư', 'Quý II/2027', 1],
-            ['NOXH Evergreen Bắc Giang', 'noxh-evergreen-bac-giang', 'Bắc Giang', 'receiving', 16.8, 21.3, 32, 65, 1200, 9.8, '05 khối chung cư', 'Quý I/2027', 1],
-            ['NOXH IEC Residences', 'noxh-iec-residences', 'Bình Định', 'building', 17.2, 22.1, 38, 68, 1500, 11.2, '06 khối chung cư', 'Quý III/2027', 0],
+            ['NOXH Evergreen Bắc Giang', 'noxh-evergreen-bac-giang', 'Bắc Ninh', 'receiving', 16.8, 21.3, 32, 65, 1200, 9.8, '05 khối chung cư', 'Quý I/2027', 1],
+            ['NOXH IEC Residences', 'noxh-iec-residences', 'Gia Lai', 'building', 17.2, 22.1, 38, 68, 1500, 11.2, '06 khối chung cư', 'Quý III/2027', 0],
             ['NOXH Phúc Thịnh', 'noxh-phuc-thinh', 'Hà Nội', 'upcoming', 20.0, 24.5, 45, 70, 2000, 14.5, '08 khối chung cư', 'Quý IV/2027', 0],
             ['NOXH Sông Công', 'noxh-song-cong', 'Thái Nguyên', 'handed', 16.5, 18.9, 30, 60, 640, 4.2, '02 khối chung cư', 'Đã bàn giao', 0],
         ];

@@ -11,6 +11,8 @@ use App\Http\Controllers\Frontend\Noxh\FinanceController;
 use App\Http\Controllers\Frontend\Noxh\QaController;
 use App\Http\Controllers\Frontend\Noxh\NewsController;
 use App\Http\Controllers\Frontend\Noxh\PageController;
+use App\Http\Controllers\Frontend\Noxh\SearchController;
+use App\Http\Controllers\Frontend\Noxh\DiaGioiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +29,15 @@ use App\Http\Controllers\Frontend\Noxh\PageController;
 Route::name('noxh.')->group(function () {
 
     Route::get('/', [HomeController::class, 'index'])->name('home');
+
+    // --- Don vi hanh chinh ----------------------------------------------------
+    // O chon phuong/xa goi duong dan nay khi nguoi dung chon tinh.
+    Route::get('dia-gioi/phuong-xa/{maTinh}', [DiaGioiController::class, 'phuongXa'])
+        ->where(['maTinh' => '[0-9]{1,2}'])->name('diagioi.ward');
+
+    // --- Tim kiem ------------------------------------------------------------
+    // O tim kiem tren dau trang tro toi day. Tim ca du an lan bai viet.
+    Route::get('tim-kiem', [SearchController::class, 'index'])->name('search');
 
     // --- Du an ---------------------------------------------------------------
     Route::get('du-an', [ProjectController::class, 'index'])->name('project.index');

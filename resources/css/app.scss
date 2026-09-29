@@ -14,9 +14,12 @@
 // =============================================================================
 @use 'variables/variables';
 @use "components/noxh";
-@use "components/noxh-home";
-@use "components/noxh-home2";
 @use "components/noxh-page";
+// Nap SAU noxh-page: trang chu va trang trong dung chung mot so ten lop
+// (nx-panel, nx-news-item...), file nap sau thang nen luat rieng cua trang
+// chu phai nam duoi. Truoc day thu tu nguoc lai, doi mot mau o trang chu la
+// phai them lop cho du dac hieu - rat de sai.
+@use "components/noxh-home";
 @use "components/noxh-advisor";
 @use "components/tel-autolink";
 

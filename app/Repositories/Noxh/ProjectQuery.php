@@ -18,7 +18,7 @@ class ProjectQuery
         'p.total_units', 'p.total_land_area', 'p.scale_description',
         'p.timeline_label', 'p.is_featured', 'p.updated_at',
         'pl.name', 'pl.canonical', 'pl.description',
-        'pr.name as province_name',
+        'pr.name as province_name', 'vw.name as ward_name',
     ];
 
     /** Khung truy van chung: chi du an dang hien, kem ten va ten tinh. */
@@ -28,7 +28,11 @@ class ProjectQuery
             ->join('product_language as pl', function ($join) {
                 $join->on('pl.product_id', '=', 'p.id')->where('pl.language_id', '=', 1);
             })
-            ->leftJoin('provinces as pr', 'pr.code', '=', 'p.province_code')
+            // vn_provinces la bang 34 tinh/thanh theo co cau hanh chinh moi
+            // (tu 01/07/2025), nap tu API bang lenh `php artisan noxh:dia-gioi`.
+            // Bang `provinces` cu 63 tinh khong con dung nua.
+            ->leftJoin('vn_provinces as pr', 'pr.code', '=', 'p.province_code')
+            ->leftJoin('vn_wards as vw', 'vw.code', '=', 'p.ward_code')
             ->where('p.publish', 2)
             ->whereNull('p.deleted_at');
     }
@@ -45,7 +49,7 @@ class ProjectQuery
     /**
      * Danh sach du an co loc va sap xep, dung o trang Du an.
      *
-     * $loc: province_code, status[], price (khoang), area (khoang), keyword
+     * $loc: province_code, ward_code, status[], price (khoang), area (khoang), keyword
      */
     public function danhSach(array $loc, string $sapXep = 'moi-nhat', int $moiTrang = 10)
     {
@@ -158,6 +162,12 @@ class ProjectQuery
 
         if (!empty($loc['province_code'])) {
             $query->where('p.province_code', $loc['province_code']);
+        }
+
+        // Co cau hanh chinh moi chi con hai cap: tinh/thanh -> phuong/xa.
+        // Khong con quan/huyen de loc qua nua.
+        if (!empty($loc['ward_code'])) {
+            $query->where('p.ward_code', $loc['ward_code']);
         }
 
         if (!empty($loc['status'])) {

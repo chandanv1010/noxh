@@ -136,11 +136,28 @@ class ProjectController extends FrontendController
      * Ma khoang gia/dien tich duoc doi thanh cap so ngay tai day, de phan truy
      * van khong phai biet gi ve ten cac muc loc.
      */
+    /**
+     * Doi chuoi "tu-den" thanh cap so. Tra ve null neu khong dung dinh dang
+     * hoac ca hai dau deu trong.
+     */
+    private function khoangTuDuongDan(string $ma): ?array
+    {
+        if (!preg_match('/^(\d*(?:\.\d+)?)-(\d*(?:\.\d+)?)$/', $ma, $khop)) {
+            return null;
+        }
+
+        $tu = $khop[1] === '' ? null : (float) $khop[1];
+        $den = $khop[2] === '' ? null : (float) $khop[2];
+
+        return ($tu === null && $den === null) ? null : ['nhan' => $ma, 'tu' => $tu, 'den' => $den];
+    }
+
     private function docBoLoc(Request $request): array
     {
         $loc = [
             'keyword' => trim((string) $request->input('tu-khoa')) ?: null,
             'province_code' => $request->input('province_code') ?: null,
+            'ward_code' => $request->input('ward_code') ?: null,
             'status' => array_values(array_intersect(
                 (array) $request->input('status', []),
                 array_keys(Product::TRANG_THAI_DU_AN)
@@ -152,6 +169,15 @@ class ProjectController extends FrontendController
         foreach ((array) $request->input('gia', []) as $ma) {
             if (isset(self::KHOANG_GIA[$ma])) {
                 $loc['price'][] = self::KHOANG_GIA[$ma];
+                continue;
+            }
+
+            // Thanh tim o trang chu dung cac khoang gia do quan tri tu dat
+            // trong module Gioi thieu, gui len thang duoi dang "tu-den"
+            // (vi du "18-20", "-18"). Nhan luon de hai cho khong phai dung
+            // chung mot bang ma cung.
+            if ($m = $this->khoangTuDuongDan((string) $ma)) {
+                $loc['price'][] = $m;
             }
         }
 
