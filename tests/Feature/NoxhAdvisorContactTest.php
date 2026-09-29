@@ -195,10 +195,30 @@ class NoxhAdvisorContactTest extends TestCase
         $html = $this->get('/')->assertOk()->getContent();
 
         $this->assertStringContainsString('Tư vấn hồ sơ tại khu vực của bạn', $html);
-        $this->assertStringContainsString('Tư vấn viên thử nghiệm', $html);
-        $this->assertStringContainsString('data-nx-lien-he="' . $this->sale->id . '"', $html);
+
+        // Trang chu chi hien SAU tu van vien dau tien theo ten - bang so cot
+        // cua luoi. Vi vay khong doi tai khoan thu nghiem phai nam trong so
+        // do (CSDL nay dung chung, ai them nguoi moi la thu tu doi); chi doi
+        // khoi co the va moi the deu co nut bam.
+        $this->assertStringContainsString('data-nx-lien-he="', $html);
 
         // Popup phai co mat, khong thi nut bam khong ra gi.
         $this->assertStringContainsString('data-nx-modal', $html);
+    }
+
+    public function test_the_tu_van_mang_dung_ma_nhan_vien(): void
+    {
+        // Dung thang component voi danh sach cua rieng bai kiem tra, khong
+        // qua trang chu - de khong phu thuoc vao co bao nhieu nguoi trong
+        // CSDL va ai duoc xep truoc.
+        $html = view('frontend.noxh.component.advisor-list', [
+            'nhanVien' => User::where('id', $this->sale->id)->get(),
+            'cot' => 6,
+            'intro' => [],
+        ])->render();
+
+        $this->assertStringContainsString('Tư vấn viên thử nghiệm', $html);
+        $this->assertStringContainsString('data-nx-lien-he="' . $this->sale->id . '"', $html);
+        $this->assertStringContainsString('data-nx-ten="Tư vấn viên thử nghiệm"', $html);
     }
 }

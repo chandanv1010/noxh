@@ -16,9 +16,7 @@
 
 <article class="nx-news-item{{ ($cot ?? false) ? ' nx-news-item--cot' : '' }}">
     <a href="{{ $url }}" class="nx-news-item__thumb" title="{{ $bai->name }}" aria-hidden="true" tabindex="-1">
-        @if(!empty($bai->image))
-            <img src="{{ $bai->image }}" alt="" loading="lazy" decoding="async">
-        @endif
+        <img src="{{ nx_anh($bai->image ?? null, 'tin-tuc') }}" alt="" loading="lazy" decoding="async">
     </a>
 
     <div>

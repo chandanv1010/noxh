@@ -1134,3 +1134,80 @@ if (!function_exists('nx_ten_dia_gioi_ngan')) {
         return $ten;
     }
 }
+
+if (!function_exists('nx_anh')) {
+    /**
+     * Duong dan anh, kem anh thay the khi ban ghi chua co anh.
+     *
+     * De trong o anh thi ngoai trang hien mot o xam rong, nhin nhu trang bi
+     * loi. Moi loai noi dung co mot anh thay the rieng - quan tri tai anh
+     * that len la anh do tu nhuong cho, khong phai sua gi.
+     *
+     * Anh thay the de trong public/images/noxh/ chu KHONG phai
+     * public/uploads/: thu muc uploads nam trong .gitignore (anh nguoi dung
+     * tai len), de o do thi clone ve may chu la mat sach, dung luc can lai
+     * hien o vo anh - dung cai loi dang di chua.
+     *
+     * $loai: 'du-an' | 'du-an-doc' | 'tin-tuc' | 'dang-ky' | 'avatar'
+     */
+    function nx_anh(?string $anh, string $loai = 'du-an'): string
+    {
+        $anh = trim((string) $anh);
+
+        if ($anh !== '') {
+            // Bang cu luu duong dan co tien to /public/ - bo di cho dung.
+            return str_replace('/public/', '/', $anh);
+        }
+
+        $thayThe = [
+            'du-an' => '/images/noxh/du-an-mac-dinh-the.jpg',
+            'du-an-doc' => '/images/noxh/du-an-mac-dinh-doc.jpg',
+            'tin-tuc' => '/images/noxh/tin-tuc-mac-dinh.svg',
+            'dang-ky' => '/images/noxh/dang-ky-mac-dinh.svg',
+            'avatar' => '/images/noxh/avatar-mac-dinh.png',
+        ];
+
+        return $thayThe[$loai] ?? $thayThe['du-an'];
+    }
+}
+
+if (!function_exists('nx_chu_dau')) {
+    /**
+     * Hai chu cai dau cua ten nguoi, dung lam anh dai dien khi chua co anh.
+     *
+     * Ten Viet Nam de ho truoc ten sau nen lay chu cai cua tu DAU va tu
+     * CUOI: "Nguyen Van Hung" -> "NH". Mot tu thi lay mot chu.
+     */
+    function nx_chu_dau(?string $ten): string
+    {
+        $tu = preg_split('/\s+/u', trim((string) $ten), -1, PREG_SPLIT_NO_EMPTY);
+
+        if (!$tu) {
+            return '?';
+        }
+
+        $dau = mb_strtoupper(mb_substr($tu[0], 0, 1));
+
+        if (count($tu) === 1) {
+            return $dau;
+        }
+
+        return $dau . mb_strtoupper(mb_substr(end($tu), 0, 1));
+    }
+}
+
+if (!function_exists('nx_mau_tu_ten')) {
+    /**
+     * Mau nen cua anh dai dien chu cai, chon theo ten.
+     *
+     * Cung mot nguoi luon ra cung mot mau (crc32 cua ten), nen danh sach
+     * nhan vien khong nhay mau moi lan mo trang. Bay mau deu nam trong ho
+     * mau cua website, khong co mau choi.
+     */
+    function nx_mau_tu_ten(?string $ten): string
+    {
+        $mau = ['#0a78f5', '#1e93cf', '#3e8c4a', '#7a5cd0', '#d4662a', '#0f6fa8', '#b8477e'];
+
+        return $mau[crc32(mb_strtolower(trim((string) $ten))) % count($mau)];
+    }
+}

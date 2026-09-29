@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 170" width="420" height="170" role="img" aria-label="Vì một Việt Nam an cư">
+    <!--
+        Anh minh hoa goc phai dai "Dang ky nhan thong tin".
+
+        Ve bang SVG de khong phu thuoc anh chup nao; quan tri tai anh that len
+        trong module Gioi thieu thi anh nay tu nhuong cho.
+
+        Khung 420x170 (khoang 2,5:1) cho gan voi o that tren trang - dai nay
+        thap nen hinh phai ngang va it chi tiet, ve nho qua thi xuong con mot
+        vet mau.
+    -->
+    <defs>
+        <linearGradient id="troi" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#e4f2fd"/>
+            <stop offset="1" stop-color="#f2f9ff"/>
+        </linearGradient>
+        <linearGradient id="motTrai" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#dff1fd"/>
+            <stop offset="1" stop-color="#dff1fd" stop-opacity="0"/>
+        </linearGradient>
+    </defs>
+
+    <rect width="420" height="170" fill="url(#troi)"/>
+
+    <!-- Day nha phia xa -->
+    <g fill="#a8cdf0" opacity="0.65">
+        <rect x="24" y="52" width="30" height="88" rx="3"/>
+        <rect x="60" y="34" width="36" height="106" rx="3"/>
+        <rect x="102" y="64" width="26" height="76" rx="3"/>
+        <rect x="316" y="44" width="32" height="96" rx="3"/>
+        <rect x="354" y="70" width="26" height="70" rx="3"/>
+    </g>
+
+    <!-- Hai cay: tan la va than, dung tren duong dat -->
+    <g>
+        <rect x="146" y="112" width="5" height="28" rx="2" fill="#7aa9d8"/>
+        <circle cx="148.5" cy="104" r="19" fill="#8cc0e8"/>
+        <rect x="292" y="118" width="4" height="22" rx="2" fill="#7aa9d8"/>
+        <circle cx="294" cy="112" r="14" fill="#8cc0e8"/>
+    </g>
+
+    <!-- Duong dat -->
+    <rect x="0" y="138" width="420" height="32" fill="#bcdaf6"/>
+
+    <!--
+        Gia dinh nhin ve phia day nha. Dau va vai phai NOI LIEN nhau: ve roi
+        ra la thanh ba cai dau troi lo lung.
+    -->
+    <g fill="#2f6fbf">
+        <!-- nguoi lon 1 -->
+        <circle cx="206" cy="86" r="15"/>
+        <path d="M182 140c0-22 11-38 24-38s24 16 24 38z"/>
+        <!-- nguoi lon 2 -->
+        <circle cx="262" cy="90" r="14"/>
+        <path d="M240 140c0-21 10-36 22-36s22 15 22 36z"/>
+        <!-- tre em, dung giua hai nguoi lon -->
+        <circle cx="234" cy="112" r="10"/>
+        <path d="M220 140c0-13 6-22 14-22s14 9 14 22z"/>
+    </g>
+
+    <!-- Vien trai chuyen dan sang nen de anh khong bi cat thanh canh thang -->
+    <rect x="0" y="0" width="140" height="170" fill="url(#motTrai)"/>
+</svg>

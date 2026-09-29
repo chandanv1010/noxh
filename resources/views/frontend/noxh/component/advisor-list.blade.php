@@ -13,11 +13,11 @@
         @foreach($nhanVien as $nv)
             <div class="nx-advisor">
                 <div class="nx-advisor__anh">
-                    @if($nv->image)
-                        <img src="{{ $nv->image }}" alt="{{ $nv->name }}" loading="lazy">
-                    @else
-                        @include('frontend.noxh.component.icon', ['name' => 'user', 'size' => 24])
-                    @endif
+                    @include('frontend.noxh.component.avatar', [
+                        'ten' => $nv->name,
+                        'anh' => $nv->image,
+                        'co' => 48,
+                    ])
                 </div>
 
                 <div class="nx-advisor__than">

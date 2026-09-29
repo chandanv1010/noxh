@@ -750,14 +750,18 @@
         display: grid;
         grid-template-columns: auto minmax(0, 1fr);
         align-items: center;
+        // Nguoi nay co dong "Khu vuc", nguoi kia khong, nen the cao thap
+        // khac nhau. space-between day nut "Lien he" xuong day moi the de
+        // ca hang thang nut.
+        align-content: space-between;
         gap: 8px 10px;
         padding: 10px;
         border-radius: 10px;
         text-align: left;
 
         &__anh {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
         }
 
         &__than {
@@ -765,12 +769,16 @@
         }
 
         &__ten {
-            font-size: 13.5px;
+            font-size: 13px;
+            line-height: 1.3;
         }
 
+        // Cot chi rong khoang 120px sau khi tru anh, nen chu phu phai nho
+        // lai - khong thi moi dong chi duoc hai tu.
         &__chuc,
         &__khu {
-            font-size: 12px;
+            font-size: 11.5px;
+            line-height: 1.35;
         }
 
         // Nut nam duoi, keo qua ca hai cot.
@@ -829,8 +837,11 @@
         img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            object-position: center right;
+            // contain chu khong phai cover: dai nay thap, cover se cat mat
+            // nua tren cua hinh. Phan thua hai ben da co lop chuyen sac
+            // ben duoi che.
+            object-fit: contain;
+            object-position: right bottom;
         }
 
         // Vien trai chuyen dan sang nen de anh khong bi cat thanh mot canh

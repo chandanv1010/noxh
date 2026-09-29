@@ -25,7 +25,13 @@ class HomeController extends FrontendController
      */
     private const SO_DU_AN_NOI_BAT = 12;
 
-    private const SO_TU_VAN_VIEN = 12;
+    /**
+     * So tu van vien hien o trang chu.
+     *
+     * Dung bang so cot cua luoi: nhieu hon mot nguoi la hang thu hai chi co
+     * mot the le loi, trong rat vo bo cuc.
+     */
+    private const SO_TU_VAN_VIEN = 6;
 
     /** Ban thiet ke xep ba tin nam ngang trong khoi tin tuc. */
     private const SO_TIN = 3;

@@ -348,11 +348,10 @@
 
 {{-- 7. DANG KY NHAN TIN ---------------------------------------------------- --}}
 <section class="nx-subscribe">
-    @if(!empty($intro['subscribe_image']))
-        <div class="nx-subscribe__anh">
-            <img src="{{ $intro['subscribe_image'] }}" alt="" loading="lazy" decoding="async">
-        </div>
-    @endif
+    <div class="nx-subscribe__anh">
+        <img src="{{ nx_anh($intro['subscribe_image'] ?? null, 'dang-ky') }}" alt=""
+             loading="lazy" decoding="async">
+    </div>
 
     <div class="nx-subscribe__inner">
         <div class="nx-subscribe__text">

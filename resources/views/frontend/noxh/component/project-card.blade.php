@@ -23,9 +23,8 @@
 
 <article class="nx-project">
     <a href="{{ $url }}" class="nx-project__media" title="{{ $duAn->name }}">
-        @if(!empty($duAn->image))
-            <img src="{{ $duAn->image }}" alt="{{ $duAn->name }}" loading="lazy" decoding="async">
-        @endif
+        <img src="{{ nx_anh($duAn->image ?? null, 'du-an') }}" alt="{{ $duAn->name }}"
+             loading="lazy" decoding="async">
 
         @if($trangThai)
             <span class="nx-badge nx-badge--{{ $duAn->status }} nx-project__badge">{{ $trangThai }}</span>

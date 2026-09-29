@@ -263,6 +263,41 @@ $nx-sm: 480px;
 }
 
 // =============================================================================
+// ANH DAI DIEN CHU CAI
+// =============================================================================
+//
+// Dung khi mot nguoi chua co anh: dia tron mang hai chu cai dau cua ho ten,
+// mau chon theo ten nen moi nguoi mot mau va khong doi giua cac lan mo
+// trang. Doc hon nhieu so voi sau hinh bong nguoi giong het nhau.
+.nx-avatar-chu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: var(--nx-avatar-mau, #{$nx-blue});
+    color: #fff;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    user-select: none;
+}
+
+// Chu danh rieng cho trinh doc man hinh: van doc duoc nhung khong chiem cho
+// tren trang. Khong dung display:none - lam the la trinh doc bo qua luon.
+.nx-an-di {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+// =============================================================================
 // DAU TRANG
 // =============================================================================
 .nx-header {
