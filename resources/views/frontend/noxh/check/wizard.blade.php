@@ -170,6 +170,10 @@
                            placeholder="{{ $cau->criteria_label }}">
                 @endif
 
+                @if($cau->hoiDiaChi())
+                    @include('frontend.noxh.check.address')
+                @endif
+
                 @if($ghiChu !== '')
                     <p class="nx-wz-ghi {{ $ghiChuPhu !== '' ? 'co-phu' : '' }}">
                         <span class="nx-wz-ghi__hinh">

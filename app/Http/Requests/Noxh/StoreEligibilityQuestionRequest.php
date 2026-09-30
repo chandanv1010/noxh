@@ -17,6 +17,7 @@ class StoreEligibilityQuestionRequest extends FormRequest
             'question' => 'required|string|max:20000',
             'step_label' => 'nullable|string|max:60',
             'layout' => 'nullable|string|max:20',
+            'extras' => 'nullable|string|max:40',
             'image' => 'nullable|string|max:255',
             'icon' => 'nullable|string|max:60',
             'icon_tone' => 'nullable|string|max:20',

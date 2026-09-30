@@ -57,6 +57,16 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-row">
+                                <label class="control-label text-left">Hỏi thêm</label>
+                                    <select name="extras" class="form-control">
+                                        <option value="">— Không hỏi thêm gì —</option>
+                                        <option value="address" {{ old('extras', ($question->extras) ?? '') === 'address' ? 'selected' : '' }}>Địa chỉ nhà ở, nơi làm việc và dự án quan tâm</option>
+                                    </select>
+                                    <small class="text-muted">Khối ở nửa dưới bản vẽ w-4.</small>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-row">
                                 <label class="control-label text-left">Trọng số điểm</label>
                                     <input type="number" name="weight" value="{{ old('weight', ($question->weight) ?? 0) }}" class="form-control" min="0">
                                     <small class="text-muted">Câu quan trọng đặt trọng số cao hơn</small>

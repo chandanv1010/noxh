@@ -17,7 +17,7 @@ class EligibilityCheck extends Model
     protected $table = 'eligibility_checks';
 
     protected $fillable = [
-        'code', 'name', 'phone', 'email', 'province_code',
+        'code', 'name', 'phone', 'email', 'province_code', 'ward_code', 'work_province_code', 'work_ward_code', 'project_ids',
         'total_questions', 'answered', 'passed', 'unclear', 'failed',
         'score_percent', 'result_level', 'expires_at', 'consent', 'ip', 'user_agent',
     ];

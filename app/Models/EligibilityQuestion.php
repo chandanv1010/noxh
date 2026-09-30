@@ -21,7 +21,7 @@ class EligibilityQuestion extends Model
     protected $table = 'eligibility_questions';
 
     protected $fillable = [
-        'question', 'step_label', 'group', 'input_type', 'layout', 'image',
+        'question', 'step_label', 'group', 'input_type', 'layout', 'extras', 'image',
         'icon', 'icon_tone', 'hint', 'foot_note', 'foot_note_sub',
         'criteria_label', 'weight', 'required', 'publish', 'order',
     ];
@@ -71,6 +71,12 @@ class EligibilityQuestion extends Model
     {
         return $this->hasMany(EligibilityPanel::class, 'eligibility_question_id', 'id')
             ->orderBy('order')->orderBy('id');
+    }
+
+    /** Buoc nay co hoi them dia chi va du an quan tam khong? */
+    public function hoiDiaChi(): bool
+    {
+        return $this->extras === 'address';
     }
 
     /** Buoc cuoi: khong hoi gi, chi xin ho ten - so dien thoai. */

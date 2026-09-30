@@ -180,6 +180,22 @@ class NoxhEligibilityWizardSeeder extends Seeder
             'wizard_consent_text' => 'Tôi đồng ý để NOXH.vn liên hệ tư vấn về nhà ở xã hội và các thông tin liên quan phù hợp với nhu cầu của tôi.',
             'wizard_consent_link_text' => 'Xem chi tiết chính sách bảo mật',
             'wizard_consent_link' => '/chinh-sach-bao-mat',
+
+            // --- khoi dia chi o buoc Nha o (nua duoi ban ve w-4) ---
+            'wizard_addr_home_heading' => 'Địa chỉ nhà ở hiện tại',
+            'wizard_addr_home_hint' => 'Chọn tỉnh/thành phố và phường/xã nơi bạn đang sinh sống thực tế.',
+            'wizard_addr_work_heading' => 'Nơi làm việc hiện tại',
+            'wizard_addr_work_hint' => 'Chọn tỉnh/thành phố và phường/xã nơi bạn đang làm việc.',
+            'wizard_addr_province_label' => 'Tỉnh/Thành phố',
+            'wizard_addr_ward_label' => 'Phường/Xã',
+            'wizard_addr_province_hint' => '— Chọn tỉnh/thành phố —',
+            'wizard_addr_ward_hint' => '— Chọn phường/xã —',
+            'wizard_project_heading' => 'Các dự án NOXH trên địa bàn nơi bạn làm việc',
+            'wizard_project_hint' => 'Chúng tôi đã tìm thấy các dự án Nhà ở xã hội tại {noi}. Bạn có thể chọn tối đa {max} dự án quan tâm.',
+            'wizard_project_count_text' => 'Đã chọn: {so}/{max}',
+            'wizard_project_link_text' => 'Xem thông tin',
+            'wizard_project_empty_text' => 'Chưa có dự án nào trong khu vực này.',
+            'wizard_project_max' => '5',
         ];
 
         $them = 0;
@@ -549,6 +565,7 @@ class NoxhEligibilityWizardSeeder extends Seeder
             'question' => 'Hiện tại anh/chị có nhà ở thuộc sở hữu không?',
             'hint' => 'Thông tin này giúp chúng tôi đánh giá đúng điều kiện theo quy định hiện hành.',
             'layout' => 'card',
+            'extras' => 'address',
             'image' => $this->anh('kt-nha.png'),
             'icon' => 'house',
             'icon_tone' => 'sky',

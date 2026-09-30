@@ -56,6 +56,11 @@ Route::name('noxh.')->group(function () {
     Route::post('kiem-tra-dieu-kien/cau-hoi/{buoc}', [EligibilityController::class, 'step'])
         ->where(['buoc' => '[0-9]+'])->name('check.step');
     Route::post('kiem-tra-dieu-kien/hoan-tat', [EligibilityController::class, 'submit'])->name('check.submit');
+    // Hai duong dan JSON cua khoi dia chi o buoc Nha o (ban ve w-4).
+    Route::get('kiem-tra-dieu-kien/phuong-xa/{tinh}', [EligibilityController::class, 'wards'])
+        ->where(['tinh' => '[0-9]+'])->name('check.wards');
+    Route::get('kiem-tra-dieu-kien/du-an/{tinh}', [EligibilityController::class, 'projectsByArea'])
+        ->where(['tinh' => '[0-9]+'])->name('check.areaProjects');
     Route::get('kiem-tra-dieu-kien/ket-qua/{code}', [EligibilityController::class, 'result'])->name('check.result');
     Route::post('kiem-tra-dieu-kien/tra-cuu', [EligibilityController::class, 'lookup'])->name('check.lookup');
 

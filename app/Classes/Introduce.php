@@ -372,6 +372,38 @@ class Introduce
                 'contact_name' => ['type' => 'text', 'label' => 'Bước cuối - nhãn ô họ tên'],
                 'contact_phone' => ['type' => 'text', 'label' => 'Bước cuối - nhãn ô số điện thoại'],
                 'contact_note' => ['type' => 'textarea', 'label' => 'Bước cuối - dòng cam kết bảo mật'],
+                'contact_name_hint' => ['type' => 'text', 'label' => 'Bước cuối - chữ mờ ô họ tên'],
+                'contact_phone_hint' => ['type' => 'text', 'label' => 'Bước cuối - chữ mờ ô số điện thoại'],
+                'consent_text' => ['type' => 'textarea', 'label' => 'Bước cuối - dòng đồng ý nhận tư vấn'],
+                'consent_link_text' => ['type' => 'text', 'label' => 'Bước cuối - chữ của liên kết chính sách'],
+                'consent_link' => ['type' => 'text', 'label' => 'Bước cuối - đường dẫn chính sách'],
+
+                'chip4_text' => ['type' => 'text', 'label' => 'Thẻ 4 - chữ'],
+                'chip4_icon' => ['type' => 'select', 'label' => 'Thẻ 4 - hình', 'option' => $icon],
+
+                // Khoi dia chi o buoc Nha o (nua duoi ban ve w-4)
+                'addr_home_heading' => ['type' => 'text', 'label' => 'Địa chỉ - tiêu đề khối nhà ở'],
+                'addr_home_hint' => ['type' => 'text', 'label' => 'Địa chỉ - mô tả khối nhà ở'],
+                'addr_work_heading' => ['type' => 'text', 'label' => 'Địa chỉ - tiêu đề khối nơi làm việc'],
+                'addr_work_hint' => ['type' => 'text', 'label' => 'Địa chỉ - mô tả khối nơi làm việc'],
+                'addr_province_label' => ['type' => 'text', 'label' => 'Địa chỉ - nhãn ô tỉnh/thành phố'],
+                'addr_ward_label' => ['type' => 'text', 'label' => 'Địa chỉ - nhãn ô phường/xã'],
+                'addr_province_hint' => ['type' => 'text', 'label' => 'Địa chỉ - dòng trống ô tỉnh/thành phố'],
+                'addr_ward_hint' => ['type' => 'text', 'label' => 'Địa chỉ - dòng trống ô phường/xã'],
+                'project_heading' => ['type' => 'text', 'label' => 'Dự án - tiêu đề khối'],
+                'project_hint' => [
+                    'type' => 'textarea',
+                    'label' => 'Dự án - dòng mô tả',
+                    'title' => 'Dùng {noi} thay cho tên khu vực và {max} thay cho số dự án tối đa.',
+                ],
+                'project_count_text' => [
+                    'type' => 'text',
+                    'label' => 'Dự án - dòng đếm',
+                    'title' => 'Dùng {so} và {max}. Ví dụ: Đã chọn: {so}/{max}',
+                ],
+                'project_link_text' => ['type' => 'text', 'label' => 'Dự án - chữ của liên kết trên thẻ'],
+                'project_empty_text' => ['type' => 'text', 'label' => 'Dự án - câu hiện khi khu vực chưa có dự án'],
+                'project_max' => ['type' => 'text', 'label' => 'Dự án - số dự án chọn tối đa'],
             ],
         ];
 

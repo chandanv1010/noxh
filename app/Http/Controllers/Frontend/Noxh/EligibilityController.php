@@ -32,6 +32,12 @@ class EligibilityController extends FrontendController
     /** Khoa giu cau tra loi dang lam do trong phien. */
     private const KHOA_PHIEN = 'noxh_check_tra_loi';
 
+    /** Khoa giu dia chi va du an quan tam dang lam do trong phien. */
+    private const KHOA_DIA_CHI = 'noxh_check_dia_chi';
+
+    /** So du an nhieu nhat mot nguoi duoc tich - ban ve w-4 ghi 5. */
+    private const SO_DU_AN_TOI_DA = 5;
+
     protected $projectQuery;
 
     public function __construct(ProjectQuery $projectQuery)
@@ -75,7 +81,19 @@ class EligibilityController extends FrontendController
 
         $cau = $cauHoi[$soBuoc - 1];
 
-        return view('frontend.noxh.check.wizard', [
+        $them = [];
+
+        if ($cau->hoiDiaChi()) {
+            $diaChi = $this->diaChiTrongPhien($request);
+
+            $them = [
+                'tinhThanh' => DB::table('vn_provinces')->orderBy('order')->get(['code', 'name']),
+                'diaChi' => $diaChi,
+                'duAnDaChon' => $diaChi['project_ids'] ?? [],
+            ];
+        }
+
+        return view('frontend.noxh.check.wizard', $them + [
             'system' => $this->system,
             'seo' => $this->seo('Kiểm tra điều kiện mua nhà ở xã hội', url('/kiem-tra-dieu-kien/cau-hoi/' . $soBuoc)),
             'cauHoi' => $cauHoi,
@@ -96,6 +114,10 @@ class EligibilityController extends FrontendController
         $cau = $cauHoi[$soBuoc - 1];
 
         $lui = $request->input('huong') === 'lui';
+
+        if ($cau->hoiDiaChi()) {
+            $this->ghiDiaChi($request);
+        }
 
         // Bam "Quay lai" thi khong bat tra loi - nguoi dung dang di nguoc.
         if (!$lui && !$this->ghiTraLoi($request, $cau)) {
@@ -154,14 +176,22 @@ class EligibilityController extends FrontendController
 
         $traLoi = $this->traLoiTrongPhien($request);
         $ketQua = $this->chamDiem($cauHoi, $traLoi, $this->duongDi($cauHoi, $traLoi));
+        $diaChi = $this->diaChiTrongPhien($request);
 
-        $luot = DB::transaction(function () use ($request, $ketQua, $cauHoi) {
+        $luot = DB::transaction(function () use ($request, $ketQua, $cauHoi, $diaChi) {
             $luot = EligibilityCheck::create([
                 'code' => $this->sinhMa(),
                 'name' => $request->input('name'),
                 'phone' => $request->input('phone'),
                 'email' => $request->input('email'),
-                'province_code' => $request->input('province_code'),
+                // Ma dia gioi go sai bi loai tu truoc thanh chuoi rong; luu
+                // chuoi rong vao bang la sau nay khong phan biet duoc "chua
+                // khai" voi "khai sai", nen doi han ve null.
+                'province_code' => $diaChi['province_code'] ?: null,
+                'ward_code' => $diaChi['ward_code'] ?: null,
+                'work_province_code' => $diaChi['work_province_code'] ?: null,
+                'work_ward_code' => $diaChi['work_ward_code'] ?: null,
+                'project_ids' => $diaChi['project_ids'] ? implode(',', $diaChi['project_ids']) : null,
                 'total_questions' => $ketQua['soCau'],
                 'answered' => $ketQua['daTraLoi'],
                 'passed' => $ketQua['dat'],
@@ -189,7 +219,7 @@ class EligibilityController extends FrontendController
             return $luot;
         });
 
-        $request->session()->forget(self::KHOA_PHIEN);
+        $request->session()->forget([self::KHOA_PHIEN, self::KHOA_DIA_CHI]);
 
         return redirect()->route('noxh.check.result', $luot->code);
     }
@@ -209,6 +239,48 @@ class EligibilityController extends FrontendController
             'seo' => $this->seo('Kết quả kiểm tra điều kiện', url('/kiem-tra-dieu-kien/ket-qua/' . $code)),
             'luot' => $luot,
             'goiY' => $this->projectQuery->noiBat(3),
+        ]);
+    }
+
+    /** Danh sach phuong/xa cua mot tinh - khoi dia chi o buoc Nha o goi toi. */
+    public function wards(string $tinh)
+    {
+        return response()->json(
+            DB::table('vn_wards')->where('province_code', $tinh)
+                ->orderBy('order')->get(['code', 'name'])
+        );
+    }
+
+    /**
+     * Cac du an nha o xa hoi tren dia ban noi lam viec.
+     *
+     * Loc theo tinh; co truyen them phuong/xa thi uu tien du an cung xa roi
+     * moi toi cac du an khac trong tinh - nguoi dung quan tam cho gan noi
+     * lam viec truoc.
+     */
+    public function projectsByArea(Request $request, string $tinh)
+    {
+        $xa = trim((string) $request->query('xa'));
+
+        $ds = $this->projectQuery->co()
+            ->where('p.province_code', $tinh)
+            ->orderByRaw('CASE WHEN p.ward_code = ? THEN 0 ELSE 1 END', [$xa])
+            ->orderByDesc('p.is_featured')
+            ->limit(12)
+            ->get(['p.id', 'p.image', 'pl.name', 'pl.canonical', 'pr.name as province_name', 'vw.name as ward_name']);
+
+        $tinhTen = DB::table('vn_provinces')->where('code', $tinh)->value('name');
+        $xaTen = $xa !== '' ? DB::table('vn_wards')->where('code', $xa)->value('name') : null;
+
+        return response()->json([
+            'noi' => trim(($xaTen ? $xaTen . ' – ' : '') . (string) $tinhTen, ' –'),
+            'duAn' => $ds->map(fn ($d) => [
+                'id' => $d->id,
+                'name' => $d->name,
+                'image' => $d->image,
+                'place' => trim((string) $d->ward_name . ($d->province_name ? ' (' . $d->province_name . ')' : '')),
+                'url' => url('/du-an/' . $d->canonical),
+            ])->all(),
         ]);
     }
 
@@ -360,6 +432,60 @@ class EligibilityController extends FrontendController
         $da = $this->traLoiTrongPhien($request);
         unset($da[$cauId]);
         $request->session()->put(self::KHOA_PHIEN, $da);
+    }
+
+    /**
+     * Dia chi nha o, noi lam viec va cac du an da tich - giu trong phien.
+     *
+     * @return array{province_code:string,ward_code:string,work_province_code:string,work_ward_code:string,project_ids:array}
+     */
+    private function diaChiTrongPhien(Request $request): array
+    {
+        $co = $request->session()->get(self::KHOA_DIA_CHI, []);
+        $co = is_array($co) ? $co : [];
+
+        return [
+            'province_code' => (string) ($co['province_code'] ?? ''),
+            'ward_code' => (string) ($co['ward_code'] ?? ''),
+            'work_province_code' => (string) ($co['work_province_code'] ?? ''),
+            'work_ward_code' => (string) ($co['work_ward_code'] ?? ''),
+            'project_ids' => array_values(array_filter((array) ($co['project_ids'] ?? []))),
+        ];
+    }
+
+    /**
+     * Ghi khoi dia chi vao phien.
+     *
+     * Ma tinh / xa nao khong co that thi bo han: nguoi dung sua the HTML
+     * khong nhet duoc ma la vao bang ket qua. Danh sach du an cat bot cho du
+     * so luong cho phep vi o trinh duyet chan bang JS, con day la cho chan
+     * that.
+     */
+    private function ghiDiaChi(Request $request): void
+    {
+        $tinh = fn ($ma) => $ma !== '' && DB::table('vn_provinces')->where('code', $ma)->exists() ? $ma : '';
+        $xa = fn ($ma, $cuaTinh) => $ma !== '' && DB::table('vn_wards')->where('code', $ma)
+            ->when($cuaTinh !== '', fn ($q) => $q->where('province_code', $cuaTinh))->exists() ? $ma : '';
+
+        $nha = $tinh(trim((string) $request->input('province_code')));
+        $viec = $tinh(trim((string) $request->input('work_province_code')));
+
+        $duAn = array_slice(array_values(array_unique(array_filter(
+            array_map('intval', (array) $request->input('project_ids', []))
+        ))), 0, self::SO_DU_AN_TOI_DA);
+
+        if ($duAn) {
+            $duAn = DB::table('products')->whereIn('id', $duAn)->where('publish', 2)
+                ->whereNull('deleted_at')->pluck('id')->all();
+        }
+
+        $request->session()->put(self::KHOA_DIA_CHI, [
+            'province_code' => $nha,
+            'ward_code' => $xa(trim((string) $request->input('ward_code')), $nha),
+            'work_province_code' => $viec,
+            'work_ward_code' => $xa(trim((string) $request->input('work_ward_code')), $viec),
+            'project_ids' => $duAn,
+        ]);
     }
 
     /** Mot o chu cua trang, lay tu bang introduces. */
