@@ -10,6 +10,7 @@ use App\Http\Controllers\Backend\V1\Noxh\DossierItemController;
 use App\Http\Controllers\Backend\V1\Noxh\EligibilityQuestionController;
 use App\Http\Controllers\Backend\V1\Noxh\EligibilityOptionController;
 use App\Http\Controllers\Backend\V1\Noxh\EligibilityOptionGroupController;
+use App\Http\Controllers\Backend\V1\Noxh\EligibilityPanelController;
 use App\Http\Controllers\Backend\V1\Noxh\EligibilityCheckController;
 use App\Http\Controllers\Backend\V1\Noxh\QaQuestionController;
 use App\Http\Controllers\Backend\V1\Noxh\ProjectMilestoneController;
@@ -112,6 +113,17 @@ Route::group(['middleware' => ['admin', 'locale', 'backend_default_locale']], fu
         Route::post('{id}/update', [EligibilityOptionGroupController::class, 'update'])->where(['id' => '[0-9]+'])->name('eligibility.group.update');
         Route::get('{id}/delete', [EligibilityOptionGroupController::class, 'delete'])->where(['id' => '[0-9]+'])->name('eligibility.group.delete');
         Route::delete('{id}/destroy', [EligibilityOptionGroupController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('eligibility.group.destroy');
+    });
+
+    // Tam o cot phai cua tung buoc - ban ve w-3, w-4, w-5.
+    Route::group(['prefix' => 'eligibility/panel'], function () {
+        Route::get('index', [EligibilityPanelController::class, 'index'])->name('eligibility.panel.index');
+        Route::get('create', [EligibilityPanelController::class, 'create'])->name('eligibility.panel.create');
+        Route::post('store', [EligibilityPanelController::class, 'store'])->name('eligibility.panel.store');
+        Route::get('{id}/edit', [EligibilityPanelController::class, 'edit'])->where(['id' => '[0-9]+'])->name('eligibility.panel.edit');
+        Route::post('{id}/update', [EligibilityPanelController::class, 'update'])->where(['id' => '[0-9]+'])->name('eligibility.panel.update');
+        Route::get('{id}/delete', [EligibilityPanelController::class, 'delete'])->where(['id' => '[0-9]+'])->name('eligibility.panel.delete');
+        Route::delete('{id}/destroy', [EligibilityPanelController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('eligibility.panel.destroy');
     });
 
     Route::group(['prefix' => 'eligibility/option'], function () {

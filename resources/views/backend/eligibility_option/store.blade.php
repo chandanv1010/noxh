@@ -75,6 +75,17 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-row">
+                                <label class="control-label text-left mb10">Dừng sớm</label>
+                                <label class="control-label text-left">
+                                    <input type="hidden" name="stop_flow" value="0">
+                                    <input type="checkbox" name="stop_flow" value="1" {{ old('stop_flow', ($option->stop_flow) ?? 0) ? 'checked' : '' }}>
+                                    Chọn đáp án này thì bỏ qua các bước còn lại
+                                </label>
+                                <small class="text-muted">Dùng khi đáp án đã đủ kết luận không đạt. Ví dụ: "Đã từng được hỗ trợ".</small>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-row">
                                 <label class="control-label text-left">Điểm</label>
                                     <input type="number" name="score" value="{{ old('score', ($option->score) ?? 0) }}" class="form-control" min="0">
                                     <small class="text-muted">Cộng vào tổng điểm khi người dùng chọn đáp án này</small>

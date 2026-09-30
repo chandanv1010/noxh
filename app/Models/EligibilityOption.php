@@ -20,8 +20,10 @@ class EligibilityOption extends Model
     protected $fillable = [
         'eligibility_question_id', 'eligibility_option_group_id',
         'label', 'image', 'icon', 'icon_tone', 'value',
-        'verdict', 'score', 'note', 'order',
+        'verdict', 'stop_flow', 'score', 'note', 'order',
     ];
+
+    protected $casts = ['stop_flow' => 'boolean'];
 
     public const KET_LUAN = [
         'pass' => 'Dat',

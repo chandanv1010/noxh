@@ -45,6 +45,7 @@
                             <th style="width:260px;">Thuộc câu hỏi</th>
                             <th class="text-center" style="width:140px;">Kết luận</th>
                             <th class="text-center" style="width:80px;">Điểm</th>
+                            <th class="text-center" style="width:100px;">Dừng sớm</th>
                             <th class="text-center" style="width:120px;">Thao tác</th>
                         </tr>
                     </thead>
@@ -64,6 +65,13 @@
                                     <td class="text-center"><span class="label label-{{ $o->verdict === 'pass' ? 'success' : ($o->verdict === 'fail' ? 'danger' : 'warning') }}">{{ $o->tenKetLuan() }}</span></td>
                                     <td class="text-center">{{ $o->score }}</td>
                                     <td class="text-center">
+                                        @if($o->stop_flow)
+                                            <span class="label label-danger">Bỏ qua bước sau</span>
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
                                         <a href="{{ route('eligibility.option.edit', $o->id) }}" class="btn btn-success"><i class="fa fa-edit"></i></a>
                                         <a href="{{ route('eligibility.option.delete', $o->id) }}" class="btn btn-danger"><i class="fa fa-trash"></i></a>
                                     </td>
@@ -72,7 +80,7 @@
 
                         @if(!$options->count())
                             <tr>
-                                <td colspan="7" class="text-center text-muted" style="padding:30px;">
+                                <td colspan="8" class="text-center text-muted" style="padding:30px;">
                                     Chưa có bản ghi nào. Bấm <strong>Thêm mới</strong> để bắt đầu.
                                 </td>
                             </tr>

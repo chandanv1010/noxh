@@ -100,6 +100,10 @@ return [
                     'route' => 'eligibility/group/index'
                 ],
                 [
+                    'title' => 'Tấm cột phải',
+                    'route' => 'eligibility/panel/index'
+                ],
+                [
                     'title' => 'Kết quả khách đã kiểm tra',
                     'route' => 'eligibility/check/index'
                 ],

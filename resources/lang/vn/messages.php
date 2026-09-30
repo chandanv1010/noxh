@@ -757,6 +757,21 @@ return [
             'title' => 'Xóa tình huống'
         ],
     ],
+    'eligibilityPanel' => [
+        'index' => [
+            'title' => 'Tấm cột phải của bước kiểm tra',
+            'table' => 'Danh sách tấm'
+        ],
+        'create' => [
+            'title' => 'Thêm mới tấm'
+        ],
+        'edit' => [
+            'title' => 'Cập nhật tấm'
+        ],
+        'delete' => [
+            'title' => 'Xóa tấm'
+        ],
+    ],
     'eligibilityCheck' => [
         'index' => [
             'title' => 'Kết quả kiểm tra điều kiện',

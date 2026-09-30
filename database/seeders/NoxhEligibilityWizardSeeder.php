@@ -69,13 +69,10 @@ class NoxhEligibilityWizardSeeder extends Seeder
      */
     private const BUOC = [
         'nhóm đối tượng' => [0, 'Đối tượng', 'Danh mục nhóm đối tượng được xây dựng theo quy định hiện hành. Vui lòng chọn đúng nhóm phù hợp.'],
-        'đã có nhà ở thuộc sở hữu' => [1, 'Nhà ở', 'Xét nhà ở thuộc sở hữu của anh/chị hoặc vợ/chồng tại tỉnh/thành phố nơi có dự án.'],
-        'thu nhập bình quân|thu nhập hàng tháng' => [2, 'Thu nhập', 'Mức thu nhập xét theo bình quân hàng tháng của hộ gia đình trong 01 năm liền kề.'],
-        'nơi có dự án NOXH?' => [3, 'Dự án', 'Anh/chị chỉ được đăng ký mua tại tỉnh/thành phố đang cư trú hoặc làm việc.'],
-        'hỗ trợ nhà ở dưới mọi hình thức' => [4, 'Chính sách', 'Đã nhận hỗ trợ nhà ở của Nhà nước thì không được xét mua nhà ở xã hội lần nữa.'],
-        'Số thành viên trong hộ' => [5, 'Hộ gia đình', 'Số thành viên dùng để đối chiếu ngưỡng thu nhập của hộ gia đình.'],
-        'thuế thu nhập cá nhân' => [6, 'Hồ sơ', 'Thông tin này dùng để đối chiếu với mức thu nhập anh/chị đã khai.'],
-        'kết hôn' => [7, 'Kết quả', 'Tình trạng hôn nhân quyết định ngưỡng thu nhập áp dụng: người độc thân hay hai vợ chồng.'],
+        'thu nhập bình quân|thu nhập hàng tháng' => [1, 'Thu nhập', 'Thu nhập được xem xét theo bình quân 12 tháng liền kề, theo quy định hiện hành.'],
+        'hỗ trợ nhà ở dưới mọi hình thức|chính sách hỗ trợ về nhà ở' => [2, 'Chính sách', 'Lưu ý: Thông tin này giúp NOXH.vn xác định sơ bộ khả năng đáp ứng điều kiện mua nhà ở xã hội theo quy định hiện hành.'],
+        'đã có nhà ở thuộc sở hữu|có nhà ở thuộc sở hữu không' => [3, 'Nhà ở', 'Vui lòng cung cấp địa điểm nhà ở hiện tại và nơi làm việc để chúng tôi kiểm tra điều kiện theo quy định.'],
+        'kết hôn|Nhận kết quả kiểm tra' => [4, 'Kết quả', ''],
     ];
 
     /**
@@ -117,6 +114,11 @@ class NoxhEligibilityWizardSeeder extends Seeder
         $this->napBuoc();
         $this->napDoiTuong();
         $this->napThuNhap();
+        $this->napChinhSach();
+        $this->napNhaO();
+        $this->napNhapTin();
+        $this->anBuocThua();
+        $this->napTamCotPhai();
         $this->napHinhDapAn();
     }
 
@@ -157,8 +159,10 @@ class NoxhEligibilityWizardSeeder extends Seeder
             'wizard_chip1_icon' => 'bolt',
             'wizard_chip2_text' => 'Chính xác',
             'wizard_chip2_icon' => 'shield-check',
-            'wizard_chip3_text' => 'Bảo mật thông tin',
-            'wizard_chip3_icon' => 'lock',
+            'wizard_chip3_text' => 'Miễn phí',
+            'wizard_chip3_icon' => 'money',
+            'wizard_chip4_text' => 'Bảo mật thông tin',
+            'wizard_chip4_icon' => 'lock',
 
             'wizard_step_text' => 'Câu {so}/{tong}',
             'wizard_back_text' => 'Quay lại',
@@ -170,7 +174,12 @@ class NoxhEligibilityWizardSeeder extends Seeder
             'wizard_contact_description' => 'Để lại thông tin để xem kết quả và được chuyên viên hỗ trợ.',
             'wizard_contact_name' => 'Họ và tên',
             'wizard_contact_phone' => 'Số điện thoại',
-            'wizard_contact_note' => 'Thông tin bạn cung cấp được bảo mật tuyệt đối và chỉ sử dụng để kiểm tra điều kiện mua nhà ở xã hội.',
+            'wizard_contact_note' => 'Số điện thoại sẽ được bảo mật, chỉ sử dụng để tư vấn các dự án phù hợp.',
+            'wizard_contact_name_hint' => 'Nhập họ và tên (ví dụ: Nguyễn Văn A)',
+            'wizard_contact_phone_hint' => 'Nhập số điện thoại (ví dụ: 0901 234 567)',
+            'wizard_consent_text' => 'Tôi đồng ý để NOXH.vn liên hệ tư vấn về nhà ở xã hội và các thông tin liên quan phù hợp với nhu cầu của tôi.',
+            'wizard_consent_link_text' => 'Xem chi tiết chính sách bảo mật',
+            'wizard_consent_link' => '/chinh-sach-bao-mat',
         ];
 
         $them = 0;
@@ -196,6 +205,32 @@ class NoxhEligibilityWizardSeeder extends Seeder
         }
 
         $this->command?->info("Da them {$them} o noi dung cho bo kiem tra dieu kien.");
+
+        $this->doiChuCu();
+    }
+
+    /**
+     * Sua vai o chu do CHINH SEEDER nay dat sai o ban truoc.
+     *
+     * Chi ghi de khi o do van dung y nguyen cau cu - quan tri da sua tay thi
+     * de nguyen, khong ai muon mo lai trang thay chu minh vua sua bien mat.
+     */
+    private function doiChuCu(): void
+    {
+        $doi = [
+            'wizard_contact_note' => [
+                'Thông tin bạn cung cấp được bảo mật tuyệt đối và chỉ sử dụng để kiểm tra điều kiện mua nhà ở xã hội.',
+                'Số điện thoại sẽ được bảo mật, chỉ sử dụng để tư vấn các dự án phù hợp.',
+            ],
+            'wizard_contact_heading' => ['Nhận kết quả', 'Nhận kết quả kiểm tra của anh/chị.'],
+            'wizard_chip3_text' => ['Bảo mật thông tin', 'Miễn phí'],
+            'wizard_chip3_icon' => ['lock', 'money'],
+        ];
+
+        foreach ($doi as $khoa => [$cu, $moi]) {
+            DB::table('introduces')->where('keyword', $khoa)->where('language_id', 1)
+                ->where('content', $cu)->update(['content' => $moi]);
+        }
     }
 
     /**
@@ -450,6 +485,288 @@ class NoxhEligibilityWizardSeeder extends Seeder
         $duong = '/uploads/noxh/' . $ten;
 
         return is_file(public_path(ltrim($duong, '/'))) ? $duong : null;
+    }
+
+
+    /**
+     * Buoc "Chinh sach" - ban ve noxh_image/w-3.jpg.
+     *
+     * Ba dap an xep doc, moi dap an mot hinh vuong va mot doan mo ta. Dap an
+     * "Da tung duoc ho tro" mang co DUNG SOM: chon no la biet chac khong du
+     * dieu kien, khong hoi tiep buoc Nha o nua.
+     */
+    private function napChinhSach(): void
+    {
+        $cau = $this->timCau('%hỗ trợ nhà ở dưới mọi hình thức%', '%chính sách hỗ trợ về nhà ở%');
+
+        if (!$cau) {
+            $this->command?->warn('Chua co cau hoi chinh sach.');
+            return;
+        }
+
+        DB::table('eligibility_questions')->where('id', $cau->id)->update([
+            'question' => 'Anh/chị hoặc vợ/chồng đã từng được hưởng chính sách hỗ trợ về nhà ở chưa?',
+            'hint' => 'Bao gồm: được cấp nhà ở, mua/thuê mua nhà ở xã hội hoặc nhận hỗ trợ nhà ở từ các chương trình của Nhà nước.',
+            'layout' => 'list',
+            'foot_note' => 'Lưu ý: Thông tin này giúp NOXH.vn xác định sơ bộ khả năng đáp ứng điều kiện mua nhà ở xã hội theo quy định hiện hành.',
+            'updated_at' => now(),
+        ]);
+
+        // [gia tri, nhan, mo ta, anh, hinh du phong, mau, ket luan, diem, dung som]
+        $ds = [
+            ['chua-ho-tro', 'Chưa từng được hỗ trợ',
+                'Chưa mua, chưa thuê mua và chưa được hưởng chính sách hỗ trợ nhà ở từ Nhà nước.',
+                'cs-chua-ho-tro.png', 'doc-line', 'rose', 'pass', 2, 0],
+            ['da-ho-tro', 'Đã từng được hỗ trợ',
+                'Đã từng được cấp nhà ở, mua/thuê mua nhà ở xã hội hoặc nhận hỗ trợ nhà ở từ các chương trình của Nhà nước.',
+                'cs-da-ho-tro.png', 'home-door', 'green', 'fail', 0, 1],
+            ['khong-chac', 'Không chắc chắn',
+                'Chưa rõ trường hợp của mình.',
+                'cs-khong-chac.png', 'question', 'amber', 'unclear', 0, 0],
+        ];
+
+        $this->dongBoDapAn($cau->id, $ds);
+
+        $this->command?->info('Da dung buoc Chinh sach (3 dap an).');
+    }
+
+    /**
+     * Buoc "Nha o" - ban ve noxh_image/w-4.jpg.
+     *
+     * Ba LOAI nha o ve thanh ba the lon. So luong khong co dinh la ba: quan
+     * tri them bot o man hinh "Dap an dieu kien", luoi tu chia lai.
+     */
+    private function napNhaO(): void
+    {
+        $cau = $this->timCau('%đã có nhà ở thuộc sở hữu%', '%có nhà ở thuộc sở hữu không%');
+
+        if (!$cau) {
+            $this->command?->warn('Chua co cau hoi nha o.');
+            return;
+        }
+
+        DB::table('eligibility_questions')->where('id', $cau->id)->update([
+            'question' => 'Hiện tại anh/chị có nhà ở thuộc sở hữu không?',
+            'hint' => 'Thông tin này giúp chúng tôi đánh giá đúng điều kiện theo quy định hiện hành.',
+            'layout' => 'card',
+            'image' => $this->anh('kt-nha.png'),
+            'icon' => 'house',
+            'icon_tone' => 'sky',
+            'foot_note' => 'Vui lòng cung cấp địa điểm nhà ở hiện tại và nơi làm việc để chúng tôi kiểm tra điều kiện theo quy định.',
+            'foot_note_sub' => '',
+            'updated_at' => now(),
+        ]);
+
+        $ds = [
+            ['chua-co-nha', 'Chưa có nhà ở', 'Chưa sở hữu nhà ở trên toàn quốc',
+                'nh-chua-co-nha.png', 'home', 'slate', 'pass', 2, 0],
+            ['co-dat', 'Có đất nhưng chưa có nhà', 'Có quyền sử dụng đất nhưng chưa có nhà ở',
+                'nh-co-dat.png', 'area', 'green', 'unclear', 1, 0],
+            ['co-nha', 'Có nhà ở', 'Đang sở hữu nhà ở',
+                'nh-co-nha.png', 'house', 'rose', 'fail', 0, 0],
+        ];
+
+        $this->dongBoDapAn($cau->id, $ds);
+
+        $this->command?->info('Da dung buoc Nha o (3 loai).');
+    }
+
+    /**
+     * Buoc cuoi - o nhap ho ten, so dien thoai (ban ve noxh_image/w-5.jpg).
+     *
+     * Buoc nay KHONG phai cau hoi: bo het dap an di de no khong bi cham diem
+     * va khong doi nguoi dung chon gi.
+     */
+    private function napNhapTin(): void
+    {
+        $cau = $this->timCau('%kết hôn chưa%', '%Nhận kết quả kiểm tra%');
+
+        if (!$cau) {
+            $this->command?->warn('Chua co cau de lam buoc nhap tin.');
+            return;
+        }
+
+        DB::table('eligibility_questions')->where('id', $cau->id)->update([
+            'question' => 'Nhận kết quả kiểm tra của anh/chị.',
+            'step_label' => 'Kết quả',
+            'hint' => 'Vui lòng nhập thông tin để xem kết quả và nhận tư vấn các dự án nhà ở xã hội phù hợp.',
+            'layout' => 'contact',
+            'image' => $this->anh('kt-ho-so.png'),
+            'icon' => 'clipboard',
+            'icon_tone' => 'sky',
+            'foot_note' => '',
+            'foot_note_sub' => '',
+            'required' => 0,
+            'order' => 4,
+            'publish' => 2,
+            'updated_at' => now(),
+        ]);
+
+        $id = DB::table('eligibility_options')->where('eligibility_question_id', $cau->id)->pluck('id');
+
+        if ($id->count()) {
+            DB::table('eligibility_answers')->whereIn('eligibility_option_id', $id)
+                ->update(['eligibility_option_id' => null]);
+            DB::table('eligibility_options')->whereIn('id', $id)->delete();
+        }
+
+        $this->command?->info('Da dung buoc nhap tin (' . $id->count() . ' dap an cu bi bo).');
+    }
+
+    /**
+     * An cac buoc khong con trong ban ve.
+     *
+     * AN chu khong xoa: cau hoi va dap an cu con duoc cac luot kiem tra da
+     * luu tro toi, xoa di la bang ket qua thung lo. Quan tri bat lai duoc
+     * bat cu luc nao.
+     */
+    private function anBuocThua(): void
+    {
+        $con = DB::table('eligibility_questions')
+            ->whereNull('deleted_at')
+            ->where('publish', 2)
+            ->whereNotIn('layout', ['contact'])
+            ->where(function ($q) {
+                $q->where('question', 'LIKE', '%Số thành viên%')
+                    ->orWhere('question', 'LIKE', '%nơi có dự án NOXH?%')
+                    ->orWhere('question', 'LIKE', '%thuế thu nhập cá nhân%');
+            })
+            ->update(['publish' => 1, 'updated_at' => now()]);
+
+        $this->command?->info("Da an {$con} buoc khong co trong ban ve.");
+    }
+
+    /**
+     * Cac tam o cot phai cua buoc 3, 4, 5 (ban ve w-3, w-4, w-5).
+     *
+     * Tra theo tieu de trong cung mot buoc nen chay lai khong sinh ra ban
+     * trung; tam chi co tranh thi tra theo duong dan anh.
+     */
+    private function napTamCotPhai(): void
+    {
+        $tam = [
+            ['%chính sách hỗ trợ về nhà ở%', [
+                ['Vì sao cần thông tin này?', '', "Đối chiếu điều kiện theo quy định hiện hành.\nTránh trùng lặp chính sách hỗ trợ.\nGiúp tư vấn chính xác và nhanh chóng hơn.\nThông tin được bảo mật tuyệt đối.", '', 'info', 'sky', 0],
+                ['', '', '', 'kt-tam-gia-dinh.png', '', 'sky', 1],
+            ]],
+            ['%có nhà ở thuộc sở hữu không%', [
+                ['Thông tin của bạn luôn được bảo mật', '', "Chỉ sử dụng để tư vấn dự án phù hợp\nKhông chia sẻ cho bên thứ 3\nDữ liệu được mã hóa, bảo mật theo quy định", '', 'shield-check', 'green', 0],
+                ['Vì sao cần thông tin này?', "Một số trường hợp có nhà ở nhưng cách nơi làm việc từ 30 km trở lên, đồng thời dự án nhà ở xã hội cách nơi làm việc không quá 30 km vẫn có thể được xem xét mua nhà ở xã hội theo quy định của từng địa phương.\n\nChúng tôi sử dụng dữ liệu địa giới hành chính mới từ VNeID để tính toán khoảng cách chính xác và thuận tiện cho bạn.", '', '', 'bulb', 'amber', 1],
+                ['', '', '', 'kt-tam-toa-nha.png', '', 'sky', 2],
+            ]],
+            ['%Nhận kết quả kiểm tra%', [
+                ['Thông tin của bạn luôn được bảo mật', '', "Chỉ sử dụng để tư vấn dự án phù hợp\nKhông chia sẻ cho bên thứ 3\nBạn có thể yêu cầu xóa thông tin bất cứ lúc nào", '', 'shield-check', 'amber', 0],
+                ['', '', '', 'kt-tam-dien-thoai.png', '', 'amber', 1],
+                ['Sau khi xem kết quả', 'Chuyên viên NOXH.vn sẽ sớm liên hệ với bạn để tư vấn chi tiết các dự án phù hợp.', '', '', 'bulb', 'amber', 2],
+            ]],
+        ];
+
+        $them = 0;
+
+        foreach ($tam as [$nhanDang, $ds]) {
+            $cau = $this->timCau($nhanDang);
+
+            if (!$cau) {
+                continue;
+            }
+
+            foreach ($ds as [$dau, $chu, $y, $anh, $hinh, $mau, $thuTu]) {
+                $dong = [
+                    'eligibility_question_id' => $cau->id,
+                    'heading' => $dau,
+                    'body' => $chu,
+                    'bullets' => $y,
+                    'image' => $anh !== '' ? $this->anh($anh) : null,
+                    'icon' => $hinh,
+                    'tone' => $mau,
+                    'order' => $thuTu,
+                    'updated_at' => now(),
+                ];
+
+                $cu = DB::table('eligibility_panels')
+                    ->where('eligibility_question_id', $cau->id)
+                    ->where('order', $thuTu)
+                    ->first();
+
+                if ($cu) {
+                    DB::table('eligibility_panels')->where('id', $cu->id)->update($dong);
+                    continue;
+                }
+
+                DB::table('eligibility_panels')->insert($dong + ['created_at' => now()]);
+                $them++;
+            }
+        }
+
+        $this->command?->info("Da them {$them} tam cot phai.");
+    }
+
+    // -------------------------------------------------------------------------
+
+    /** Tim cau hoi theo mot trong cac doan chu nhan dang. */
+    private function timCau(string ...$doan)
+    {
+        return DB::table('eligibility_questions')
+            ->whereNull('deleted_at')
+            ->where(function ($q) use ($doan) {
+                foreach ($doan as $d) {
+                    $q->orWhere('question', 'LIKE', $d);
+                }
+            })
+            ->first();
+    }
+
+    /**
+     * Dong bo bo dap an cua mot cau theo ban ve.
+     *
+     * Dap an cu khong con trong ban ve thi xoa, nhung go lien ket o bang tra
+     * loi truoc - ket luan va diem da luu ngay tren dong tra loi roi nen cac
+     * luot kiem tra cu van doc duoc.
+     */
+    private function dongBoDapAn(int $cauId, array $ds): void
+    {
+        $giu = [];
+
+        foreach ($ds as $i => [$gia, $nhan, $moTa, $anh, $hinh, $mau, $ketLuan, $diem, $dungSom]) {
+            $dong = [
+                'eligibility_question_id' => $cauId,
+                'eligibility_option_group_id' => null,
+                'label' => $nhan,
+                'note' => $moTa,
+                'image' => $this->anh($anh),
+                'icon' => $hinh,
+                'icon_tone' => $mau,
+                'verdict' => $ketLuan,
+                'stop_flow' => $dungSom,
+                'score' => $diem,
+                'order' => $i,
+                'updated_at' => now(),
+            ];
+
+            $cu = DB::table('eligibility_options')
+                ->where('eligibility_question_id', $cauId)
+                ->where('value', $gia)
+                ->first();
+
+            if ($cu) {
+                DB::table('eligibility_options')->where('id', $cu->id)->update($dong);
+                $giu[] = $cu->id;
+                continue;
+            }
+
+            $giu[] = DB::table('eligibility_options')->insertGetId($dong + ['value' => $gia, 'created_at' => now()]);
+        }
+
+        $bo = DB::table('eligibility_options')
+            ->where('eligibility_question_id', $cauId)
+            ->whereNotIn('id', $giu)
+            ->pluck('id');
+
+        if ($bo->count()) {
+            DB::table('eligibility_answers')->whereIn('eligibility_option_id', $bo)
+                ->update(['eligibility_option_id' => null]);
+            DB::table('eligibility_options')->whereIn('id', $bo)->delete();
+        }
     }
 
     /** Hinh cho dap an cua cac cau con lai - o nao da co hinh thi de nguyen. */

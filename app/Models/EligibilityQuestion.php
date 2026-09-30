@@ -45,6 +45,9 @@ class EligibilityQuestion extends Model
     public const BO_CUC = [
         'grid' => 'Luoi o dap an',
         'matrix' => 'Chia theo tinh huong',
+        'list' => 'Danh sach doc co mo ta',
+        'card' => 'Ba the lon',
+        'contact' => 'O nhap thong tin (buoc cuoi)',
     ];
 
     public const KIEU_NHAP = [
@@ -62,6 +65,18 @@ class EligibilityQuestion extends Model
     {
         return $this->hasMany(EligibilityOptionGroup::class, 'eligibility_question_id', 'id')
             ->orderBy('order')->orderBy('id');
+    }
+
+    public function panels()
+    {
+        return $this->hasMany(EligibilityPanel::class, 'eligibility_question_id', 'id')
+            ->orderBy('order')->orderBy('id');
+    }
+
+    /** Buoc cuoi: khong hoi gi, chi xin ho ten - so dien thoai. */
+    public function laBuocNhapTin(): bool
+    {
+        return $this->layout === 'contact';
     }
 
     /** Cau hoi nay ve theo kieu chia tam tinh huong? */

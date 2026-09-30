@@ -27,6 +27,10 @@ Sinh ra:
                                           cau hoi thu nhap (w-2.jpg)
     public/uploads/noxh/th-*.png          tranh cua tung tinh huong o buoc
                                           thu nhap (w-2.jpg)
+    public/uploads/noxh/cs-*.png          hinh vuong cua ba dap an buoc Chinh
+                                          sach (w-3.jpg)
+    public/uploads/noxh/nh-*.png          hinh tron cua ba loai nha o (w-4.jpg)
+    public/uploads/noxh/kt-tam-*.png      tranh o cot phai cac buoc 3, 4, 5
     public/uploads/noxh/kiem-tra-nen.jpg  tranh nen (day nha, hang cay, luoi
                                           cham) cua trang mo dau bo kiem tra
                                           dieu kien (start-fix.jpg)
@@ -50,6 +54,9 @@ BAN_VE_TIN = os.path.join(ANH, 'tin-tuc-fix.webp')
 BAN_VE_KT = os.path.join(ANH, 'w-1.jpg')
 BAN_VE_BD = os.path.join(ANH, 'start-fix.jpg')
 BAN_VE_KT2 = os.path.join(ANH, 'w-2.jpg')
+BAN_VE_KT3 = os.path.join(ANH, 'w-3.jpg')
+BAN_VE_KT4 = os.path.join(ANH, 'w-4.jpg')
+BAN_VE_KT5 = os.path.join(ANH, 'w-5.jpg')
 DICH = os.path.join(GOC, 'public', 'uploads', 'noxh')
 
 
@@ -551,6 +558,92 @@ def hinh_thu_nhap(im):
     return ra
 
 
+def _vuong_trong(im, khung, nen, phong=3):
+    """Cat mot o vuong roi bo nen phang di, giu lai hinh ben trong."""
+    o = im.crop(khung)
+    o = o.resize((o.size[0] * phong, o.size[1] * phong), Image.LANCZOS).convert('RGBA')
+
+    m = np.asarray(o).astype(int)
+    trong = np.abs(m[:, :, :3] - np.array(nen)).sum(axis=2) < 30
+    m[:, :, 3] = np.where(trong, 0, 255)
+
+    return Image.fromarray(m.astype(np.uint8))
+
+
+def hinh_chinh_sach(im):
+    """
+    Ba hinh vuong cua buoc "Chinh sach" va buc tranh o cot phai (w-3.jpg).
+
+    Ban ve nay ve o kich thuoc khac hai ban truoc (rong 1024), toa do do
+    rieng chu khong dung chung cong thuc nao.
+    """
+    TEN = ('cs-chua-ho-tro.png', 'cs-da-ho-tro.png', 'cs-khong-chac.png')
+    HANG = (703, 830, 951)
+    TRAI, RONG = 124, 74
+
+    ra = []
+
+    for ten, y in zip(TEN, HANG):
+        ra.append((ten, _vuong_trong(im, (TRAI, y, TRAI + RONG, y + RONG), (243, 247, 252))))
+
+    ra.append(('kt-tam-gia-dinh.png', im.crop((700, 770, 1010, 1060))))
+
+    return ra
+
+
+def hinh_nha_o(im):
+    """
+    Ba hinh tron cua buoc "Nha o" va buc tranh o cot phai (w-4.jpg).
+
+    Net but do de len hinh tron thu hai ("Co dat nhung chua co nha"). Manh
+    tranh do la mot dai dat co hang cay, hai nua gan giong nhau nen lay guong
+    ben kia dap sang la lien.
+    """
+    TAM = (('nh-chua-co-nha.png', 174, 386, False),
+           ('nh-co-dat.png', 452, 386, True),
+           ('nh-co-nha.png', 731, 386, False))
+    BAN_KINH = 44
+
+    m = np.asarray(im).astype(int)
+    r, g, b = m[:, :, 0], m[:, :, 1], m[:, :, 2]
+    but = (r > 150) & (g < 115) & (b < 115) & (r - g > 85) & (r - b > 85)
+
+    for _ in range(3):
+        but[1:, :] |= but[:-1, :]
+        but[:-1, :] |= but[1:, :]
+        but[:, 1:] |= but[:, :-1]
+        but[:, :-1] |= but[:, 1:]
+
+    ra = []
+
+    for ten, cx, cy, guong in TAM:
+        R = BAN_KINH + 3
+        con = m[cy - R:cy + R, cx - R:cx + R].copy()
+
+        if guong:
+            vet = but[cy - R:cy + R, cx - R:cx + R]
+            lat = con[:, ::-1]
+            dap = vet & ~vet[:, ::-1]
+            con[dap] = lat[dap]
+
+        anh = Image.fromarray(np.clip(con, 0, 255).astype(np.uint8))
+        ra.append((ten, _cat_tron(anh, R, R, BAN_KINH)))
+
+    # Hinh tron dau cau hoi cua buoc Nha o.
+    ra.append(('kt-nha.png', _cat_tron(im, 94, 268, 46)))
+    ra.append(('kt-tam-toa-nha.png', im.crop((895, 660, 1210, 940))))
+
+    return ra
+
+
+def hinh_nhap_tin(im):
+    """Hinh tron va buc tranh cua buoc cuoi - o nhap thong tin (w-5.jpg)."""
+    return [
+        ('kt-ho-so.png', _cat_tron(im, 120, 325, 45)),
+        ('kt-tam-dien-thoai.png', im.crop((820, 500, 1160, 830))),
+    ]
+
+
 def main():
     os.makedirs(DICH, exist_ok=True)
 
@@ -564,6 +657,9 @@ def main():
         (BAN_VE_BD, '', hinh_tron_bat_dau),
         (BAN_VE_KT, '', hinh_doi_tuong),
         (BAN_VE_KT2, '', hinh_thu_nhap),
+        (BAN_VE_KT3, '', hinh_chinh_sach),
+        (BAN_VE_KT4, '', hinh_nha_o),
+        (BAN_VE_KT5, '', hinh_nhap_tin),
     )
 
     for nguon, ten, ham in viec:

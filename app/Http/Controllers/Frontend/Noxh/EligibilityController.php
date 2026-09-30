@@ -64,20 +64,26 @@ class EligibilityController extends FrontendController
         // con thieu - cham diem can du cau, de nguoi dung di tiep roi bao
         // thieu o buoc cuoi thi ho phai bam nguoc lai ca bo.
         $daCo = $this->traLoiTrongPhien($request);
-        $dauTien = $this->buocConThieu($cauHoi, $daCo);
+        $duongDi = $this->duongDi($cauHoi, $daCo);
+        $dauTien = $this->buocConThieu($cauHoi, $daCo, $duongDi);
 
-        if ($soBuoc > $dauTien) {
+        // Nhay coc sang giua chung (go thang duong dan), hoac go so cua mot
+        // buoc da bi bo qua, thi lui ve buoc dau con thieu.
+        if ($soBuoc > $dauTien || !in_array($soBuoc, $duongDi, true)) {
             return redirect()->route('noxh.check.form', $dauTien);
         }
+
+        $cau = $cauHoi[$soBuoc - 1];
 
         return view('frontend.noxh.check.wizard', [
             'system' => $this->system,
             'seo' => $this->seo('Kiểm tra điều kiện mua nhà ở xã hội', url('/kiem-tra-dieu-kien/cau-hoi/' . $soBuoc)),
             'cauHoi' => $cauHoi,
+            'duongDi' => $duongDi,
             'buoc' => $soBuoc,
-            'cau' => $cauHoi[$soBuoc - 1],
-            'cuoiCung' => $soBuoc === $cauHoi->count(),
-            'daChon' => $daCo[$cauHoi[$soBuoc - 1]->id] ?? null,
+            'cau' => $cau,
+            'cuoiCung' => $cau->laBuocNhapTin() || $soBuoc === $cauHoi->count(),
+            'daChon' => $daCo[$cau->id] ?? null,
             'traLoi' => $daCo,
         ]);
     }
@@ -99,17 +105,20 @@ class EligibilityController extends FrontendController
             );
         }
 
+        $duongDi = $this->duongDi($cauHoi, $this->traLoiTrongPhien($request));
+        $viTri = array_search($soBuoc, $duongDi, true);
+
         if ($lui) {
-            return $soBuoc <= 1
+            $truoc = $viTri > 0 ? $duongDi[$viTri - 1] : null;
+
+            return $truoc === null
                 ? redirect()->route('noxh.check.index')
-                : redirect()->route('noxh.check.form', $soBuoc - 1);
+                : redirect()->route('noxh.check.form', $truoc);
         }
 
-        if ($soBuoc >= $cauHoi->count()) {
-            return redirect()->route('noxh.check.form', $soBuoc);
-        }
+        $ke = ($viTri !== false && isset($duongDi[$viTri + 1])) ? $duongDi[$viTri + 1] : $soBuoc;
 
-        return redirect()->route('noxh.check.form', $soBuoc + 1);
+        return redirect()->route('noxh.check.form', $ke);
     }
 
     /** Buoc cuoi: ghi not cau tra loi, lay ho ten - so dien thoai roi cham diem. */
@@ -134,7 +143,9 @@ class EligibilityController extends FrontendController
 
         $cuoi = $cauHoi->last();
 
-        if (!$this->ghiTraLoi($request, $cuoi)) {
+        // Buoc cuoi trong ban ve w-5 chi xin ho ten - so dien thoai, khong
+        // hoi gi nua; chi cau hoi that moi phai ghi cau tra loi.
+        if (!$cuoi->laBuocNhapTin() && !$this->ghiTraLoi($request, $cuoi)) {
             return back()->withInput()->with(
                 'nx_error',
                 $this->chu('wizard_require_text', 'Bạn chưa chọn câu trả lời.')
@@ -142,7 +153,7 @@ class EligibilityController extends FrontendController
         }
 
         $traLoi = $this->traLoiTrongPhien($request);
-        $ketQua = $this->chamDiem($cauHoi, $traLoi);
+        $ketQua = $this->chamDiem($cauHoi, $traLoi, $this->duongDi($cauHoi, $traLoi));
 
         $luot = DB::transaction(function () use ($request, $ketQua, $cauHoi) {
             $luot = EligibilityCheck::create([
@@ -151,7 +162,7 @@ class EligibilityController extends FrontendController
                 'phone' => $request->input('phone'),
                 'email' => $request->input('email'),
                 'province_code' => $request->input('province_code'),
-                'total_questions' => $cauHoi->count(),
+                'total_questions' => $ketQua['soCau'],
                 'answered' => $ketQua['daTraLoi'],
                 'passed' => $ketQua['dat'],
                 'unclear' => $ketQua['chuaRo'],
@@ -221,7 +232,7 @@ class EligibilityController extends FrontendController
     /** Bo cau hoi dang phat hanh, dung thu tu cua thanh buoc. */
     private function cauHoi()
     {
-        return EligibilityQuestion::with(['options', 'optionGroups.options'])
+        return EligibilityQuestion::with(['options', 'optionGroups.options', 'panels'])
             ->where('publish', 2)
             ->orderBy('order')
             ->orderBy('id')
@@ -245,21 +256,70 @@ class EligibilityController extends FrontendController
     }
 
     /**
-     * Buoc dau tien CHUA co cau tra loi (hoac buoc cuoi neu da tra loi het).
+     * Cac buoc nguoi dung THAT SU phai di qua, tinh theo cau tra loi hien co.
      *
-     * Cau khong bat buoc thi bo qua - khong chan duong di tiep.
+     * Co dap an mang co "dung som" (cot stop_flow): chon no la biet chac
+     * khong du dieu kien, hoi tiep vo nghia - vi du o buoc Chinh sach chon
+     * "Da tung duoc ho tro" thi bo qua buoc Nha o, di thang sang buoc nhap
+     * thong tin de xem ket qua.
+     *
+     * Tinh lai moi lan goi chu khong nho vao phien: nguoi dung quay lai doi
+     * dap an la duong di phai doi theo.
+     *
+     * @return array<int,int> danh sach so buoc, tang dan
      */
-    private function buocConThieu($cauHoi, array $daCo): int
+    private function duongDi($cauHoi, array $daCo): array
     {
-        foreach ($cauHoi as $i => $cau) {
-            $co = isset($daCo[$cau->id]) && $daCo[$cau->id] !== '';
+        $di = [];
+        $cuoi = $cauHoi->count();
 
-            if (!$co) {
-                return $i + 1;
+        foreach ($cauHoi as $i => $cau) {
+            $di[] = $i + 1;
+
+            if ($cau->laBuocNhapTin()) {
+                break;
+            }
+
+            $gia = $daCo[$cau->id] ?? null;
+
+            if ($gia === null || $gia === '') {
+                break;
+            }
+
+            $dapAn = $cau->options->firstWhere('value', $gia);
+
+            if ($dapAn && $dapAn->stop_flow) {
+                if (end($di) !== $cuoi) {
+                    $di[] = $cuoi;
+                }
+                break;
             }
         }
 
-        return $cauHoi->count();
+        return $di;
+    }
+
+    /**
+     * Buoc dau tien CHUA co cau tra loi (hoac buoc cuoi neu da tra loi het).
+     *
+     * Chi xet nhung buoc nam tren duong di; buoc bi bo qua khong tinh la
+     * thieu. Buoc nhap thong tin khong co cau tra loi nen luon dung o do.
+     */
+    private function buocConThieu($cauHoi, array $daCo, array $duongDi): int
+    {
+        foreach ($duongDi as $so) {
+            $cau = $cauHoi[$so - 1];
+
+            if ($cau->laBuocNhapTin()) {
+                return $so;
+            }
+
+            if (!isset($daCo[$cau->id]) || $daCo[$cau->id] === '') {
+                return $so;
+            }
+        }
+
+        return (int) (end($duongDi) ?: 1);
     }
 
     /**
@@ -318,14 +378,27 @@ class EligibilityController extends FrontendController
      * tinh bang diem dat duoc chia cho diem toi da co the dat - khong phai
      * dem so cau dung, vi moi cau co trong so khac nhau.
      */
-    private function chamDiem($cauHoi, array $traLoi): array
+    private function chamDiem($cauHoi, array $traLoi, array $duongDi = []): array
     {
         $diem = 0;
         $diemToiDa = 0;
         $dat = $chuaRo = $khongDat = $daTraLoi = 0;
+        $soCau = 0;
         $chiTiet = [];
 
-        foreach ($cauHoi as $ch) {
+        foreach ($cauHoi as $i => $ch) {
+            // Buoc nhap thong tin khong phai cau hoi; buoc bi bo qua thi
+            // nguoi dung chua bao gio nhin thay - tinh diem ca hai la ep ho
+            // mat diem vi mot cau khong duoc hoi.
+            if ($ch->laBuocNhapTin()) {
+                continue;
+            }
+
+            if ($duongDi && !in_array($i + 1, $duongDi, true)) {
+                continue;
+            }
+
+            $soCau++;
             $trongSo = max(1, (int) $ch->weight);
 
             // Diem toi da cua mot cau la diem cao nhat trong cac dap an cua no.
@@ -378,6 +451,7 @@ class EligibilityController extends FrontendController
         $phanTram = $diemToiDa > 0 ? (int) round($diem / $diemToiDa * 100) : 0;
 
         return [
+            'soCau' => $soCau,
             'phanTram' => $phanTram,
             'muc' => $khongDat > 0 ? 'low' : ($phanTram >= 70 ? 'high' : ($phanTram >= 40 ? 'medium' : 'low')),
             'dat' => $dat,
