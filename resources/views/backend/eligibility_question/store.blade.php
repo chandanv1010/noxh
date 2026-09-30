@@ -46,6 +46,17 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-row">
+                                <label class="control-label text-left">Bố cục khối đáp án</label>
+                                    <select name="layout" class="form-control">
+                                        @foreach(\App\Models\EligibilityQuestion::BO_CUC as $ma => $ten)
+                                            <option value="{{ $ma }}" {{ old('layout', ($question->layout) ?? 'grid') === $ma ? 'selected' : '' }}>{{ $ten }}</option>
+                                        @endforeach
+                                    </select>
+                                    <small class="text-muted">"Chia theo tình huống" thì đáp án xếp vào các tấm ở màn hình Tình huống.</small>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-row">
                                 <label class="control-label text-left">Trọng số điểm</label>
                                     <input type="number" name="weight" value="{{ old('weight', ($question->weight) ?? 0) }}" class="form-control" min="0">
                                     <small class="text-muted">Câu quan trọng đặt trọng số cao hơn</small>
@@ -81,6 +92,15 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row mb15">
+                        <div class="col-lg-12">
+                            <div class="form-row">
+                                <label class="control-label text-left">Dòng lưu ý - dòng thứ hai</label>
+                                    <textarea name="foot_note_sub" rows="2" class="form-control">{{ old('foot_note_sub', ($question->foot_note_sub) ?? '') }}</textarea>
+                                    <small class="text-muted">Dòng đầu in đậm, dòng này in thường ngay dưới.</small>
+                            </div>
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -94,6 +114,37 @@
                                         <input type="checkbox" name="required" value="1" {{ old('required', ($question->required) ?? 0) ? 'checked' : '' }}>
                                         Bắt buộc trả lời
                                     </label>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- Hinh tron in tren dau cau hoi (bo cuc "Chia theo tinh
+                             huong" - ban ve noxh_image/w-2.jpg). --}}
+                        <div class="row mb15">
+                            <div class="col-lg-12">
+                                <div class="form-row">
+                                    <label class="control-label text-left mb10">Hình tròn trên đầu câu hỏi</label>
+                                    <span class="image img-cover image-target"
+                                          style="height:110px;padding:10px;text-align:center;border:1px dashed #b8b2b2;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                                        <img src="{{ old('image', ($question->image) ?? '') ?: 'backend/img/image.svg' }}" alt="" style="max-width:100%;max-height:100%;object-fit:contain;">
+                                    </span>
+                                    <input type="hidden" name="image" value="{{ old('image', ($question->image) ?? '') }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb15">
+                            <div class="col-lg-12">
+                                <div class="form-row">
+                                    <label class="control-label text-left mb10">Hình (dùng khi chưa có ảnh)</label>
+                                    <select name="icon" class="form-control mb10">
+                                        @foreach(\App\Classes\NoxhIcon::chon() as $ma => $ten)
+                                            <option value="{{ $ma }}" {{ (string) old('icon', ($question->icon) ?? '') === (string) $ma ? 'selected' : '' }}>{{ $ten }}</option>
+                                        @endforeach
+                                    </select>
+                                    <select name="icon_tone" class="form-control">
+                                        @foreach(\App\Classes\NoxhTone::chon() as $ma => $ten)
+                                            <option value="{{ $ma }}" {{ (string) old('icon_tone', ($question->icon_tone) ?? \App\Classes\NoxhTone::MAC_DINH) === (string) $ma ? 'selected' : '' }}>{{ $ten }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>

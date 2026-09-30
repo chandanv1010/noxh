@@ -298,6 +298,40 @@ class Introduce
             ],
         ];
 
+        // --- Trang mo dau bo kiem tra dieu kien ---------------------------------
+        $data['start'] = [
+            'label' => 'Kiểm tra điều kiện - trang mở đầu',
+            'description' => 'Màn hình đồng ý trước khi bắt đầu trả lời câu hỏi (/kiem-tra-dieu-kien)',
+            'value' => [
+                'bg' => ['type' => 'images', 'label' => 'Tranh nền của trang'],
+                'image' => ['type' => 'images', 'label' => 'Hình tròn ở đầu trang'],
+
+                'heading' => ['type' => 'text', 'label' => 'Tiêu đề - dòng thứ nhất'],
+                'heading_blue' => ['type' => 'text', 'label' => 'Tiêu đề - dòng thứ hai (màu xanh)'],
+                'description' => ['type' => 'textarea', 'label' => 'Đoạn mô tả dưới tiêu đề'],
+
+                'time_text' => ['type' => 'text', 'label' => 'Thẻ thời gian - chữ'],
+                'time_strong' => ['type' => 'text', 'label' => 'Thẻ thời gian - phần in đậm màu xanh'],
+                'time_icon' => ['type' => 'select', 'label' => 'Thẻ thời gian - hình', 'option' => $icon],
+
+                'privacy_image' => ['type' => 'images', 'label' => 'Thẻ bảo mật - hình tròn bên trái'],
+                'privacy_heading' => ['type' => 'text', 'label' => 'Thẻ bảo mật - tiêu đề'],
+                'privacy_text' => ['type' => 'textarea', 'label' => 'Thẻ bảo mật - nội dung'],
+                'privacy_icon' => ['type' => 'select', 'label' => 'Thẻ bảo mật - hình trước dòng nội dung', 'option' => $icon],
+
+                'agree_text' => ['type' => 'text', 'label' => 'Ô đồng ý - dòng chữ'],
+                'agree_link_text' => ['type' => 'text', 'label' => 'Ô đồng ý - chữ của liên kết'],
+                'agree_link' => ['type' => 'text', 'label' => 'Ô đồng ý - đường dẫn', 'title' => 'Ví dụ: /chinh-sach-bao-mat'],
+
+                'button' => ['type' => 'text', 'label' => 'Chữ trên nút bắt đầu'],
+                'note' => ['type' => 'text', 'label' => 'Dòng chữ nhỏ dưới nút'],
+                'note_icon' => ['type' => 'select', 'label' => 'Hình trước dòng chữ nhỏ', 'option' => $icon],
+
+                'disclaimer' => ['type' => 'textarea', 'label' => 'Dải lưu ý cuối trang'],
+                'disclaimer_icon' => ['type' => 'select', 'label' => 'Dải lưu ý cuối trang - hình', 'option' => $icon],
+            ],
+        ];
+
         // --- Bo kiem tra dieu kien (wizard nhieu buoc) --------------------------
         //
         // Ban ve: noxh_image/w-1.jpg. Cau hoi, dap an, hinh cua tung dap an va

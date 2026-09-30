@@ -55,7 +55,13 @@ class NoxhEligibilityWizardTest extends TestCase
                 $this->assertStringContainsString(e($da->note), $html);
             }
 
-            // Mau cua hinh tron di kem tung dap an, khong phai mot mau chung.
+            // Hinh di kem tung dap an: tranh cat tu ban ve neu co, khong
+            // thi la hinh net trong vong tron mau RIENG cua dap an do.
+            if (trim((string) $da->image) !== '') {
+                $this->assertStringContainsString(e($da->image), $html);
+                continue;
+            }
+
             [$nen] = $da->mauHinh();
             $this->assertStringContainsString($nen, $html);
         }

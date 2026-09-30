@@ -18,7 +18,8 @@ class EligibilityOption extends Model
     protected $table = 'eligibility_options';
 
     protected $fillable = [
-        'eligibility_question_id', 'label', 'icon', 'icon_tone', 'value',
+        'eligibility_question_id', 'eligibility_option_group_id',
+        'label', 'image', 'icon', 'icon_tone', 'value',
         'verdict', 'score', 'note', 'order',
     ];
 
@@ -27,6 +28,11 @@ class EligibilityOption extends Model
         'unclear' => 'Can kiem tra them',
         'fail' => 'Khong dat',
     ];
+
+    public function group()
+    {
+        return $this->belongsTo(EligibilityOptionGroup::class, 'eligibility_option_group_id', 'id');
+    }
 
     public function question()
     {

@@ -61,20 +61,36 @@ class NoxhEligibilityWizardSeeder extends Seeder
     /**
      * Thu tu buoc + ten buoc + dong luu y, tra theo cau hoi.
      *
-     * Khoa la mot doan chu co trong cau hoi (khong dau cach dau dong) - tra
-     * theo id thi may khac chay ra so khac.
+     * Khoa la mot doan chu co trong cau hoi - tra theo id thi may khac chay
+     * ra so khac. Vai cau doi loi van theo ban ve moi nen khoa cho phep viet
+     * NHIEU doan, ngan cach bang dau |, khop doan nao cung duoc.
      *
      * [doan chu nhan dang cau hoi] => [thu tu, ten buoc, dong luu y]
      */
     private const BUOC = [
         'nhóm đối tượng' => [0, 'Đối tượng', 'Danh mục nhóm đối tượng được xây dựng theo quy định hiện hành. Vui lòng chọn đúng nhóm phù hợp.'],
         'đã có nhà ở thuộc sở hữu' => [1, 'Nhà ở', 'Xét nhà ở thuộc sở hữu của anh/chị hoặc vợ/chồng tại tỉnh/thành phố nơi có dự án.'],
-        'Tổng thu nhập bình quân' => [2, 'Thu nhập', 'Mức thu nhập xét theo bình quân hàng tháng của hộ gia đình trong 01 năm liền kề.'],
+        'thu nhập bình quân|thu nhập hàng tháng' => [2, 'Thu nhập', 'Mức thu nhập xét theo bình quân hàng tháng của hộ gia đình trong 01 năm liền kề.'],
         'nơi có dự án NOXH?' => [3, 'Dự án', 'Anh/chị chỉ được đăng ký mua tại tỉnh/thành phố đang cư trú hoặc làm việc.'],
         'hỗ trợ nhà ở dưới mọi hình thức' => [4, 'Chính sách', 'Đã nhận hỗ trợ nhà ở của Nhà nước thì không được xét mua nhà ở xã hội lần nữa.'],
         'Số thành viên trong hộ' => [5, 'Hộ gia đình', 'Số thành viên dùng để đối chiếu ngưỡng thu nhập của hộ gia đình.'],
         'thuế thu nhập cá nhân' => [6, 'Hồ sơ', 'Thông tin này dùng để đối chiếu với mức thu nhập anh/chị đã khai.'],
         'kết hôn' => [7, 'Kết quả', 'Tình trạng hôn nhân quyết định ngưỡng thu nhập áp dụng: người độc thân hay hai vợ chồng.'],
+    ];
+
+    /**
+     * Ba tinh huong cua cau hoi thu nhap (ban ve noxh_image/w-2.jpg).
+     *
+     * [ten tam, dong ghi chu, tranh, hinh du phong, mau nen, nguong trieu/thang]
+     *
+     * LUU Y: ba muc 25 / 35 / 50 trieu chep tu ban ve de co du lieu mau.
+     * Nguong thu nhap thay doi theo nghi dinh - sua trong man hinh quan tri,
+     * khong sua file nay.
+     */
+    private const THU_NHAP = [
+        ['doc-than', 'Độc thân', '(chưa kết hôn)', 'th-doc-than.png', 'user', 'sky', 25],
+        ['nuoi-con', 'Độc thân nuôi con nhỏ', '(có con dưới 18 tuổi)', 'th-nuoi-con.png', 'family', 'amber', 35],
+        ['ket-hon', 'Đã kết hôn', '(tổng thu nhập hai vợ chồng)', 'th-ket-hon.png', 'group', 'rose', 50],
     ];
 
     /** Hinh mac dinh cho dap an cua cac cau con lai, tra theo gia tri luu. */
@@ -100,6 +116,7 @@ class NoxhEligibilityWizardSeeder extends Seeder
         $this->napChu();
         $this->napBuoc();
         $this->napDoiTuong();
+        $this->napThuNhap();
         $this->napHinhDapAn();
     }
 
@@ -108,13 +125,36 @@ class NoxhEligibilityWizardSeeder extends Seeder
     private function napChu(): void
     {
         $chu = [
+            // --- trang mo dau (start-fix.jpg) ---
+            'start_bg' => '/uploads/noxh/kiem-tra-nen.jpg',
+            'start_image' => '/uploads/noxh/kt-bang-kep.png',
+            'start_heading' => 'Kiểm tra điều kiện mua',
+            'start_heading_blue' => 'Nhà ở xã hội',
+            'start_description' => 'Trả lời một số câu hỏi để kiểm tra sơ bộ khả năng đáp ứng điều kiện mua NOXH theo quy định hiện hành.',
+            'start_time_text' => 'Thời gian thực hiện khoảng',
+            'start_time_strong' => '3 – 5 phút',
+            'start_time_icon' => 'clock-line',
+            'start_privacy_image' => '/uploads/noxh/kt-khien-khoa.png',
+            'start_privacy_heading' => 'Thông tin của bạn được bảo mật',
+            'start_privacy_text' => 'Thông tin chỉ được sử dụng để phục vụ việc kiểm tra điều kiện và tư vấn NOXH.',
+            'start_privacy_icon' => 'lock',
+            'start_agree_text' => 'Tôi đã đọc và đồng ý với',
+            'start_agree_link_text' => 'chính sách bảo mật thông tin',
+            'start_agree_link' => '/chinh-sach-bao-mat',
+            'start_button' => 'Bắt đầu kiểm tra',
+            'start_note' => '100% miễn phí  ·  Không lưu thông tin nếu bạn không đồng ý',
+            'start_note_icon' => 'shield-tick',
+            'start_disclaimer' => 'Kết quả chỉ mang tính tham khảo. Việc xác định đủ điều kiện mua NOXH được thực hiện dựa trên hồ sơ và quy định áp dụng tại thời điểm xét duyệt.',
+            'start_disclaimer_icon' => 'info-line',
+
+            // --- wizard (w-1.jpg) ---
             'wizard_heading' => 'Kiểm tra khả năng mua',
             'wizard_heading_blue' => 'Nhà ở xã hội',
             'wizard_subtitle' => '{so} câu hỏi đơn giản – Khoảng 2 phút – Biết ngay kết quả!',
             'wizard_image' => '/uploads/noxh/kiem-tra-dau-trang.jpg',
 
             'wizard_chip1_text' => 'Nhanh chóng',
-            'wizard_chip1_icon' => 'clock',
+            'wizard_chip1_icon' => 'bolt',
             'wizard_chip2_text' => 'Chính xác',
             'wizard_chip2_icon' => 'shield-check',
             'wizard_chip3_text' => 'Bảo mật thông tin',
@@ -171,7 +211,11 @@ class NoxhEligibilityWizardSeeder extends Seeder
         foreach (self::BUOC as $nhanDang => [$thuTu, $tenBuoc, $luuY]) {
             $cau = DB::table('eligibility_questions')
                 ->whereNull('deleted_at')
-                ->where('question', 'LIKE', '%' . $nhanDang . '%')
+                ->where(function ($q) use ($nhanDang) {
+                    foreach (explode('|', $nhanDang) as $doan) {
+                        $q->orWhere('question', 'LIKE', '%' . $doan . '%');
+                    }
+                })
                 ->first();
 
             if (!$cau) {
@@ -226,9 +270,16 @@ class NoxhEligibilityWizardSeeder extends Seeder
         foreach (self::DOI_TUONG as $i => [$gia, $nhan, $ghi, $hinh, $mau]) {
             [$ketLuan, $diem] = self::KET_LUAN_DOI_TUONG[$gia] ?? ['pass', 3];
 
+            // Tranh cat tu ban ve. Hai nhom bi net but do de len khong cat
+            // ra duoc (xem tools/tach-anh-ban-ve.py) - de trong thi trang
+            // ngoai lui ve ve hinh net trong vong tron mau.
+            $anh = '/uploads/noxh/dt-' . $gia . '.png';
+            $anh = is_file(public_path(ltrim($anh, '/'))) ? $anh : null;
+
             $dong = [
                 'eligibility_question_id' => $cau->id,
                 'label' => $nhan,
+                'image' => $anh,
                 'icon' => $hinh,
                 'icon_tone' => $mau,
                 'verdict' => $ketLuan,
@@ -276,6 +327,129 @@ class NoxhEligibilityWizardSeeder extends Seeder
         }
 
         $this->command?->info('Da dong bo 12 nhom doi tuong (' . $xoa . ' dap an cu bi bo).');
+    }
+
+
+    /**
+     * Cau hoi thu nhap chuyen sang bo cuc "chia theo tinh huong".
+     *
+     * Ban ve w-2.jpg bo bang nam muc thu nhap cu, thay bang ba tam: doc than,
+     * doc than nuoi con nho, da ket hon - moi tam hai muc "khong qua X" va
+     * "tren X". Dong bo han theo ban ve nhung KHONG xoa dap an cu neu da co
+     * luot kiem tra tro toi: chi go khoi tam va de quan tri tu quyet.
+     */
+    private function napThuNhap(): void
+    {
+        $cau = DB::table('eligibility_questions')
+            ->whereNull('deleted_at')
+            ->where('question', 'LIKE', '%Tổng thu nhập bình quân%')
+            ->orWhere('question', 'LIKE', '%Mức thu nhập hàng tháng%')
+            ->first();
+
+        if (!$cau) {
+            $this->command?->warn('Chua co cau hoi thu nhap.');
+            return;
+        }
+
+        DB::table('eligibility_questions')->where('id', $cau->id)->update([
+            'question' => 'Mức thu nhập hàng tháng của anh/chị?',
+            'hint' => 'Vui lòng chọn mức thu nhập phù hợp với trường hợp của bạn.',
+            'layout' => 'matrix',
+            'image' => $this->anh('kt-tien.png'),
+            'icon' => 'coins',
+            'icon_tone' => 'sky',
+            'foot_note' => 'Thu nhập được xem xét theo bình quân 12 tháng liền kề, theo quy định hiện hành.',
+            'foot_note_sub' => 'Đây là thông tin để đánh giá sơ bộ. Cơ quan có thẩm quyền sẽ xác nhận khi bạn nộp hồ sơ.',
+            'updated_at' => now(),
+        ]);
+
+        $giuTam = [];
+        $giuDapAn = [];
+
+        foreach (self::THU_NHAP as $i => [$ma, $ten, $ghi, $tranh, $hinh, $mau, $nguong]) {
+            $tam = DB::table('eligibility_option_groups')
+                ->where('eligibility_question_id', $cau->id)
+                ->where('label', $ten)
+                ->first();
+
+            $dong = [
+                'eligibility_question_id' => $cau->id,
+                'label' => $ten,
+                'note' => $ghi,
+                'image' => $this->anh($tranh),
+                'icon' => $hinh,
+                'tone' => $mau,
+                'order' => $i,
+                'updated_at' => now(),
+            ];
+
+            if ($tam) {
+                DB::table('eligibility_option_groups')->where('id', $tam->id)->update($dong);
+                $tamId = $tam->id;
+            } else {
+                $tamId = DB::table('eligibility_option_groups')->insertGetId($dong + ['created_at' => now()]);
+            }
+
+            $giuTam[] = $tamId;
+
+            $muc = [
+                [$ma . '-duoi', 'Không quá ' . $nguong . ' triệu/tháng', 'pass', 3, 0],
+                [$ma . '-tren', 'Trên ' . $nguong . ' triệu/tháng', 'fail', 0, 1],
+            ];
+
+            foreach ($muc as [$gia, $nhan, $ketLuan, $diem, $thuTu]) {
+                $dongDapAn = [
+                    'eligibility_question_id' => $cau->id,
+                    'eligibility_option_group_id' => $tamId,
+                    'label' => $nhan,
+                    'verdict' => $ketLuan,
+                    'score' => $diem,
+                    'order' => $i * 10 + $thuTu,
+                    'updated_at' => now(),
+                ];
+
+                $cu = DB::table('eligibility_options')
+                    ->where('eligibility_question_id', $cau->id)
+                    ->where('value', $gia)
+                    ->first();
+
+                if ($cu) {
+                    DB::table('eligibility_options')->where('id', $cu->id)->update($dongDapAn);
+                    $giuDapAn[] = $cu->id;
+                    continue;
+                }
+
+                $giuDapAn[] = DB::table('eligibility_options')
+                    ->insertGetId($dongDapAn + ['value' => $gia, 'created_at' => now()]);
+            }
+        }
+
+        // Nam muc thu nhap cu cua bo cau hoi mau khong con cho dung trong ban
+        // ve moi. Xoa han, neu chi go khoi tam thi chung roi xuong duoi ba
+        // tam va nguoi dung thay hai bo muc thu nhap chong nhau.
+        $id = DB::table('eligibility_options')
+            ->where('eligibility_question_id', $cau->id)
+            ->whereNotIn('id', $giuDapAn)
+            ->pluck('id');
+
+        if ($id->count()) {
+            // Luot kiem tra cu tro toi dap an bi bo: go lien ket chu khong
+            // xoa luot - ket luan va diem da luu ngay tren dong tra loi roi.
+            DB::table('eligibility_answers')->whereIn('eligibility_option_id', $id)
+                ->update(['eligibility_option_id' => null]);
+
+            DB::table('eligibility_options')->whereIn('id', $id)->delete();
+        }
+
+        $this->command?->info('Da dung 3 tinh huong cho cau thu nhap (' . $id->count() . ' dap an cu bi bo).');
+    }
+
+    /** Duong dan anh neu file co that, khong thi tra ve null. */
+    private function anh(string $ten): ?string
+    {
+        $duong = '/uploads/noxh/' . $ten;
+
+        return is_file(public_path(ltrim($duong, '/'))) ? $duong : null;
     }
 
     /** Hinh cho dap an cua cac cau con lai - o nao da co hinh thi de nguyen. */

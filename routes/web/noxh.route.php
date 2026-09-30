@@ -9,6 +9,7 @@ use App\Http\Controllers\Backend\V1\Noxh\DossierSetController;
 use App\Http\Controllers\Backend\V1\Noxh\DossierItemController;
 use App\Http\Controllers\Backend\V1\Noxh\EligibilityQuestionController;
 use App\Http\Controllers\Backend\V1\Noxh\EligibilityOptionController;
+use App\Http\Controllers\Backend\V1\Noxh\EligibilityOptionGroupController;
 use App\Http\Controllers\Backend\V1\Noxh\EligibilityCheckController;
 use App\Http\Controllers\Backend\V1\Noxh\QaQuestionController;
 use App\Http\Controllers\Backend\V1\Noxh\ProjectMilestoneController;
@@ -99,6 +100,18 @@ Route::group(['middleware' => ['admin', 'locale', 'backend_default_locale']], fu
         Route::post('{id}/update', [EligibilityQuestionController::class, 'update'])->where(['id' => '[0-9]+'])->name('eligibility.question.update');
         Route::get('{id}/delete', [EligibilityQuestionController::class, 'delete'])->where(['id' => '[0-9]+'])->name('eligibility.question.delete');
         Route::delete('{id}/destroy', [EligibilityQuestionController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('eligibility.question.destroy');
+    });
+
+    // Tinh huong (nhom dap an) - chi dung cho cau hoi bo cuc "Chia theo
+    // tinh huong", ban ve noxh_image/w-2.jpg.
+    Route::group(['prefix' => 'eligibility/group'], function () {
+        Route::get('index', [EligibilityOptionGroupController::class, 'index'])->name('eligibility.group.index');
+        Route::get('create', [EligibilityOptionGroupController::class, 'create'])->name('eligibility.group.create');
+        Route::post('store', [EligibilityOptionGroupController::class, 'store'])->name('eligibility.group.store');
+        Route::get('{id}/edit', [EligibilityOptionGroupController::class, 'edit'])->where(['id' => '[0-9]+'])->name('eligibility.group.edit');
+        Route::post('{id}/update', [EligibilityOptionGroupController::class, 'update'])->where(['id' => '[0-9]+'])->name('eligibility.group.update');
+        Route::get('{id}/delete', [EligibilityOptionGroupController::class, 'delete'])->where(['id' => '[0-9]+'])->name('eligibility.group.delete');
+        Route::delete('{id}/destroy', [EligibilityOptionGroupController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('eligibility.group.destroy');
     });
 
     Route::group(['prefix' => 'eligibility/option'], function () {

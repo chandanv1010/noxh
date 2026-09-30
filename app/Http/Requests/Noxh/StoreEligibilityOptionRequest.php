@@ -15,7 +15,9 @@ class StoreEligibilityOptionRequest extends FormRequest
     {
         return [
             'eligibility_question_id' => 'required|integer|exists:eligibility_questions,id',
+            'eligibility_option_group_id' => 'nullable|integer|exists:eligibility_option_groups,id',
             'label' => 'required|string|max:191',
+            'image' => 'nullable|string|max:255',
             'icon' => 'nullable|string|max:60',
             'icon_tone' => 'nullable|string|max:20',
             'value' => 'required|string|max:191',

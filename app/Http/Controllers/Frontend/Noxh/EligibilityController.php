@@ -221,7 +221,7 @@ class EligibilityController extends FrontendController
     /** Bo cau hoi dang phat hanh, dung thu tu cua thanh buoc. */
     private function cauHoi()
     {
-        return EligibilityQuestion::with('options')
+        return EligibilityQuestion::with(['options', 'optionGroups.options'])
             ->where('publish', 2)
             ->orderBy('order')
             ->orderBy('id')

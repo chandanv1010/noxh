@@ -27,6 +27,24 @@
                             </div>
                         </div>
                     </div>
+                    {{-- Chi dung voi cau hoi dat bo cuc "Chia theo tinh huong"
+                         (ban ve noxh_image/w-2.jpg): dap an nam trong tam nao. --}}
+                    <div class="row mb15">
+                        <div class="col-lg-12">
+                            <div class="form-row">
+                                <label class="control-label text-left">Thuộc tình huống</label>
+                                <select name="eligibility_option_group_id" class="form-control">
+                                    <option value="">— Không thuộc tình huống nào —</option>
+                                    @foreach(\App\Models\EligibilityOptionGroup::with('question')->orderBy('eligibility_question_id')->orderBy('order')->get() as $tam)
+                                        <option value="{{ $tam->id }}" {{ (int) old('eligibility_option_group_id', ($option->eligibility_option_group_id) ?? 0) === $tam->id ? 'selected' : '' }}>
+                                            {{ $tam->label }} — {{ \Illuminate\Support\Str::limit($tam->question->question ?? '', 50) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <small class="text-muted">Để trống nếu câu hỏi dùng bố cục lưới ô đáp án.</small>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row mb15">
                         <div class="col-lg-6">
                             <div class="form-row">
@@ -69,10 +87,25 @@
                             </div>
                         </div>
                     </div>
-                    {{-- Hinh tron pastel ben trai o dap an o trang Kiem tra dieu kien
-                         (ban ve noxh_image/w-1.jpg). Bo trong thi o dap an chi co chu. --}}
+                    {{-- Hinh tron ben trai o dap an o trang Kiem tra dieu kien
+                         (ban ve noxh_image/w-1.jpg).
+
+                         Uu tien ANH: ban ve dung tranh minh hoa nhieu mau. Khong
+                         co anh thi lui ve hinh net trong vong tron mau ben duoi,
+                         khong co ca hai thi o dap an chi co chu. --}}
                     <div class="row mb15">
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
+                            <div class="form-row">
+                                <label class="control-label text-left mb10">Ảnh của đáp án</label>
+                                <span class="image img-cover image-target"
+                                      style="height:120px;padding:12px;text-align:center;border:1px dashed #b8b2b2;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                                    <img src="{{ old('image', ($option->image) ?? '') ?: 'backend/img/image.svg' }}" alt="" style="max-width:100%;max-height:100%;object-fit:contain;">
+                                </span>
+                                <input type="hidden" name="image" value="{{ old('image', ($option->image) ?? '') }}">
+                                <small class="text-muted">Bấm vào ô trên để chọn ảnh. Ảnh tròn, nền trong suốt.</small>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
                             <div class="form-row">
                                 <label class="control-label text-left">Hình của đáp án</label>
                                     <select name="icon" class="form-control">
@@ -83,7 +116,7 @@
                                     <small class="text-muted">Hiện trong hình tròn bên trái ô đáp án</small>
                             </div>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
                             <div class="form-row">
                                 <label class="control-label text-left">Màu hình tròn</label>
                                     <select name="icon_tone" class="form-control">

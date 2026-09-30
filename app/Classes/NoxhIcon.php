@@ -99,6 +99,12 @@ class NoxhIcon
         'eye-line' => 'Con mắt (nét viền)',
         'link' => 'Mắt xích (đường dẫn)',
 
+        // Trang Kiem tra dieu kien
+        'bolt' => 'Tia chớp',
+        'clock-line' => 'Đồng hồ kim (nét viền)',
+        'info-line' => 'Vòng tròn chữ i (nét viền)',
+        'shield-tick' => 'Khiên có dấu tích (nét viền)',
+
         // Trang Kiem tra dieu kien - hinh cua tung o dap an
         'medal' => 'Huy chương',
         'cottage' => 'Nhà mái dốc (nông thôn)',

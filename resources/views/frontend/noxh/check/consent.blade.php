@@ -1,64 +1,110 @@
 @extends('frontend.noxh.layout')
 
+@php
+    // Ban ve: noxh_image/start-fix.jpg (do 1:1, moi con so chep thang tu ban ve).
+    //
+    // Khong chuoi nao viet cung o day - moi dong chu, moi hinh deu doc tu
+    // nhom "Kiểm tra điều kiện - trang mở đầu" cua man hinh Gioi thieu.
+    $nen = trim((string) ($intro['start_bg'] ?? ''));
+    $anhDau = trim((string) ($intro['start_image'] ?? ''));
+    $anhKhien = trim((string) ($intro['start_privacy_image'] ?? ''));
+
+    $moTa = trim((string) ($intro['start_description'] ?? ''));
+    $baoMat = trim((string) ($intro['start_privacy_text'] ?? ''));
+    $luuY = trim((string) ($intro['start_disclaimer'] ?? ''));
+
+    $duongDongY = trim((string) ($intro['start_agree_link'] ?? '')) ?: '/chinh-sach-bao-mat';
+@endphp
+
 @section('content')
-<div class="nx-consent">
-    <span class="nx-consent__icon">
-        @include('frontend.noxh.component.icon', ['name' => 'clipboard', 'size' => 36])
-    </span>
+<div class="nx-kt" @if($nen) style="--nx-nen: url('{{ $nen }}')" @endif>
+    <div class="nx-kt__trong">
+        @if($anhDau)
+            <img class="nx-kt__hinh" src="{{ $anhDau }}" alt="" width="122" height="122">
+        @endif
 
-    <h1 class="nx-consent__title">
-        Kiểm tra điều kiện mua
-        <span>Nhà ở xã hội</span>
-    </h1>
+        <h1 class="nx-kt__ten">
+            {{ $intro['start_heading'] ?? 'Kiểm tra điều kiện mua' }}
+            @if(!empty($intro['start_heading_blue']))
+                <span>{{ $intro['start_heading_blue'] }}</span>
+            @endif
+        </h1>
 
-    <p class="nx-consent__description">
-        Trả lời một số câu hỏi để kiểm tra sơ bộ khả năng đáp ứng điều kiện mua
-        NOXH theo quy định hiện hành.
-    </p>
+        <span class="nx-kt__gach" aria-hidden="true"></span>
 
-    <div class="nx-consent__time">
-        @include('frontend.noxh.component.icon', ['name' => 'clock', 'size' => 16])
-        Thời gian thực hiện khoảng <strong>3 – 5 phút</strong>
-    </div>
+        @if($moTa !== '')
+            <p class="nx-kt__mo">{{ $moTa }}</p>
+        @endif
 
-    {{-- Nut bat dau bi khoa cho toi khi nguoi dung tich dong y - JS chi de
-         tien tay, phia may chu van luu consent = true khi nhan bai. --}}
-    <form method="GET" action="{{ url('/kiem-tra-dieu-kien/cau-hoi') }}">
-        <div class="nx-consent__box">
-            <div style="display:flex;gap:14px;align-items:flex-start">
-                <span style="color:#1668e3;flex-shrink:0">
-                    @include('frontend.noxh.component.icon', ['name' => 'lock', 'size' => 28])
-                </span>
-                <div>
-                    <strong style="display:block;margin-bottom:4px">Thông tin của bạn được bảo mật</strong>
-                    <span style="color:#4a5a70;font-size:13.5px">
-                        Thông tin chỉ được sử dụng để phục vụ việc kiểm tra điều kiện và tư vấn NOXH.
-                    </span>
+        @if(!empty($intro['start_time_text']) || !empty($intro['start_time_strong']))
+            <p class="nx-kt-gio">
+                @if(!empty($intro['start_time_icon']))
+                    @include('frontend.noxh.component.icon', ['name' => $intro['start_time_icon'], 'size' => 22])
+                @endif
+                {{ $intro['start_time_text'] ?? '' }}
+                @if(!empty($intro['start_time_strong']))
+                    <strong>{{ $intro['start_time_strong'] }}</strong>
+                @endif
+            </p>
+        @endif
+
+        {{-- Nut bat dau bi khoa cho toi khi nguoi dung tich dong y - JS chi de
+             tien tay, phia may chu van luu consent = true khi nhan bai. --}}
+        <form method="GET" action="{{ route('noxh.check.form') }}">
+            <div class="nx-kt-bm">
+                @if($anhKhien)
+                    <img class="nx-kt-bm__hinh" src="{{ $anhKhien }}" alt="" width="128" height="128">
+                @endif
+
+                <div class="nx-kt-bm__chu">
+                    @if(!empty($intro['start_privacy_heading']))
+                        <h2>{{ $intro['start_privacy_heading'] }}</h2>
+                    @endif
+
+                    @if($baoMat !== '')
+                        <p>
+                            @if(!empty($intro['start_privacy_icon']))
+                                @include('frontend.noxh.component.icon', ['name' => $intro['start_privacy_icon'], 'size' => 18])
+                            @endif
+                            {{ $baoMat }}
+                        </p>
+                    @endif
                 </div>
+
+                <label class="nx-kt-bm__y">
+                    <input type="checkbox" id="nx-dong-y">
+                    <span>
+                        {{ $intro['start_agree_text'] ?? 'Tôi đã đọc và đồng ý với' }}
+                        <a href="{{ url($duongDongY) }}">
+                            {{ $intro['start_agree_link_text'] ?? 'chính sách bảo mật thông tin' }}
+                        </a>
+                    </span>
+                </label>
             </div>
 
-            <label class="nx-consent__agree">
-                <input type="checkbox" id="nx-dong-y">
-                <span>
-                    Tôi đã đọc và đồng ý với
-                    <a href="{{ url('/chinh-sach-bao-mat') }}">chính sách bảo mật thông tin</a>
-                </span>
-            </label>
-        </div>
+            <button type="submit" class="nx-kt-nut" id="nx-bat-dau" disabled>
+                {{ $intro['start_button'] ?? 'Bắt đầu kiểm tra' }}
+                @include('frontend.noxh.component.icon', ['name' => 'arrow-right', 'size' => 26])
+            </button>
+        </form>
 
-        <button type="submit" class="nx-btn" id="nx-bat-dau" style="font-size:17px;padding:16px 46px" disabled>
-            BẮT ĐẦU KIỂM TRA
-            @include('frontend.noxh.component.icon', ['name' => 'arrow-right', 'size' => 18])
-        </button>
-    </form>
+        @if(!empty($intro['start_note']))
+            <p class="nx-kt__ghi">
+                @if(!empty($intro['start_note_icon']))
+                    @include('frontend.noxh.component.icon', ['name' => $intro['start_note_icon'], 'size' => 17])
+                @endif
+                {{ $intro['start_note'] }}
+            </p>
+        @endif
 
-    <p style="margin-top:12px;color:#8695aa;font-size:13px">
-        100% miễn phí · Không lưu thông tin nếu bạn không đồng ý
-    </p>
-
-    <div class="nx-alert nx-alert--info" style="margin-top:26px;text-align:left">
-        Kết quả chỉ mang tính tham khảo. Việc xác định đủ điều kiện mua NOXH được
-        thực hiện dựa trên hồ sơ và quy định áp dụng tại thời điểm xét duyệt.
+        @if($luuY !== '')
+            <p class="nx-kt-luu">
+                @if(!empty($intro['start_disclaimer_icon']))
+                    @include('frontend.noxh.component.icon', ['name' => $intro['start_disclaimer_icon'], 'size' => 26])
+                @endif
+                <span>{{ $luuY }}</span>
+            </p>
+        @endif
     </div>
 </div>
 

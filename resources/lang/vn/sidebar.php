@@ -96,6 +96,10 @@ return [
                     'route' => 'eligibility/option/index'
                 ],
                 [
+                    'title' => 'Tình huống (câu hỏi nhiều tấm)',
+                    'route' => 'eligibility/group/index'
+                ],
+                [
                     'title' => 'Kết quả khách đã kiểm tra',
                     'route' => 'eligibility/check/index'
                 ],

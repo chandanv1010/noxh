@@ -742,6 +742,21 @@ return [
             'title' => 'Xóa đáp án'
         ],
     ],
+    'eligibilityOptionGroup' => [
+        'index' => [
+            'title' => 'Tình huống của câu hỏi điều kiện',
+            'table' => 'Danh sách tình huống'
+        ],
+        'create' => [
+            'title' => 'Thêm mới tình huống'
+        ],
+        'edit' => [
+            'title' => 'Cập nhật tình huống'
+        ],
+        'delete' => [
+            'title' => 'Xóa tình huống'
+        ],
+    ],
     'eligibilityCheck' => [
         'index' => [
             'title' => 'Kết quả kiểm tra điều kiện',

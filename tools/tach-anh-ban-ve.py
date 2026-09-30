@@ -18,6 +18,18 @@ Sinh ra:
     public/uploads/noxh/kiem-tra-dau-trang.jpg
                                           day nha o ben phai dai dau trang
                                           "Kiem tra kha nang mua" (w-1.jpg)
+    public/uploads/noxh/kt-bang-kep.png   hinh tron "bang kep co dau tich" va
+    public/uploads/noxh/kt-khien-khoa.png hinh tron "khien co o khoa" cua
+                                          trang mo dau (start-fix.jpg)
+    public/uploads/noxh/dt-*.png          12 hinh tron cua tung nhom doi tuong
+                                          o buoc 1 (w-1.jpg)
+    public/uploads/noxh/kt-tien.png       hinh tron "chong dong xu" tren dau
+                                          cau hoi thu nhap (w-2.jpg)
+    public/uploads/noxh/th-*.png          tranh cua tung tinh huong o buoc
+                                          thu nhap (w-2.jpg)
+    public/uploads/noxh/kiem-tra-nen.jpg  tranh nen (day nha, hang cay, luoi
+                                          cham) cua trang mo dau bo kiem tra
+                                          dieu kien (start-fix.jpg)
 
 Chay:
     python tools/tach-anh-ban-ve.py
@@ -28,13 +40,16 @@ nay (hoac quan tri up anh that de len trong man hinh Gioi thieu).
 import os
 from collections import deque
 
-from PIL import Image, ImageFilter
+import numpy as np
+from PIL import Image, ImageDraw, ImageFilter
 
 GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ANH = os.path.join(os.path.dirname(GOC), 'noxh_image')
 BAN_VE = os.path.join(ANH, 'plxh fix.jpg')
 BAN_VE_TIN = os.path.join(ANH, 'tin-tuc-fix.webp')
 BAN_VE_KT = os.path.join(ANH, 'w-1.jpg')
+BAN_VE_BD = os.path.join(ANH, 'start-fix.jpg')
+BAN_VE_KT2 = os.path.join(ANH, 'w-2.jpg')
 DICH = os.path.join(GOC, 'public', 'uploads', 'noxh')
 
 
@@ -291,6 +306,251 @@ def anh_dau_kiem_tra(im):
     return im.resize((rong * 2, cao * 2), Image.LANCZOS)
 
 
+def nen_bat_dau(im):
+    """
+    Tranh nen cua trang mo dau bo kiem tra dieu kien (start-fix.jpg).
+
+    Tranh la mot day nha mau xanh rat nhat, hang cay o chan trang va mot luoi
+    cham o goc tren phai. Chu va cac khoi giao dien nam de len giua tranh nen
+    khong the cat mot vung nao ra dung duoc - phai XOA phan giao dien di roi
+    va lai cho nen lien.
+
+    Cach xoa chia hai tang:
+
+      - Nua tren (chu tieu de, dong mo ta, the thoi gian): chu la muc DAM
+        (do sang < 178) con tranh nen cho nao toi nhat cung con 190, nen chi
+        can do do sang la tach duoc, khong dung toi mang tranh nao.
+
+      - Nua duoi (the trang, nut, dai ghi chu): cac khoi nay MAU TRANG, do
+        sang khong tach duoc. Nhung o vung do tranh nen chi ve toi x=145 ben
+        trai va x=1262 ben phai, giua la khoang trang - nen quet han mot o
+        chu nhat.
+
+    Cho da xoa duoc va lai bang cach noi thang mau tu diem sach gan nhat ben
+    trai sang diem sach gan nhat ben phai cua chinh hang do: nen la mot dai
+    mau chuyen deu theo chieu ngang nen noi thang nhu vay khong thay vet.
+    """
+    TREN, DUOI = 107, 1122          # duoi thanh dau trang -> het ban ve
+    NUA = 615 - TREN                # ranh giua hai tang xoa
+    QUET_TRAI, QUET_PHAI = 145, 1262
+    NGUONG_MUC = 178
+    NO_RONG = 7
+
+    # Hai khoi o nua tren co nen SANG (dia tron sau hinh bang kep, the "Thoi
+    # gian thuc hien") nen do sang khong bat duoc - quet han theo o chu nhat.
+    O_SANG = (
+        (630, 135, 780, 265),
+        (450, 530, 955, 605),
+    )
+
+    im = im.crop((0, TREN, im.size[0], DUOI))
+    m = np.asarray(im).astype(np.int16)
+    cao, rong = m.shape[0], m.shape[1]
+
+    sang = m.mean(axis=2)
+    xoa = sang < NGUONG_MUC
+    xoa[NUA:, :] = False
+    xoa[NUA:, QUET_TRAI:QUET_PHAI] = True
+
+    for x0, y0, x1, y1 in O_SANG:
+        xoa[y0 - TREN:y1 - TREN, x0:x1] = True
+
+    # No rong vet muc cho het vien nhoe cua JPEG.
+    for d in range(1, NO_RONG + 1):
+        xoa[:, d:] |= xoa[:, :-d]
+        xoa[:, :-d] |= xoa[:, d:]
+
+    for y in range(cao):
+        hang = xoa[y]
+        if not hang.any():
+            continue
+
+        x = 0
+        while x < rong:
+            if not hang[x]:
+                x += 1
+                continue
+
+            dau = x
+            while x < rong and hang[x]:
+                x += 1
+            cuoi = x - 1
+
+            trai = m[y, dau - 1] if dau > 0 else m[y, cuoi + 1] if cuoi + 1 < rong else None
+            phai = m[y, cuoi + 1] if cuoi + 1 < rong else trai
+
+            if trai is None:
+                continue
+
+            n = cuoi - dau + 1
+            for i in range(n):
+                t = (i + 1) / (n + 1)
+                m[y, dau + i] = trai + (phai - trai) * t
+
+    # Noi ngang xong thi tung hang van con lech nhau vai don vi, nhin ra
+    # thanh nhung vet ke ngang mo mo cho vua xoa chu. Lam min THEO CHIEU DOC
+    # va chi o dung cho da xoa: mang tranh hai ben giu nguyen do net.
+    doc = np.copy(m).astype(np.float32)
+    cong = np.cumsum(np.vstack([np.zeros((1, rong, 3), np.float32), doc]), axis=0)
+    r = 7
+    tren = np.clip(np.arange(cao) - r, 0, cao)
+    duoi = np.clip(np.arange(cao) + r + 1, 0, cao)
+    doc = (cong[duoi] - cong[tren]) / (duoi - tren)[:, None, None]
+    m = np.where(xoa[:, :, None], doc, m)
+
+    im = Image.fromarray(np.clip(m, 0, 255).astype(np.uint8))
+    im = im.filter(ImageFilter.GaussianBlur(0.7))
+
+    # Phong to cho man hinh rong - tranh nen mem nen phong khong vo hat.
+    return im.resize((int(rong * 1.4), int(cao * 1.4)), Image.LANCZOS)
+
+
+def _cat_tron(im, cx, cy, r, phong=3):
+    """
+    Cat mot hinh TRON ra khoi ban ve thanh anh PNG co nen trong suot.
+
+    Ban ve ve san ca dia mau nhat lan hinh ben trong; cat ca cum nhu vay thi
+    giu dung mau va dung net ma khong phai ve lai. Cat vuong roi dat len trang
+    se lo goc vuong nen phai boi mat na tron; mat na ve o kich thuoc lon roi
+    thu nho lai de vien tron khong bi rang cua.
+    """
+    o = im.crop((cx - r, cy - r, cx + r, cy + r)).resize((2 * r * phong, 2 * r * phong), Image.LANCZOS)
+
+    mat = Image.new('L', (o.size[0] * 4, o.size[1] * 4), 0)
+    ImageDraw.Draw(mat).ellipse((0, 0, mat.size[0] - 1, mat.size[1] - 1), fill=255)
+    mat = mat.resize(o.size, Image.LANCZOS)
+
+    o = o.convert('RGBA')
+    o.putalpha(mat)
+
+    return o
+
+
+def hinh_tron_bat_dau(im):
+    """Hai hinh tron lon cua trang mo dau bo kiem tra dieu kien."""
+    return [
+        ('kt-bang-kep.png', _cat_tron(im, 700, 198, 61)),
+        ('kt-khien-khoa.png', _cat_tron(im, 240, 719, 64)),
+    ]
+
+
+def hinh_doi_tuong(im):
+    """
+    Hinh tron cua tung nhom doi tuong o buoc 1 (w-1.jpg).
+
+    Ten file dat theo gia tri luu cua dap an (cot `value`) chu khong theo so
+    thu tu: quan tri doi thu tu cac o thi hinh van di theo dung nhom.
+
+    BAN VE BI DANH DAU BANG BUT DO. Net do de len bon hinh:
+
+      - "ho-ngheo-thien-tai": net chi phu len mang cay ben phai, ma canh phai
+        cua tranh gan nhu lap lai canh trai, nen lay guong ben kia dap sang -
+        nhin khong ra vet.
+      - "luc-luong-vu-trang": ve dung mot nguoi si quan giong het o
+        "cach-mang" (chi khac mau dia), nen lay tranh cua o kia rot sang roi
+        doi mau dia.
+      - "ho-ngheo-nong-thon" va "hai-con": net do cat ngang giua nguoi, khong
+        con du tranh de dap lai. HAI HINH NAY KHONG CAT RA DUOC - trang ngoai
+        se lui ve dung hinh Material da chon cho dap an do. Muon co dung
+        tranh cua ban ve thi phai gui lai file w-1.jpg CHUA danh dau.
+    """
+    TEN = [
+        'cach-mang', 'ho-ngheo-nong-thon', 'ho-ngheo-thien-tai', 'ho-ngheo-do-thi',
+        'thu-nhap-thap', 'cong-nhan', 'luc-luong-vu-trang', 'can-bo',
+        'hoc-sinh-sinh-vien', 'doanh-nghiep', 'hai-con', 'chua-xac-dinh',
+    ]
+    BO_QUA = {'ho-ngheo-nong-thon', 'hai-con'}
+    LAY_GUONG = {'ho-ngheo-thien-tai'}
+    CHEP_TU = {'luc-luong-vu-trang': ('cach-mang', (251, 227, 223), (229, 247, 226))}
+
+    # Tam cua tung hinh tron, DO TAY tung o mot chu khong tinh theo cong
+    # thuc: ban ve la anh ve ra chu khong phai anh chup trang that, bon cot
+    # khong deu nhau (khoang cach 268 / 258 / 285), tinh theo cong thuc thi
+    # hai o ben phai cat vao chu.
+    TAM = (
+        (109, 707), (378, 710), (634, 707), (915, 707),
+        (103, 844), (374, 843), (631, 845), (912, 845),
+        (101, 989), (371, 989), (631, 990), (918, 990),
+    )
+    BAN_KINH = 41
+
+    def tam(i):
+        return TAM[i]
+
+    m = np.asarray(im).astype(int)
+    r, g, b = m[:, :, 0], m[:, :, 1], m[:, :, 2]
+    but = (r > 140) & (g < 130) & (b < 130) & (r - g > 70) & (r - b > 70)
+
+    for _ in range(3):
+        but[1:, :] |= but[:-1, :]
+        but[:-1, :] |= but[1:, :]
+        but[:, 1:] |= but[:, :-1]
+        but[:, :-1] |= but[:, 1:]
+
+    def o(i, guong=False):
+        cx, cy = tam(i)
+        R = BAN_KINH + 3
+        con = m[cy - R:cy + R, cx - R:cx + R].copy()
+
+        if guong:
+            vet = but[cy - R:cy + R, cx - R:cx + R]
+            lat = con[:, ::-1]
+            dap = vet & ~vet[:, ::-1]
+            con[dap] = lat[dap]
+
+        return Image.fromarray(np.clip(con, 0, 255).astype(np.uint8)), R
+
+    ra = []
+
+    for i, ten in enumerate(TEN):
+        if ten in BO_QUA:
+            continue
+
+        if ten in CHEP_TU:
+            nguon, cu, moi = CHEP_TU[ten]
+            anh, R = o(TEN.index(nguon))
+            d = np.asarray(anh).astype(int)
+            gan = np.abs(d - np.array(cu)).sum(axis=2) < 34
+            d[gan] = moi
+            anh = Image.fromarray(np.clip(d, 0, 255).astype(np.uint8))
+        else:
+            anh, R = o(i, guong=ten in LAY_GUONG)
+
+        ra.append(('dt-' + ten + '.png', _cat_tron(anh, R, R, BAN_KINH)))
+
+    return ra
+
+
+def hinh_thu_nhap(im):
+    """
+    Hinh tron va tranh cua tung tinh huong o buoc thu nhap (w-2.jpg).
+
+    Ban ve nay cung bi danh dau bang but do: net do khoanh qua tam giua
+    ("Doc than nuoi con nho") nen tranh do KHONG cat ra duoc - trang ngoai se
+    lui ve ve hinh net trong vong tron mau. Hai tam con lai va hinh tron
+    chong dong xu deu sach.
+    """
+    ra = [('kt-tien.png', _cat_tron(im, 613, 357, 58))]
+
+    # (ten file, khung tranh, mau nen cua tam) - khung do tay tren ban ve.
+    TRANH = (
+        ('th-doc-than.png', (85, 570, 232, 745), (242, 247, 253)),
+        ('th-ket-hon.png', (822, 570, 988, 745), (253, 241, 241)),
+    )
+
+    for ten, khung, nen in TRANH:
+        o = im.crop(khung).convert('RGBA')
+        m = np.asarray(o).astype(int)
+
+        # Nen cua tam bo di cho tranh dat duoc len bat ky mau nao.
+        trong = np.abs(m[:, :, :3] - np.array(nen)).sum(axis=2) < 26
+        m[:, :, 3] = np.where(trong, 0, 255)
+
+        ra.append((ten, Image.fromarray(m.astype(np.uint8))))
+
+    return ra
+
+
 def main():
     os.makedirs(DICH, exist_ok=True)
 
@@ -300,6 +560,10 @@ def main():
         (BAN_VE_TIN, 'bang-ron-trang-trong.png', bang_ron_trang_trong),
         (BAN_VE_TIN, '', anh_bai_viet),
         (BAN_VE_KT, 'kiem-tra-dau-trang.jpg', anh_dau_kiem_tra),
+        (BAN_VE_BD, 'kiem-tra-nen.jpg', nen_bat_dau),
+        (BAN_VE_BD, '', hinh_tron_bat_dau),
+        (BAN_VE_KT, '', hinh_doi_tuong),
+        (BAN_VE_KT2, '', hinh_thu_nhap),
     )
 
     for nguon, ten, ham in viec:

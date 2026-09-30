@@ -158,6 +158,12 @@ const BANG = {
     'eye-line': 'visibility:net',     // con mat - luot xem
     'link': 'link',                   // mat xich - nut chep duong dan bai viet
 
+    // --- trang Kiem tra dieu kien: dai dau trang, the, dong luu y ---
+    'bolt': 'bolt',                      // tia chop - the "Nhanh chong"
+    'clock-line': 'schedule:net',        // dong ho kim - the "Thoi gian thuc hien"
+    'info-line': 'info:net',             // vong tron co chu i - dong luu y
+    'shield-tick': 'verified_user:net',  // khien co dau tich - dong "100% mien phi"
+
     // --- trang Kiem tra dieu kien, buoc 1 "Doi tuong" (w-1.jpg) ---
     //
     // Moi o dap an la mot hinh tron pastel kem mot hinh to dac ben trong.

@@ -21,7 +21,8 @@ class EligibilityQuestion extends Model
     protected $table = 'eligibility_questions';
 
     protected $fillable = [
-        'question', 'step_label', 'group', 'input_type', 'hint', 'foot_note',
+        'question', 'step_label', 'group', 'input_type', 'layout', 'image',
+        'icon', 'icon_tone', 'hint', 'foot_note', 'foot_note_sub',
         'criteria_label', 'weight', 'required', 'publish', 'order',
     ];
 
@@ -34,6 +35,18 @@ class EligibilityQuestion extends Model
         'other' => 'Dieu kien khac',
     ];
 
+    /**
+     * Bo cuc cua khoi dap an ngoai trang.
+     *
+     * 'grid'   - luoi o dap an ngang hang nhau (ban ve w-1.jpg)
+     * 'matrix' - chia thanh nhieu tam tinh huong, moi tam mot nhom dap an
+     *            (ban ve w-2.jpg)
+     */
+    public const BO_CUC = [
+        'grid' => 'Luoi o dap an',
+        'matrix' => 'Chia theo tinh huong',
+    ];
+
     public const KIEU_NHAP = [
         'boolean' => 'Co / Khong',
         'select' => 'Chon mot dap an',
@@ -43,6 +56,18 @@ class EligibilityQuestion extends Model
     public function options()
     {
         return $this->hasMany(EligibilityOption::class, 'eligibility_question_id', 'id')->orderBy('order');
+    }
+
+    public function optionGroups()
+    {
+        return $this->hasMany(EligibilityOptionGroup::class, 'eligibility_question_id', 'id')
+            ->orderBy('order')->orderBy('id');
+    }
+
+    /** Cau hoi nay ve theo kieu chia tam tinh huong? */
+    public function laMatrix(): bool
+    {
+        return $this->layout === 'matrix';
     }
 
     /** Ten ngan in tren thanh buoc - chua dat thi lui ve ten nhom. */
