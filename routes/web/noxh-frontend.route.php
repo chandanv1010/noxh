@@ -85,6 +85,9 @@ Route::name('noxh.')->group(function () {
         ->name('news.catalogue');
     Route::get('tin-tuc/{canonical}', [NewsController::class, 'show'])->name('news.show');
 
+    // --- The (tag) cua bai viet ------------------------------------------------
+    Route::get('tags/{canonical}', [NewsController::class, 'tag'])->name('news.tag');
+
     // --- Form de lai thong tin ------------------------------------------------
     Route::post('de-lai-thong-tin', [LeadController::class, 'store'])->name('lead.store');
     // Nut "Lien he" o tung nhan vien kinh doanh - popup gui bang fetch.

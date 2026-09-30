@@ -6,8 +6,6 @@
     // Khong chuoi nao viet cung o day - moi dong chu deu doc tu bang
     // introduces (nhom "Khối 6: Tin tức"), gia tri mac dinh chi la phao cuu
     // sinh khi quan tri lo xoa trang mot o.
-    $tenTrang = $chuyenMuc->name ?? ($intro['news_cat_all_text'] ?? 'Tất cả tin tức');
-
     // Tra nhanh chuyen muc cua tung bai de ve nhan mau, khong phai truy van
     // lai cho moi dong.
     $tra = $danhMuc->keyBy('id');
@@ -20,14 +18,10 @@
 
 @section('content')
 <div class="nx-tin">
-    @include('frontend.noxh.component.news-band', ['the' => 'h1'])
+    @include('frontend.noxh.component.news-band', ['theTieuDe' => 'h1'])
 
     <div class="nx__container">
-        @include('frontend.noxh.component.crumb', [
-            'crumbs' => $chuyenMuc
-                ? ['Tin tức' => url('/tin-tuc'), $chuyenMuc->name => '']
-                : ['Tin tức' => ''],
-        ])
+        @include('frontend.noxh.component.crumb', ['crumbs' => $duongDan])
 
         <div class="nx-tin__luoi">
             <aside class="nx-tin__trai">

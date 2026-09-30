@@ -45,6 +45,36 @@
     </div>
 </div>
 {{--
+    The (tag) cua bai viet. Go cach nhau dau phay; the chua co se duoc tao
+    ngay khi luu bai. Ngoai trang, moi the la mot duong dan rieng /tags/... -
+    bam vao ra tat ca bai cung mang the do.
+--}}
+<div class="ibox w">
+    <div class="ibox-title">
+        <h5>Thẻ (tags)</h5>
+    </div>
+    <div class="ibox-content">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="form-row">
+                    <span class="text-danger notice">
+                        *Mỗi thẻ cách nhau một dấu phẩy. Ví dụ: nhà ở xã hội, chính sách, thu nhập
+                    </span>
+                    <input
+                        type="text"
+                        name="tags"
+                        value="{{ old('tags', isset($post) ? $post->tags->pluck('name')->implode(', ') : '') }}"
+                        placeholder="nhà ở xã hội, chính sách"
+                        class="form-control"
+                        autocomplete="off"
+                    >
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{--
     Dong chu nho duoi anh dau bai o trang chi tiet tin. Cua RIENG tung bai nen
     khong the de trong cau hinh chung; cung khong dung lai doan mo ta ngan vi
     doan do da dung lam tom tat ngoai trang danh sach.

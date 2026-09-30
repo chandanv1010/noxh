@@ -287,8 +287,13 @@ class Introduce
                 'collapse_text' => ['type' => 'text', 'label' => 'Trang chi tiết - chữ trên nút thu gọn nội dung'],
                 'tag_heading' => [
                     'type' => 'text',
-                    'label' => 'Trang chi tiết - tiêu đề hàng từ khoá',
-                    'title' => 'Từ khoá lấy từ ô "Meta keyword" của bài viết, cách nhau dấu phẩy. Để trống ô này thì hàng từ khoá không có tiêu đề.',
+                    'label' => 'Trang chi tiết - tiêu đề hàng thẻ',
+                    'title' => 'Thẻ của bài gõ trong ô "Thẻ (tags)" ở form bài viết. Để trống ô này thì hàng thẻ không có tiêu đề.',
+                ],
+                'tag_title' => [
+                    'type' => 'text',
+                    'label' => 'Trang một thẻ - tiêu đề',
+                    'title' => 'Dùng {the} thay cho tên thẻ. Ví dụ: #{the} hoặc Bài viết về {the}',
                 ],
             ],
         ];

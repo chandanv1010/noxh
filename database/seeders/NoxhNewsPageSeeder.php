@@ -84,6 +84,7 @@ class NoxhNewsPageSeeder extends Seeder
         $this->napHinhChuyenMuc();
         $this->napAnhBai();
         $this->napNoiDung();
+        $this->napThe();
         $this->napAnhChuyenGia();
     }
 
@@ -151,6 +152,7 @@ class NoxhNewsPageSeeder extends Seeder
             'news_expand_text' => 'Xem thêm nội dung',
             'news_collapse_text' => 'Thu gọn nội dung',
             'news_tag_heading' => '',
+            'news_tag_title' => '#{the}',
 
             // --- the chuyen gia o cot phai (dung chung nhieu trang) ------------
             'expert_heading' => 'TƯ VẤN CÙNG CHUYÊN GIA',
@@ -327,6 +329,38 @@ HTML,
         }
 
         $this->command?->info("Da bo sung noi dung cho {$sua} bai viet mau.");
+    }
+
+    /**
+     * The (tag) cua cac bai viet mau.
+     *
+     * Dung lai chinh chuoi tu khoa khai bao o NOI_DUNG_BAI - ban ve ve hang
+     * the duoi bai bang dung nhung chu do. Bai nao da co the roi thi bo qua.
+     */
+    private function napThe(): void
+    {
+        $them = 0;
+
+        foreach (self::NOI_DUNG_BAI as $canonical => [$tuKhoa, $noiDung]) {
+            $id = DB::table('post_language')
+                ->where('canonical', $canonical)->where('language_id', 1)
+                ->value('post_id');
+
+            if (!$id) {
+                continue;
+            }
+
+            $bai = \App\Models\Post::find($id);
+
+            if (!$bai || $bai->tags()->count() > 0) {
+                continue;
+            }
+
+            $bai->tags()->sync(\App\Models\Tag::tuChuoi($tuKhoa));
+            $them++;
+        }
+
+        $this->command?->info("Da gan the cho {$them} bai viet.");
     }
 
     private function napHinhChuyenMuc(): void

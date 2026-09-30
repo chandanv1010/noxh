@@ -6,12 +6,9 @@
     $luot = (int) ($bai->viewed ?? 0);
     $duongBai = url('/tin-tuc/' . $bai->canonical);
 
-    // Tu khoa lay tu o "Meta keyword" cua bai - khong co bang tu khoa rieng
-    // nen dung lai o nay, quan tri go cach nhau dau phay.
-    $tuKhoa = array_values(array_filter(array_map(
-        'trim',
-        explode(',', (string) $bai->meta_keyword)
-    ), fn ($t) => $t !== ''));
+    // The (tag) cua bai - quan tri go o form bai viet, moi the co duong dan
+    // rieng /tags/... chu khong phai mot cau tim kiem.
+    $tuKhoa = $bai->tags;
 
     $moTaBai = trim(strip_tags((string) $bai->description));
     $chuThich = trim((string) ($bai->image_caption ?? ''));
@@ -27,7 +24,7 @@
 
 @section('content')
 <div class="nx-tin">
-    @include('frontend.noxh.component.news-band', ['the' => 'p'])
+    @include('frontend.noxh.component.news-band', ['theTieuDe' => 'p'])
 
     <div class="nx__container">
         @include('frontend.noxh.component.crumb', ['crumbs' => $duongDan])
@@ -121,7 +118,7 @@
                             @endif
 
                             @foreach($tuKhoa as $t)
-                                <a href="{{ url('/tim-kiem?tu-khoa=' . urlencode($t)) }}">{{ $t }}</a>
+                                <a href="{{ url('/tags/' . $t->canonical) }}">{{ $t->name }}</a>
                             @endforeach
                         </div>
                     @endif

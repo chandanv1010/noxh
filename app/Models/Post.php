@@ -58,6 +58,11 @@ class Post extends Model
         return $this->belongsToMany(PostCatalogue::class, 'post_catalogue_post' , 'post_id', 'post_catalogue_id');
     }
 
+    /** The (tag) cua bai viet - quan tri go o form bai, cach nhau dau phay. */
+    public function tags(){
+        return $this->belongsToMany(Tag::class, 'post_tag', 'post_id', 'tag_id');
+    }
+
     protected $casts = [
         'released_at' => 'datetime:Y-m-d H:i:s',
     ];

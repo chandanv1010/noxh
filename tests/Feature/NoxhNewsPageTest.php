@@ -130,6 +130,76 @@ class NoxhNewsPageTest extends TestCase
         }
     }
 
+    /**
+     * The la mot doi tuong that: co duong dan rieng, bam vao ra dung nhung
+     * bai cung mang the do. Truoc day hang chu duoi bai chi la tu khoa SEO
+     * tro sang trang tim kiem.
+     */
+    public function test_the_co_duong_dan_rieng_va_loc_dung_bai(): void
+    {
+        $the = DB::table('tags as t')
+            ->join('post_tag as pt', 'pt.tag_id', '=', 't.id')
+            ->where('t.language_id', 1)
+            ->groupBy('t.id', 't.name', 't.canonical')
+            ->havingRaw('COUNT(pt.post_id) >= 2')
+            ->first(['t.id', 't.name', 't.canonical']);
+
+        $this->assertNotNull($the, 'Chua co the nao gan cho tu hai bai tro len');
+
+        $html = $this->get('/tags/' . $the->canonical)->assertOk()->getContent();
+        $this->assertStringContainsString(e($the->name), $html);
+
+        // Dung nhung bai mang the do, khong lot bai nao khac vao.
+        $ten = DB::table('post_tag as pt')
+            ->join('post_language as pl', function ($j) {
+                $j->on('pl.post_id', '=', 'pt.post_id')->where('pl.language_id', '=', 1);
+            })
+            ->join('posts as p', 'p.id', '=', 'pt.post_id')
+            ->where('pt.tag_id', $the->id)
+            ->where('p.publish', 2)
+            ->pluck('pl.name');
+
+        foreach ($ten as $t) {
+            $this->assertStringContainsString(e($t), $html);
+        }
+
+        $this->get('/tags/khong-he-co-the-nay')->assertNotFound();
+    }
+
+    /** Hang the duoi bai tro sang /tags/..., khong phai sang trang tim kiem. */
+    public function test_hang_the_duoi_bai_tro_sang_trang_the(): void
+    {
+        $bai = $this->baiCoNoiDung();
+
+        $html = $this->get('/tin-tuc/' . $bai->canonical)->assertOk()->getContent();
+
+        $duong = DB::table('tags as t')
+            ->join('post_tag as pt', 'pt.tag_id', '=', 't.id')
+            ->where('pt.post_id', $bai->post_id)
+            ->pluck('t.canonical');
+
+        $this->assertGreaterThan(0, $duong->count(), 'Bai mau chua co the nao');
+
+        foreach ($duong as $d) {
+            $this->assertStringContainsString('/tags/' . $d, $html);
+        }
+
+        $this->assertStringNotContainsString('tim-kiem?tu-khoa=', $html);
+    }
+
+    /** Go ten the: khoang trang thua, chu hoa chu thuong deu ve chung mot the. */
+    public function test_go_ten_the_khac_nhau_van_ra_mot_the(): void
+    {
+        $a = \App\Models\Tag::tuChuoi('Kiem Tra The,   kiem tra the ');
+
+        $this->assertCount(1, $a, 'Hai cach go phai ve chung mot the');
+
+        // Chuoi khong sinh ra duong dan duoc thi bo qua han.
+        $this->assertSame([], \App\Models\Tag::tuChuoi(' , *** , '));
+
+        \App\Models\Tag::whereIn('id', $a)->delete();
+    }
+
     private function baiCoNoiDung()
     {
         $bai = DB::table('post_language as pl')

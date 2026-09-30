@@ -102,6 +102,7 @@ class PostService extends BaseService
             if($post->id > 0){
                 $this->updateLanguageForPost($post, $request, $languageId);
                 $this->updateCatalogueForPost($post, $request);
+                $this->updateTagForPost($post, $request, $languageId);
                 $this->createRouter($post, $request, $this->controllerName, $languageId);
             }
             DB::commit();
@@ -121,6 +122,7 @@ class PostService extends BaseService
             if($this->uploadPost($post, $request)){
                 $this->updateLanguageForPost($post, $request, $languageId);
                 $this->updateCatalogueForPost($post, $request);
+                $this->updateTagForPost($post, $request, $languageId);
                 $this->updateRouter(
                     $post, $request, $this->controllerName, $languageId
                 );
@@ -176,6 +178,20 @@ class PostService extends BaseService
 
     private function updateCatalogueForPost($post, $request){
         $post->post_catalogues()->sync($this->catalogue($request));
+    }
+
+    /**
+     * Dong bo the cua bai viet.
+     *
+     * Form khong gui o nay (vi du luu bai tu mot man hinh khac) thi GIU
+     * NGUYEN the cu - dung sync([]) se xoa sach the ma nguoi dung khong he
+     * dong toi.
+     */
+    private function updateTagForPost($post, $request, $languageId){
+        if(!$request->has('tags')){
+            return;
+        }
+        $post->tags()->sync(\App\Models\Tag::tuChuoi($request->input('tags'), $languageId));
     }
 
     private function formatLanguagePayload($payload, $postId, $languageId){

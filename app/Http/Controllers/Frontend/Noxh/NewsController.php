@@ -6,6 +6,7 @@ use App\Http\Controllers\FrontendController;
 use App\Http\ViewComposers\NoxhComposer;
 use App\Models\Post;
 use App\Models\PostCatalogue;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 
 /**
@@ -37,26 +38,82 @@ class NewsController extends FrontendController
             $this->locTheoChuyenMuc($khung, (int) $chuyenMuc->id);
         }
 
+        $intro = NoxhComposer::intro();
+        $ten = $chuyenMuc->name ?? ($intro['news_cat_all_text'] ?? 'Tất cả tin tức');
+
+        return $this->trangDanhSach($khung, [
+            'ten' => $ten,
+            'duongDan' => $chuyenMuc
+                ? ['Tin tức' => url('/tin-tuc'), $chuyenMuc->name => '']
+                : ['Tin tức' => ''],
+            'canonical' => $chuyenMuc
+                ? url('/tin-tuc/chuyen-muc/' . $chuyenMuc->canonical)
+                : url('/tin-tuc'),
+            'meta_title' => ($chuyenMuc->meta_title ?? '') ?: $ten . ' - NOXH.vn',
+            'meta_description' => $chuyenMuc->meta_description ?? '',
+            'chuyenMuc' => $chuyenMuc,
+        ]);
+    }
+
+    /**
+     * Trang mot the: /tags/{duong-dan}.
+     *
+     * Dung lai y nguyen bo cuc trang danh muc - nguoi doc chi doi bo loc, giao
+     * dien khong co ly do gi phai khac.
+     */
+    public function tag(string $canonical)
+    {
+        $the = Tag::where('language_id', $this->language)
+            ->where('canonical', $canonical)
+            ->first();
+
+        if (!$the) {
+            abort(404);
+        }
+
+        $khung = $this->khung();
+        $khung->whereExists(function ($sub) use ($the) {
+            $sub->from('post_tag as pt')
+                ->whereColumn('pt.post_id', 'posts.id')
+                ->where('pt.tag_id', $the->id);
+        });
+
+        $intro = NoxhComposer::intro();
+        $mau = (string) ($intro['news_tag_title'] ?? '#{the}');
+
+        return $this->trangDanhSach($khung, [
+            'ten' => strtr($mau, ['{the}' => $the->name]),
+            'duongDan' => ['Tin tức' => url('/tin-tuc'), $the->name => ''],
+            'canonical' => url('/tags/' . $the->canonical),
+            'meta_title' => strtr($mau, ['{the}' => $the->name]) . ' - NOXH.vn',
+            'meta_description' => '',
+            'the' => $the,
+        ]);
+    }
+
+    /** Phan dung chung cua trang danh muc va trang the. */
+    private function trangDanhSach($khung, array $o)
+    {
         $baiViet = $khung->orderByDesc('posts.id')
             ->paginate(self::MOI_TRANG)
             ->withQueryString();
 
-        $intro = NoxhComposer::intro();
-        $ten = $chuyenMuc->name ?? ($intro['news_heading'] ?? 'Tin tức');
+        $chuyenMuc = $o['chuyenMuc'] ?? null;
 
         return view('frontend.noxh.news.index', [
             'system' => $this->system,
             'seo' => [
-                'meta_title' => ($chuyenMuc->meta_title ?? '') ?: $ten . ' - NOXH.vn',
-                'meta_description' => ($chuyenMuc->meta_description ?? '')
+                'meta_title' => $o['meta_title'],
+                'meta_description' => $o['meta_description']
                     ?: ($this->system['seo_meta_description'] ?? ''),
                 'meta_image' => $this->system['seo_meta_images'] ?? '',
-                'canonical' => $chuyenMuc
-                    ? url('/tin-tuc/chuyen-muc/' . $chuyenMuc->canonical)
-                    : url('/tin-tuc'),
+                'canonical' => $o['canonical'],
             ],
             'baiViet' => $baiViet,
+            'tenTrang' => $o['ten'],
+            'duongDan' => $o['duongDan'],
             'chuyenMuc' => $chuyenMuc,
+            'the' => $o['the'] ?? null,
             'danhMuc' => $this->danhMuc(),
             'dangMo' => $chuyenMuc->id ?? null,
             'lienQuan' => $this->lienQuan(),
