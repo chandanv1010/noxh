@@ -44,6 +44,37 @@
         </div>
     </div>
 </div>
+{{--
+    Dong chu nho duoi anh dau bai o trang chi tiet tin. Cua RIENG tung bai nen
+    khong the de trong cau hinh chung; cung khong dung lai doan mo ta ngan vi
+    doan do da dung lam tom tat ngoai trang danh sach.
+--}}
+<div class="ibox w">
+    <div class="ibox-title">
+        <h5>Chú thích ảnh đại diện</h5>
+    </div>
+    <div class="ibox-content">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="form-row">
+                    <span class="text-danger notice">
+                        *Hiện ngay dưới ảnh đầu bài viết. Để trống thì không hiện dòng nào.
+                    </span>
+                    <input
+                        type="text"
+                        name="image_caption"
+                        value="{{ old('image_caption', ($post->image_caption) ?? '') }}"
+                        placeholder="Ví dụ: Khu nhà ở xã hội Túc Duyên. (Ảnh minh hoạ)"
+                        class="form-control"
+                        maxlength="500"
+                        autocomplete="off"
+                    >
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="ibox w hidden">
     <div class="ibox-title">
         <h5>Review</h5>

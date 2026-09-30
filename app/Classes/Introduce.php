@@ -50,6 +50,19 @@ class Introduce
             ],
         ];
 
+        // --- Dai anh dau cac trang trong ---------------------------------------
+        $data['pagehead'] = [
+            'label' => 'Dải ảnh đầu các trang trong',
+            'description' => 'Ảnh nền của dải xanh ở đầu trang Tin tức và trang chi tiết dự án',
+            'value' => [
+                'image' => [
+                    'type' => 'images',
+                    'label' => 'Ảnh nền dải đầu trang',
+                    'title' => 'Ảnh NGANG rất dẹt (khoảng 1920x140). Chữ tiêu đề nằm đè lên nửa trái nên nửa đó của ảnh nên là nền trời, đừng để chi tiết rối.',
+                ],
+            ],
+        ];
+
         // --- Khoi 1: banner ---------------------------------------------------
         $data['hero'] = [
             'label' => 'Khối 1: Banner trang chủ',
@@ -225,12 +238,73 @@ class Introduce
         // --- Khoi tin tuc ------------------------------------------------------
         $data['news'] = [
             'label' => 'Khối 6: Tin tức',
-            'description' => 'Khối tin tức ở trang chủ và phần đầu trang Tin tức',
+            'description' => 'Khối tin tức ở trang chủ, trang danh mục tin và trang chi tiết tin',
             'value' => [
                 'block_heading' => ['type' => 'text', 'label' => 'Trang chủ - tiêu đề khối tin tức'],
                 'more_text' => ['type' => 'text', 'label' => 'Trang chủ - chữ liên kết "xem tất cả"'],
-                'heading' => ['type' => 'text', 'label' => 'Trang Tin tức - tiêu đề'],
-                'description' => ['type' => 'textarea', 'label' => 'Trang Tin tức - mô tả'],
+
+                'heading' => ['type' => 'text', 'label' => 'Dải đầu trang - tiêu đề'],
+                'description' => ['type' => 'textarea', 'label' => 'Dải đầu trang - mô tả'],
+
+                // Cot trai - dung chung cho ca trang danh muc va trang chi tiet
+                'cat_heading' => ['type' => 'text', 'label' => 'Cột trái - tiêu đề khối danh mục'],
+                'cat_all_text' => ['type' => 'text', 'label' => 'Cột trái - tên mục "tất cả tin tức"'],
+                'cat_all_icon' => [
+                    'type' => 'select',
+                    'label' => 'Cột trái - hình của mục "tất cả tin tức"',
+                    'option' => $icon,
+                    'title' => 'Hình của từng chuyên mục chọn trong màn hình Chuyên mục tin tức.',
+                ],
+                'help_heading' => ['type' => 'text', 'label' => 'Cột trái - thẻ hỗ trợ: tiêu đề'],
+                'help_description' => ['type' => 'textarea', 'label' => 'Cột trái - thẻ hỗ trợ: mô tả'],
+                'help_icon' => ['type' => 'select', 'label' => 'Cột trái - thẻ hỗ trợ: hình', 'option' => $icon],
+                'help_button' => ['type' => 'text', 'label' => 'Cột trái - thẻ hỗ trợ: chữ trên nút'],
+                'help_link' => [
+                    'type' => 'text',
+                    'label' => 'Cột trái - thẻ hỗ trợ: đường dẫn của nút',
+                    'title' => 'Ví dụ: /cong-hoa/tu-van',
+                ],
+
+                // Cot phai
+                'related_heading' => ['type' => 'text', 'label' => 'Cột phải - tiêu đề khối bài liên quan'],
+                'related_all_text' => ['type' => 'text', 'label' => 'Cột phải - chữ liên kết "xem tất cả"'],
+
+                // Giua trang
+                'count_text' => [
+                    'type' => 'text',
+                    'label' => 'Trang danh mục - dòng đếm bài viết',
+                    'title' => 'Dùng {so} thay cho con số. Ví dụ: {so} bài viết',
+                ],
+                'empty_text' => ['type' => 'text', 'label' => 'Câu hiện khi chuyên mục chưa có bài nào'],
+                'view_text' => [
+                    'type' => 'text',
+                    'label' => 'Chữ sau con số lượt xem',
+                    'title' => 'Ví dụ: lượt xem',
+                ],
+                'share_label' => ['type' => 'text', 'label' => 'Trang chi tiết - chữ trước các nút chia sẻ'],
+                'copy_done_text' => ['type' => 'text', 'label' => 'Trang chi tiết - báo đã chép đường dẫn'],
+                'expand_text' => ['type' => 'text', 'label' => 'Trang chi tiết - chữ trên nút mở rộng nội dung'],
+                'collapse_text' => ['type' => 'text', 'label' => 'Trang chi tiết - chữ trên nút thu gọn nội dung'],
+                'tag_heading' => [
+                    'type' => 'text',
+                    'label' => 'Trang chi tiết - tiêu đề hàng từ khoá',
+                    'title' => 'Từ khoá lấy từ ô "Meta keyword" của bài viết, cách nhau dấu phẩy. Để trống ô này thì hàng từ khoá không có tiêu đề.',
+                ],
+            ],
+        ];
+
+        // --- The chuyen gia o cot phai ------------------------------------------
+        $data['expert'] = [
+            'label' => 'Thẻ chuyên gia (cột phải)',
+            'description' => 'Các dòng chữ cố định của thẻ chuyên gia; tên, chức danh, cam kết và ảnh lấy từ màn hình Chuyên gia',
+            'value' => [
+                'heading' => ['type' => 'text', 'label' => 'Nhãn phía trên tên chuyên gia'],
+                'button' => [
+                    'type' => 'text',
+                    'label' => 'Chữ trên nút',
+                    'title' => 'Để trống thì thẻ hiện nút gọi số điện thoại của chuyên gia.',
+                ],
+                'button_link' => ['type' => 'text', 'label' => 'Đường dẫn của nút'],
             ],
         ];
 

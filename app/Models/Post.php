@@ -14,6 +14,7 @@ class Post extends Model
 
     protected $fillable = [
         'image',
+        'image_caption',
         'album',
         'publish',
         'approval_status',

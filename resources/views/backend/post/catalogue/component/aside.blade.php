@@ -45,4 +45,34 @@
     </div>
 </div>
 
+{{--
+    Hinh cua chuyen muc, hien o cot "Danh muc tin tuc" ben trai trang Tin tuc.
+    Danh sach hinh lay tu App\Classes\NoxhIcon - dung bo hinh ma frontend
+    dung, khong go tay ten hinh.
+--}}
+<div class="ibox w">
+    <div class="ibox-title">
+        <h5>Hình của chuyên mục</h5>
+    </div>
+    <div class="ibox-content">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="form-row">
+                    <span class="text-danger notice">
+                        *Hiện bên trái tên chuyên mục ở cột danh mục trang Tin tức.
+                    </span>
+                    <select name="icon" class="form-control setupSelect2">
+                        @foreach(\App\Classes\NoxhIcon::chon() as $ma => $ten)
+                            <option value="{{ $ma }}"
+                                {{ old('icon', ($postCatalogue->icon) ?? '') === (string) $ma ? 'selected' : '' }}>
+                                {{ $ten }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @include('backend.dashboard.component.publish', ['model' => ($postCatalogue) ?? null, 'hideImage' => false])

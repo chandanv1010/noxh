@@ -1086,7 +1086,7 @@
 
         &.co-nen {
             background-image:
-                linear-gradient(180deg, rgba(207, 232, 255, 0.45) 0%, rgba(244, 248, 253, 0.92) 78%, $nx-bg 100%),
+                linear-gradient(180deg, rgba(207, 232, 255, 0.28) 0%, rgba(244, 248, 253, 0.9) 74%, $nx-bg 100%),
                 var(--nx-nen);
             background-repeat: no-repeat;
             background-position: center top;
@@ -4301,6 +4301,589 @@
             font-size: 13px;
             font-style: normal;
             line-height: 1.35;
+        }
+    }
+}
+
+// =============================================================================
+// TRANG DANH MUC TIN TUC VA TRANG CHI TIET TIN - noxh_image/tin-tuc-fix.webp
+//
+// Ban ve rong 1364 diem anh va do o ty le 1:1 voi khung 1280 mac dinh: noi
+// dung trong ban ve chay tu x=73 den x=1289, tuc rong 1216 - dung bang be
+// ngang trong long .nx__container (1280 tru hai le 35). Vi vay moi con so
+// duoi day chep THANG tu ban ve, khong phai nhan he so nao.
+//
+// Ba cot do bang mep cac khoi trang:
+//   cot trai   73..336   (263)
+//   cot giua  353..978   (626)
+//   cot phai  993..1289  (296)
+// =============================================================================
+.nx-tin {
+    padding-bottom: 40px;
+
+    .nx-crumb {
+        padding-top: 13px;
+    }
+
+    .nx-panel {
+        margin-bottom: 16px;
+    }
+
+    &__luoi {
+        display: grid;
+        grid-template-columns: 262px minmax(0, 1fr) 296px;
+        grid-template-areas: 'trai giua phai';
+        gap: 16px;
+        align-items: start;
+
+        // Man hinh vua: cot phai (bai lien quan + chuyen gia) xuong duoi, hai
+        // cot con lai giu nguyen. KHONG an cot do di - do la loi dieu huong
+        // sang bai khac va o goi tu van.
+        @media (max-width: 1180px) {
+            grid-template-columns: 240px minmax(0, 1fr);
+            grid-template-areas:
+                'trai giua'
+                'phai phai';
+        }
+
+        // Dien thoai: bai viet len truoc, hai cot phu xuong sau.
+        @media (max-width: $nx-md) {
+            grid-template-columns: minmax(0, 1fr);
+            grid-template-areas: 'giua' 'trai' 'phai';
+        }
+    }
+
+    &__trai { grid-area: trai; }
+    &__phai { grid-area: phai; }
+
+    &__giua {
+        grid-area: giua;
+        min-width: 0;
+    }
+
+    &__trong {
+        margin: 20px 0;
+        color: $nx-text;
+        font-size: 14px;
+        text-align: center;
+    }
+}
+
+// --- Dai anh dau trang -------------------------------------------------------
+//
+// Cao 97 diem anh trong ban ve (y 52..149). Anh nen do quan tri chon; chua
+// chon thi con chuyen mau xanh cung huong voi anh de dai khong trong tron.
+.nx-tin-dai {
+    background: linear-gradient(90deg, #1263db 0%, #2a86ef 52%, #63aef4 100%);
+    color: #fff;
+
+    // Lop mo nhe phu tu trai sang: chu tieu de nam de len phan anh sang nen
+    // khong co lop nay thi dong mo ta chim han vao nen toa nha.
+    &.co-nen {
+        background-image:
+            linear-gradient(90deg, rgba(8, 48, 110, 0.5) 0%, rgba(8, 48, 110, 0.22) 46%, rgba(8, 48, 110, 0) 72%),
+            var(--nx-nen);
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: auto, cover;
+    }
+
+    > .nx__container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 97px;
+        padding-block: 13px;
+    }
+
+    // Chieu cao chu "T" trong ban ve la 26 diem anh; Inter co ty le cap
+    // height 0,727 nen co chu ra 36.
+    &__ten {
+        margin: 0;
+        color: #fff;
+        font-size: 36px;
+        font-weight: 800;
+        line-height: 1.15;
+    }
+
+    &__mo-ta {
+        margin: 5px 0 0;
+        max-width: 720px;
+        color: rgba(255, 255, 255, 0.94);
+        font-size: 14.5px;
+        line-height: 1.5;
+    }
+
+    @media (max-width: $nx-md) {
+        &__ten { font-size: 25px; }
+        &__mo-ta { font-size: 13.5px; }
+    }
+}
+
+// --- Cot trai: danh muc chuyen muc -------------------------------------------
+.nx-tin-muc {
+    padding: 15px;
+
+    &__dau {
+        margin: 0 0 10px;
+        color: $nx-ink;
+        font-size: 16.5px;
+        font-weight: 800;
+    }
+
+    &__ds {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    &__o {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 9px 11px;
+        border-radius: 9px;
+        color: $nx-ink;
+        font-size: 13.5px;
+        text-decoration: none;
+
+        > svg {
+            flex: none;
+            color: $nx-navy;
+        }
+
+        &:hover {
+            background: $nx-blue-pale;
+        }
+
+        // Muc dang xem: nen xanh nhat, chu va hinh chuyen sang xanh sang.
+        &.dang-xem {
+            background: #dceeff;
+            color: $nx-blue;
+            font-weight: 700;
+
+            > svg { color: $nx-blue; }
+        }
+    }
+
+    // Chuyen muc chua chon hinh van phai chua cho, khong thi ten cac muc so
+    // le nhau mot khoang bang be ngang mot hinh.
+    &__khong {
+        display: block;
+        flex: none;
+        width: 20px;
+        height: 20px;
+    }
+}
+
+// --- Cot trai: the "Can tu van them?" ----------------------------------------
+.nx-tin-hotro {
+    padding: 16px 15px;
+
+    &__dau {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 14px;
+
+        strong {
+            display: block;
+            color: $nx-ink;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        span span {
+            display: block;
+            margin-top: 3px;
+            color: $nx-text;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+    }
+
+    &__icon {
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: $nx-blue-soft;
+        color: $nx-blue;
+    }
+
+    .nx-btn {
+        width: 100%;
+        margin-bottom: 9px;
+        padding-block: 10px;
+
+        &:last-child { margin-bottom: 0; }
+    }
+
+    // Nut so dien thoai: chu to han nut thuong, dung nhu ban ve.
+    .nx-btn--ghost {
+        font-size: 17px;
+    }
+}
+
+// --- Cot phai: bai viet lien quan --------------------------------------------
+.nx-tin-lq {
+    padding: 15px;
+
+    &__dau {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin: 0 0 4px;
+        color: $nx-ink;
+        font-size: 17px;
+        font-weight: 800;
+
+        a {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: $nx-blue;
+            font-size: 12.5px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+    }
+
+    &__o {
+        display: flex;
+        gap: 11px;
+        padding: 11px 0;
+        border-bottom: 1px solid $nx-line;
+        text-decoration: none;
+
+        &:last-child {
+            padding-bottom: 2px;
+            border-bottom: 0;
+        }
+
+        &:hover strong { color: $nx-blue; }
+    }
+
+    &__anh {
+        flex: none;
+        width: 92px;
+        aspect-ratio: 16 / 11;
+        border-radius: 8px;
+        background: $nx-blue-soft;
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &__chu {
+        min-width: 0;
+
+        strong {
+            display: block;
+            color: $nx-ink;
+            font-size: 13.5px;
+            font-weight: 700;
+            line-height: 1.42;
+        }
+
+        time {
+            display: block;
+            margin-top: 4px;
+            color: $nx-muted;
+            font-size: 12.5px;
+        }
+    }
+}
+
+// --- Nhan chuyen muc ---------------------------------------------------------
+//
+// Mau nen lay tu o "Mau nhan chuyen muc" cua tung chuyen muc (thuoc tinh
+// style ngay tren the), o day chi la mau du phong khi chua chon.
+.nx-tin-nhan {
+    display: inline-flex;
+    padding: 5px 11px;
+    border-radius: 6px;
+    background: $nx-blue;
+    color: #fff;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+// --- Dong ngay thang va luot xem ---------------------------------------------
+.nx-tin-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 18px;
+    color: $nx-text;
+    font-size: 13px;
+
+    span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    svg { color: $nx-muted; }
+}
+
+// --- Trang danh muc: mot dong mot tin ----------------------------------------
+.nx-tin-ds {
+    padding: 16px 17px;
+
+    &__dau {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 0 0 2px;
+        color: $nx-ink;
+        font-size: 19px;
+        font-weight: 800;
+
+        span {
+            color: $nx-text;
+            font-size: 13px;
+            font-weight: 500;
+        }
+    }
+}
+
+.nx-tin-dong {
+    display: grid;
+    grid-template-columns: 216px minmax(0, 1fr);
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid $nx-line;
+
+    &:last-child {
+        padding-bottom: 2px;
+        border-bottom: 0;
+    }
+
+    // Anh phai cao DUNG BANG cot chu ben canh, khong thi hai ben so le nhau
+    // trong rat cap kenh. Vi vay height:100% (an theo chieu cao hang cua
+    // luoi) chu KHONG phai aspect-ratio - dat aspect-ratio thi chieu cao do
+    // ty le quyet dinh va anh luon thap hon phan chu.
+    //
+    // min-height giu cho tin nao mo ta qua ngan thi anh van khong bi det.
+    &__anh {
+        display: block;
+        height: 100%;
+        min-height: 136px;
+        border-radius: 10px;
+        background: $nx-blue-soft;
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.25s ease;
+        }
+    }
+
+    &:hover &__anh img {
+        transform: scale(1.04);
+    }
+
+    &__ten {
+        margin: 9px 0 0;
+        font-size: 17px;
+        font-weight: 700;
+        line-height: 1.4;
+
+        a {
+            color: $nx-ink;
+            text-decoration: none;
+
+            &:hover { color: $nx-blue; }
+        }
+    }
+
+    &__tom {
+        margin: 7px 0 10px;
+        color: $nx-text;
+        font-size: 13.5px;
+        line-height: 1.65;
+    }
+
+    @media (max-width: $nx-sm) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+// --- Trang chi tiet ----------------------------------------------------------
+.nx-tin-bai {
+    padding: 17px;
+
+    &__ten {
+        margin: 11px 0 0;
+        color: $nx-navy;
+        font-size: 27px;
+        font-weight: 800;
+        line-height: 1.28;
+
+        @media (max-width: $nx-md) {
+            font-size: 21px;
+        }
+    }
+
+    &__dau {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 13px 0 15px;
+    }
+
+    &__anh {
+        margin: 0 0 16px;
+
+        img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        figcaption {
+            margin-top: 8px;
+            color: $nx-muted;
+            font-size: 12.5px;
+            line-height: 1.5;
+            text-align: center;
+        }
+    }
+
+    // Doan mo dau in dam han phan con lai - ban ve ve nhu vay.
+    &__mo {
+        color: $nx-ink;
+        font-weight: 600;
+    }
+
+    // Khi con thu gon: cat bot chieu cao va phu mot lop mo dan mau trang o
+    // day, dung nhu ban ve. Lop phu ve bang ::after nen khong che mat chu khi
+    // da mo rong (luc do lop nay bien mat cung lop .dang-thu).
+    &__noi {
+        position: relative;
+
+        &.dang-thu {
+            overflow: hidden;
+
+            &::after {
+                content: '';
+                position: absolute;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                height: 130px;
+                background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #fff 88%);
+                pointer-events: none;
+            }
+        }
+    }
+}
+
+.nx-tin-chia {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: $nx-text;
+    font-size: 13px;
+
+    &__o {
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: $nx-blue;
+        color: #fff;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.18s ease;
+
+        svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        &--fb { background: #1877f2; }
+
+        &--zalo {
+            border: 1.5px solid #0068ff;
+            background: #fff;
+            color: #0068ff;
+        }
+
+        &--link { background: #aab3c2; }
+
+        &.da-chep { background: $nx-green; }
+    }
+}
+
+// Nut "Xem them noi dung" - do JS gan vao khi bai that su dai.
+.nx-tin-them {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 16px auto 0;
+    padding: 9px 20px;
+    border: 1px solid $nx-line;
+    border-radius: 24px;
+    background: #fff;
+    color: $nx-ink;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+        border-color: $nx-blue;
+        color: $nx-blue;
+    }
+}
+
+.nx-tin-khoa {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+
+    &__dau {
+        color: $nx-ink;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    a {
+        padding: 6px 12px;
+        border-radius: 7px;
+        background: #eef2f7;
+        color: $nx-text;
+        font-size: 12.5px;
+        text-decoration: none;
+
+        &:hover {
+            background: $nx-blue-soft;
+            color: $nx-blue;
         }
     }
 }

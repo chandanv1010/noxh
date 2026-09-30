@@ -848,16 +848,20 @@ html {
         &:hover {
             color: $nx-blue;
         }
-
-        // Hinh ngoi nha o dau duong dan - xanh de tach khoi chu xam.
-        svg {
-            color: $nx-blue;
-        }
     }
 
     span[aria-hidden] {
         color: #c4cedd;
     }
+}
+
+// Duong dan tu no da la mot khung noi dung (co le hai ben). Khi dat BEN
+// TRONG mot .nx__container san co thi le do bi tinh hai lan, duong dan thut
+// vao trong so voi cac khoi ben duoi - phai tra le ve 0.
+.nx__container > .nx-crumb,
+.nx__container .nx-crumb {
+    max-width: none;
+    padding-inline: 0;
 }
 
 // =============================================================================

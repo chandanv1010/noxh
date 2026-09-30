@@ -236,6 +236,7 @@ class PostService extends BaseService
             // cot giu nguyen gia tri cu - hanh vi cu khong doi.
             'approval_status',
             'image',
+            'image_caption',
             'album',
             'post_catalogue_id',
             'video',

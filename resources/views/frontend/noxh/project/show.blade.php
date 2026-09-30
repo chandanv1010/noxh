@@ -7,7 +7,11 @@
     $tt = \App\Models\Product::TRANG_THAI_DU_AN[$duAn->status] ?? null;
     $thay = ['{tinh}' => $tenTinh ?: 'khu vực'];
 
-    $anhNen = trim((string) ($intro['projectdetail_hero_bg'] ?? ''));
+    // Anh nen dai dau trang. Chua chon rieng cho trang du an thi dung dai
+    // anh chung cua cac trang trong ("Dải ảnh đầu các trang trong") - dung
+    // mot anh cho ca trang Tin tuc lan trang nay, nhu ban thiet ke.
+    $anhNen = trim((string) ($intro['projectdetail_hero_bg'] ?? ''))
+        ?: trim((string) ($intro['pagehead_image'] ?? ''));
 
     // Khau hieu viet tay o goc phai: moi dong mot cau.
     $khauHieu = array_values(array_filter(array_map(

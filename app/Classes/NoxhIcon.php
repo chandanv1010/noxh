@@ -88,6 +88,16 @@ class NoxhIcon
         'trust-live' => 'Đồng hồ có vạch tốc độ',
         'trust-chat' => 'Bong bóng chat kèm dấu tích',
         'trust-lock' => 'Bảng kẹp kèm dấu tích',
+
+        // Trang Tin tuc - hinh cua tung chuyen muc o cot trai
+        'news-all' => 'Khung tin (tất cả tin tức)',
+        'scale-line' => 'Cân công lý (nét viền)',
+        'trend' => 'Biểu đồ có đường đi lên',
+        'bulb-line' => 'Bóng đèn có tia (nét viền)',
+        'pin-line' => 'Ghim bản đồ (nét viền)',
+        'calendar-line' => 'Lịch (nét viền)',
+        'eye-line' => 'Con mắt (nét viền)',
+        'link' => 'Mắt xích (đường dẫn)',
     ];
 
     /** Dung lam 'option' cho o chon kieu select trong trang cau hinh. */

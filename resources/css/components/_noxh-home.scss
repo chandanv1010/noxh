@@ -1210,11 +1210,21 @@
         text-transform: uppercase;
     }
 
-    &__name {
-        margin: 0 0 10px;
+    // Ten nguoi tu van - dam va tham han chuc danh ngay duoi.
+    &__nguoi {
+        margin: 0 0 2px;
+        max-width: 62%;
         color: $nx-ink;
-        font-size: 15px;
-        font-weight: 700;
+        font-size: 16px;
+        font-weight: 800;
+    }
+
+    &__name {
+        margin: 0 0 12px;
+        max-width: 62%;
+        color: $nx-ink;
+        font-size: 14px;
+        font-weight: 500;
     }
 
     &__description {

@@ -145,6 +145,19 @@ const BANG = {
     'trust-chat': 'nx_chat_check',
     'trust-lock': 'nx_board_check',
 
+    // --- trang Tin tuc (tin-tuc-fix.webp) ---
+    //
+    // Cot trai liet ke chuyen muc bang hinh VE VIEN mau xanh tham - de hinh
+    // to dac vao thi cot nay nang han han ban ve.
+    'news-all': 'nx_tin_tat_ca',      // khung tin co thanh dau va hai o - "Tat ca tin tuc"
+    'scale-line': 'balance:net',      // can cong ly - "Chinh sach"
+    'trend': 'monitoring:net',        // cot bieu do kem duong di len - "Thi truong"
+    'bulb-line': 'nx_bong_den_tia',   // bong den VE VIEN co tia - "Kinh nghiem"
+    'pin-line': 'location_on:net',    // ghim ban do - "Tin dia phuong"
+    'calendar-line': 'calendar_month:net', // lich - dong ngay dang bai
+    'eye-line': 'visibility:net',     // con mat - luot xem
+    'link': 'link',                   // mat xich - nut chep duong dan bai viet
+
     'bullet': 'expand_circle_down',        // tron dac co mui nhon - gach dau dong the can ho
     'gallery': 'photo_library:net',        // chong anh - nut xem album
     'video': 'smart_display',              // man hinh co nut phat - nut xem video
@@ -162,6 +175,13 @@ const GHEP = {
     'nx_board_check': ['assignment', 'check_circle'],    // bang kep + tich tron
 };
 
+// Hinh CHONG: giu NGUYEN mot hinh cua Material roi ve them vai net len tren.
+// Khac GHEP o cho khong thu nho hinh nen va khong chen khe trang, nen dung
+// duoc tren moi mau nen.
+const CHONG = {
+    'nx_bong_den_tia': ['emoji_objects:net', 'nx_tia_den'],  // bong den + tia sang
+};
+
 // Hinh khong co trong Material Symbols thi ve tay theo dung ban thiet ke.
 // Luoi giong Material: viewBox "0 -960 960 960", toa do y am.
 const VE_TAY = {
@@ -169,6 +189,28 @@ const VE_TAY = {
     // (dung fill-rule evenodd de khoet ruot), giua la mot hinh thoi dac.
     'nx_diamond': '<path fill-rule="evenodd" d="M480-872 872-480 480-88 88-480 480-872Zm0 116L204-480l276 276 276-276-276-276Z"/>'
         + '<path d="M480-616 616-480 480-344 344-480 480-616Z"/>',
+
+    // Khung tin cua muc "Tat ca tin tuc": mot khung bo tron, trong co thanh
+    // dau (o vuong dac kem hai dong ke) va hai o noi dung. Material khong co
+    // hinh nao dung nhu vay nen ve lai theo ban ve.
+    'nx_tin_tat_ca': '<rect x="118" y="-822" width="724" height="684" rx="86"'
+        + ' fill="none" stroke="currentColor" stroke-width="62"/>'
+        + '<rect x="196" y="-740" width="92" height="92" rx="26"/>'
+        + '<rect x="330" y="-730" width="330" height="34" rx="17"/>'
+        + '<rect x="330" y="-676" width="230" height="34" rx="17"/>'
+        + '<rect x="205" y="-570" width="250" height="340" rx="44"'
+        + ' fill="none" stroke="currentColor" stroke-width="54"/>'
+        + '<rect x="505" y="-570" width="250" height="340" rx="44"'
+        + ' fill="none" stroke="currentColor" stroke-width="54"/>',
+
+    // Nam tia sang toa quanh nua tren bong den, dung cho hinh ghep
+    // 'nx_bong_den_tia'. Tam bong den cua emoji_objects nam o (480,-600).
+    'nx_tia_den': '<g stroke="currentColor" stroke-width="46" stroke-linecap="round">'
+        + '<line x1="742" y1="-600" x2="812" y2="-600"/>'
+        + '<line x1="665" y1="-785" x2="714" y2="-834"/>'
+        + '<line x1="480" y1="-862" x2="480" y2="-932"/>'
+        + '<line x1="295" y1="-785" x2="246" y2="-834"/>'
+        + '<line x1="218" y1="-600" x2="148" y2="-600"/></g>',
 
     // Ba vach toc do ben trai dong ho "Cap nhat lien tuc". Day khong phai huy
     // hieu goc duoi phai nen ham ghep khong thu nho, khong chen khe trang.
@@ -182,6 +224,7 @@ const VE_TAY = {
 // loc, de hinh to dac vao thi nang han so voi ban ve.
 function doc(ten) {
     if (GHEP[ten]) return ghep(...GHEP[ten]);
+    if (CHONG[ten]) return chong(...CHONG[ten]);
     if (VE_TAY[ten]) return `<svg viewBox="0 -960 960 960">${VE_TAY[ten]}</svg>`;
 
     const day = ten.endsWith(':day');
@@ -198,6 +241,11 @@ function doc(ten) {
     }
 
     throw new Error(`Khong tim thay icon "${goc}" trong ${thuMuc}`);
+}
+
+/** Ve `nen` nguyen ban roi dan them cac net cua `them` len tren. */
+function chong(nen, them) {
+    return `<svg viewBox="0 -960 960 960">${ruot(doc(nen))}${VE_TAY[them]}</svg>`;
 }
 
 /**

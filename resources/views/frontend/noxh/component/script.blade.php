@@ -558,5 +558,80 @@ window.NX.tienTuTrieu = function (trieu) {
     });
 })();
 
+// --- Trang chi tiet tin: nut "Xem them noi dung" -----------------------------
+//
+// Nut do JS TU GAN chu khong viet san trong Blade: bai ngan thi khong can cat,
+// va neu trinh duyet khong chay JS thi bai viet phai hien nguyen ven - viet
+// san the cat trong HTML la bai ngan cung bi cut mat.
+(function () {
+    var CAO = 520;   // chieu cao toi da khi con thu gon, don vi diem anh
+
+    document.querySelectorAll('[data-nx-mo-rong]').forEach(function (hop) {
+        if (hop.scrollHeight <= CAO + 80) return;
+
+        var nut = document.createElement('button');
+        nut.type = 'button';
+        nut.className = 'nx-tin-them';
+        nut.setAttribute('aria-expanded', 'false');
+
+        var chuMo = hop.getAttribute('data-nx-chu-mo') || 'Xem thêm nội dung';
+        var chuThu = hop.getAttribute('data-nx-chu-thu') || 'Thu gọn nội dung';
+        var mui = '<svg class="nx-ico" width="18" height="18" viewBox="0 -960 960 960"'
+            + ' fill="currentColor" aria-hidden="true"><path d="M469-358q-5-2-10-7L261-563q-9-9-8.5-21.5T262-606q9-9 21.5-9t21.5 9l175 176 176-176q9-9 21-8.5t21 9.5q9 9 9 21.5t-9 21.5L501-365q-5 5-10 7t-11 2q-6 0-11-2Z"/></svg>';
+
+        var ve = function (mo) {
+            nut.innerHTML = '<span>' + (mo ? chuThu : chuMo) + '</span>' + mui;
+            nut.setAttribute('aria-expanded', mo ? 'true' : 'false');
+        };
+
+        hop.classList.add('dang-thu');
+        hop.style.maxHeight = CAO + 'px';
+        ve(false);
+
+        nut.addEventListener('click', function () {
+            var mo = hop.classList.toggle('dang-thu') === false;
+            hop.style.maxHeight = mo ? '' : CAO + 'px';
+            ve(mo);
+
+            if (!mo) hop.scrollIntoView({ block: 'nearest' });
+        });
+
+        hop.parentNode.insertBefore(nut, hop.nextSibling);
+    });
+})();
+
+// --- Nut chep duong dan bai viet ---------------------------------------------
+(function () {
+    document.querySelectorAll('[data-nx-chep]').forEach(function (nut) {
+        nut.addEventListener('click', function () {
+            var duong = nut.getAttribute('data-nx-chep');
+
+            var xong = function () {
+                nut.classList.add('da-chep');
+                nut.setAttribute('title', nut.getAttribute('data-nx-chep-xong') || '');
+                setTimeout(function () { nut.classList.remove('da-chep'); }, 1800);
+            };
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(duong).then(xong, function () {});
+                return;
+            }
+
+            // Trinh duyet cu khong co clipboard API: muon tam mot o nhap.
+            var o = document.createElement('textarea');
+            o.value = duong;
+            o.setAttribute('readonly', '');
+            o.style.position = 'fixed';
+            o.style.opacity = '0';
+            document.body.appendChild(o);
+            o.select();
+
+            try { document.execCommand('copy'); xong(); } catch (e) {}
+
+            document.body.removeChild(o);
+        });
+    });
+})();
+
 </script>
 @stack('script')

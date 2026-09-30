@@ -79,6 +79,10 @@ Route::name('noxh.')->group(function () {
 
     // --- Tin tuc -------------------------------------------------------------
     Route::get('tin-tuc', [NewsController::class, 'index'])->name('news.index');
+    // Khai bao TRUOC route chi tiet: 'tin-tuc/{canonical}' la mau bat chung
+    // nen dat sau se nuot luon duong dan chuyen muc.
+    Route::get('tin-tuc/chuyen-muc/{canonical}', [NewsController::class, 'index'])
+        ->name('news.catalogue');
     Route::get('tin-tuc/{canonical}', [NewsController::class, 'show'])->name('news.show');
 
     // --- Form de lai thong tin ------------------------------------------------

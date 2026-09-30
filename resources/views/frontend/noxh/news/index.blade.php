@@ -1,41 +1,67 @@
 @extends('frontend.noxh.layout')
 
+@php
+    // Ban ve: noxh_image/tin-tuc-fix.webp
+    //
+    // Khong chuoi nao viet cung o day - moi dong chu deu doc tu bang
+    // introduces (nhom "Khối 6: Tin tức"), gia tri mac dinh chi la phao cuu
+    // sinh khi quan tri lo xoa trang mot o.
+    $tenTrang = $chuyenMuc->name ?? ($intro['news_cat_all_text'] ?? 'Tất cả tin tức');
+
+    // Tra nhanh chuyen muc cua tung bai de ve nhan mau, khong phai truy van
+    // lai cho moi dong.
+    $tra = $danhMuc->keyBy('id');
+
+    $dongDem = strtr(
+        (string) ($intro['news_count_text'] ?? '{so} bài viết'),
+        ['{so}' => number_format($baiViet->total(), 0, ',', '.')]
+    );
+@endphp
+
 @section('content')
-@include('frontend.noxh.component.page-head', [
-    'crumbs' => ['Tin tức' => ''],
-    'tieuDe' => $intro['news_heading'] ?? 'Tin tức nhà ở xã hội',
-    'moTa' => $intro['news_description'] ?? 'Chính sách, tiến độ dự án và hướng dẫn thủ tục mới nhất.',
-])
+<div class="nx-tin">
+    @include('frontend.noxh.component.news-band', ['the' => 'h1'])
 
-<div class="nx__container" style="padding-bottom:40px">
-    @if($baiViet->count())
-        <div class="nx-article-grid">
-            @foreach($baiViet as $bai)
-                <article class="nx-article">
-                    <a href="{{ url('/tin-tuc/' . $bai->canonical) }}" class="nx-article__media">
-                        @if($bai->image)<img src="{{ $bai->image }}" alt="{{ $bai->name }}" loading="lazy">@endif
-                    </a>
-                    <div class="nx-article__body">
-                        <h2 class="nx-article__title">
-                            <a href="{{ url('/tin-tuc/' . $bai->canonical) }}">{{ $bai->name }}</a>
-                        </h2>
-                        @if($bai->description)
-                            <p class="nx-article__description">{{ \Illuminate\Support\Str::words(strip_tags($bai->description), 22, '…') }}</p>
+    <div class="nx__container">
+        @include('frontend.noxh.component.crumb', [
+            'crumbs' => $chuyenMuc
+                ? ['Tin tức' => url('/tin-tuc'), $chuyenMuc->name => '']
+                : ['Tin tức' => ''],
+        ])
+
+        <div class="nx-tin__luoi">
+            <aside class="nx-tin__trai">
+                @include('frontend.noxh.component.news-aside-left')
+            </aside>
+
+            <main class="nx-tin__giua">
+                <div class="nx-panel nx-tin-ds">
+                    <h2 class="nx-tin-ds__dau">
+                        {{ $tenTrang }}
+                        @if($baiViet->total())
+                            <span>{{ $dongDem }}</span>
                         @endif
-                        <div class="nx-article__meta">
-                            <span>
-                                @include('frontend.noxh.component.icon', ['name' => 'calendar', 'size' => 13])
-                                {{ \Illuminate\Support\Carbon::parse($bai->created_at)->format('d/m/Y') }}
-                            </span>
-                        </div>
-                    </div>
-                </article>
-            @endforeach
-        </div>
+                    </h2>
 
-        @include('frontend.noxh.component.pagination', ['model' => $baiViet])
-    @else
-        <div class="nx-empty">Chưa có bài viết nào.</div>
-    @endif
+                    @forelse($baiViet as $bai)
+                        @include('frontend.noxh.component.news-row', [
+                            'bai' => $bai,
+                            'muc' => $tra[$bai->post_catalogue_id] ?? null,
+                        ])
+                    @empty
+                        <p class="nx-tin__trong">
+                            {{ $intro['news_empty_text'] ?? 'Chưa có bài viết nào.' }}
+                        </p>
+                    @endforelse
+                </div>
+
+                @include('frontend.noxh.component.pagination', ['model' => $baiViet])
+            </main>
+
+            <aside class="nx-tin__phai">
+                @include('frontend.noxh.component.news-aside-right')
+            </aside>
+        </div>
+    </div>
 </div>
 @endsection
