@@ -21,8 +21,8 @@ class EligibilityQuestion extends Model
     protected $table = 'eligibility_questions';
 
     protected $fillable = [
-        'question', 'group', 'input_type', 'hint', 'criteria_label',
-        'weight', 'required', 'publish', 'order',
+        'question', 'step_label', 'group', 'input_type', 'hint', 'foot_note',
+        'criteria_label', 'weight', 'required', 'publish', 'order',
     ];
 
     protected $casts = ['required' => 'boolean'];
@@ -43,6 +43,14 @@ class EligibilityQuestion extends Model
     public function options()
     {
         return $this->hasMany(EligibilityOption::class, 'eligibility_question_id', 'id')->orderBy('order');
+    }
+
+    /** Ten ngan in tren thanh buoc - chua dat thi lui ve ten nhom. */
+    public function tenBuoc(): string
+    {
+        $ten = trim((string) $this->step_label);
+
+        return $ten !== '' ? $ten : $this->tenNhom();
     }
 
     public function tenNhom()

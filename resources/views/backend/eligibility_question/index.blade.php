@@ -42,6 +42,7 @@
                     <thead>
                         <tr>
                             <th style="width:50px;"><input type="checkbox" value="" id="checkAll" class="input-checkbox"></th>
+                            <th class="text-center" style="width:70px;">Bước</th>
                             <th>Câu hỏi</th>
                             <th style="width:130px;">Nhóm</th>
                             <th style="width:140px;">Kiểu trả lời</th>
@@ -55,6 +56,7 @@
                         @foreach($questions as $o)
                             <tr>
                                     <td><input type="checkbox" value="{{ $o->id }}" class="input-checkbox checkBoxItem"></td>
+                                    <td class="text-center"><span class="label label-primary">{{ $o->order + 1 }}. {{ $o->tenBuoc() }}</span></td>
                                     <td>{{ $o->question }}</td>
                                     <td>{{ $o->tenNhom() }}</td>
                                     <td>{{ \App\Models\EligibilityQuestion::KIEU_NHAP[$o->input_type] ?? $o->input_type }}</td>
@@ -72,7 +74,7 @@
 
                         @if(!$questions->count())
                             <tr>
-                                <td colspan="8" class="text-center text-muted" style="padding:30px;">
+                                <td colspan="9" class="text-center text-muted" style="padding:30px;">
                                     Chưa có bản ghi nào. Bấm <strong>Thêm mới</strong> để bắt đầu.
                                 </td>
                             </tr>

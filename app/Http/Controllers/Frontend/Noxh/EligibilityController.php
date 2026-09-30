@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Frontend\Noxh;
 use App\Http\Controllers\FrontendController;
 use App\Models\EligibilityAnswer;
 use App\Models\EligibilityCheck;
-use App\Models\EligibilityOption;
 use App\Models\EligibilityQuestion;
 use App\Repositories\Noxh\ProjectQuery;
 use Illuminate\Http\Request;
@@ -13,16 +12,25 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
- * Bo kiem tra dieu kien mua nha o xa hoi.
+ * Bo kiem tra dieu kien mua nha o xa hoi - dang WIZARD nhieu buoc
+ * (ban ve noxh_image/w-1.jpg).
  *
- * Quy tac cham diem KHONG nam trong lop nay: cau hoi, dap an, diem va ket
- * luan deu doc tu CSDL (quan tri sua duoc). Dieu kien mua NOXH thay doi theo
- * nghi dinh, de trong code thi moi lan doi chinh sach lai phai trien khai lai.
+ * Moi cau hoi la MOT buoc, mot man hinh. Thanh buoc o dau trang, so cau
+ * ("Cau 1/8"), ten tung buoc, cau hoi, dap an va hinh cua tung dap an deu doc
+ * tu CSDL: them hay bot mot dap an la viec cua quan tri, khong phai viec cua
+ * ban cap nhat ma nguon.
+ *
+ * Cau tra loi giu trong PHIEN cho toi khi nguoi dung bam nut o buoc cuoi.
+ * Khong ghi CSDL tung buoc: bo do giua chung la chuyen thuong, ghi som thi
+ * bang eligibility_checks day nhung luot do dang.
  */
 class EligibilityController extends FrontendController
 {
     /** Ma tra cuu chi co gia tri 30 ngay. */
     private const SO_NGAY_HIEU_LUC = 30;
+
+    /** Khoa giu cau tra loi dang lam do trong phien. */
+    private const KHOA_PHIEN = 'noxh_check_tra_loi';
 
     protected $projectQuery;
 
@@ -41,41 +49,99 @@ class EligibilityController extends FrontendController
         ]);
     }
 
-    /** Bo cau hoi, chia theo bon nhom. */
-    public function form()
+    /** Mot buoc cua wizard. Khong truyen so buoc thi ve buoc 1. */
+    public function form(Request $request, $buoc = null)
     {
-        $cauHoi = EligibilityQuestion::with('options')
-            ->where('publish', 2)
-            ->orderBy('order')
-            ->get();
+        $cauHoi = $this->cauHoi();
 
-        return view('frontend.noxh.check.form', [
+        if ($cauHoi->isEmpty()) {
+            abort(404);
+        }
+
+        $soBuoc = $this->chuanHoaBuoc($buoc, $cauHoi->count());
+
+        // Nhay coc sang giua chung (go thang duong dan) thi lui ve buoc dau
+        // con thieu - cham diem can du cau, de nguoi dung di tiep roi bao
+        // thieu o buoc cuoi thi ho phai bam nguoc lai ca bo.
+        $daCo = $this->traLoiTrongPhien($request);
+        $dauTien = $this->buocConThieu($cauHoi, $daCo);
+
+        if ($soBuoc > $dauTien) {
+            return redirect()->route('noxh.check.form', $dauTien);
+        }
+
+        return view('frontend.noxh.check.wizard', [
             'system' => $this->system,
-            'seo' => $this->seo('Kiểm tra điều kiện mua nhà ở xã hội', url('/kiem-tra-dieu-kien/cau-hoi')),
-            'nhom' => EligibilityQuestion::NHOM,
+            'seo' => $this->seo('Kiểm tra điều kiện mua nhà ở xã hội', url('/kiem-tra-dieu-kien/cau-hoi/' . $soBuoc)),
             'cauHoi' => $cauHoi,
-            'cauHoiTheoNhom' => $cauHoi->groupBy('group'),
+            'buoc' => $soBuoc,
+            'cau' => $cauHoi[$soBuoc - 1],
+            'cuoiCung' => $soBuoc === $cauHoi->count(),
+            'daChon' => $daCo[$cauHoi[$soBuoc - 1]->id] ?? null,
+            'traLoi' => $daCo,
         ]);
     }
 
+    /** Ghi cau tra loi cua mot buoc roi sang buoc ke tiep. */
+    public function step(Request $request, $buoc)
+    {
+        $cauHoi = $this->cauHoi();
+        $soBuoc = $this->chuanHoaBuoc($buoc, $cauHoi->count());
+        $cau = $cauHoi[$soBuoc - 1];
+
+        $lui = $request->input('huong') === 'lui';
+
+        // Bam "Quay lai" thi khong bat tra loi - nguoi dung dang di nguoc.
+        if (!$lui && !$this->ghiTraLoi($request, $cau)) {
+            return back()->withInput()->with(
+                'nx_error',
+                $this->chu('wizard_require_text', 'Bạn chưa chọn câu trả lời.')
+            );
+        }
+
+        if ($lui) {
+            return $soBuoc <= 1
+                ? redirect()->route('noxh.check.index')
+                : redirect()->route('noxh.check.form', $soBuoc - 1);
+        }
+
+        if ($soBuoc >= $cauHoi->count()) {
+            return redirect()->route('noxh.check.form', $soBuoc);
+        }
+
+        return redirect()->route('noxh.check.form', $soBuoc + 1);
+    }
+
+    /** Buoc cuoi: ghi not cau tra loi, lay ho ten - so dien thoai roi cham diem. */
     public function submit(Request $request)
     {
+        $cauHoi = $this->cauHoi();
+
+        if ($cauHoi->isEmpty()) {
+            abort(404);
+        }
+
         $request->validate(
             [
                 'name' => 'required|string|max:191',
                 'phone' => 'required|string|max:20',
-                'traLoi' => 'required|array',
             ],
             [
                 'name.required' => 'Bạn chưa nhập họ tên.',
                 'phone.required' => 'Bạn chưa nhập số điện thoại để nhận kết quả.',
-                'traLoi.required' => 'Bạn chưa trả lời câu hỏi nào.',
             ]
         );
 
-        $cauHoi = EligibilityQuestion::with('options')->where('publish', 2)->orderBy('order')->get();
-        $traLoi = (array) $request->input('traLoi');
+        $cuoi = $cauHoi->last();
 
+        if (!$this->ghiTraLoi($request, $cuoi)) {
+            return back()->withInput()->with(
+                'nx_error',
+                $this->chu('wizard_require_text', 'Bạn chưa chọn câu trả lời.')
+            );
+        }
+
+        $traLoi = $this->traLoiTrongPhien($request);
         $ketQua = $this->chamDiem($cauHoi, $traLoi);
 
         $luot = DB::transaction(function () use ($request, $ketQua, $cauHoi) {
@@ -111,6 +177,8 @@ class EligibilityController extends FrontendController
 
             return $luot;
         });
+
+        $request->session()->forget(self::KHOA_PHIEN);
 
         return redirect()->route('noxh.check.result', $luot->code);
     }
@@ -149,6 +217,99 @@ class EligibilityController extends FrontendController
     }
 
     // -------------------------------------------------------------------------
+
+    /** Bo cau hoi dang phat hanh, dung thu tu cua thanh buoc. */
+    private function cauHoi()
+    {
+        return EligibilityQuestion::with('options')
+            ->where('publish', 2)
+            ->orderBy('order')
+            ->orderBy('id')
+            ->get()
+            ->values();
+    }
+
+    private function chuanHoaBuoc($buoc, int $tong): int
+    {
+        $buoc = (int) $buoc;
+
+        return max(1, min($tong, $buoc ?: 1));
+    }
+
+    /** @return array<int,string> cauHoiId => gia tri da chon */
+    private function traLoiTrongPhien(Request $request): array
+    {
+        $da = $request->session()->get(self::KHOA_PHIEN, []);
+
+        return is_array($da) ? $da : [];
+    }
+
+    /**
+     * Buoc dau tien CHUA co cau tra loi (hoac buoc cuoi neu da tra loi het).
+     *
+     * Cau khong bat buoc thi bo qua - khong chan duong di tiep.
+     */
+    private function buocConThieu($cauHoi, array $daCo): int
+    {
+        foreach ($cauHoi as $i => $cau) {
+            $co = isset($daCo[$cau->id]) && $daCo[$cau->id] !== '';
+
+            if (!$co) {
+                return $i + 1;
+            }
+        }
+
+        return $cauHoi->count();
+    }
+
+    /**
+     * Ghi cau tra loi cua mot cau vao phien.
+     *
+     * @return bool false khi cau bat buoc ma nguoi dung chua chon gi
+     */
+    private function ghiTraLoi(Request $request, $cau): bool
+    {
+        $gia = $request->input('traLoi');
+        $gia = is_string($gia) || is_numeric($gia) ? trim((string) $gia) : '';
+
+        // Cau co dap an dinh san thi chi nhan dung mot trong nhung gia tri do:
+        // nguoi dung sua the HTML khong the nhet gia tri la vao bang diem.
+        if ($gia !== '' && $cau->options->count() && !$cau->options->contains('value', $gia)) {
+            $gia = '';
+        }
+
+        if ($gia === '') {
+            if ($cau->required) {
+                return false;
+            }
+
+            $this->quen($request, $cau->id);
+
+            return true;
+        }
+
+        $da = $this->traLoiTrongPhien($request);
+        $da[$cau->id] = $gia;
+        $request->session()->put(self::KHOA_PHIEN, $da);
+
+        return true;
+    }
+
+    private function quen(Request $request, int $cauId): void
+    {
+        $da = $this->traLoiTrongPhien($request);
+        unset($da[$cauId]);
+        $request->session()->put(self::KHOA_PHIEN, $da);
+    }
+
+    /** Mot o chu cua trang, lay tu bang introduces. */
+    private function chu(string $khoa, string $du): string
+    {
+        $o = \App\Http\ViewComposers\NoxhComposer::intro();
+        $gia = trim((string) ($o[$khoa] ?? ''));
+
+        return $gia !== '' ? $gia : $du;
+    }
 
     /**
      * Cham diem mot luot tra loi.

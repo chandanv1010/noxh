@@ -70,6 +70,17 @@
                             </div>
                         </div>
                     </div>
+                    {{-- Dong chu xam co hinh chu "i" nam duoi luoi dap an
+                         (ban ve noxh_image/w-1.jpg). --}}
+                    <div class="row mb15">
+                        <div class="col-lg-12">
+                            <div class="form-row">
+                                <label class="control-label text-left">Dòng lưu ý dưới lưới đáp án</label>
+                                    <textarea name="foot_note" rows="2" class="form-control">{{ old('foot_note', ($question->foot_note) ?? '') }}</textarea>
+                                    <small class="text-muted">Ví dụ: Danh mục nhóm đối tượng được xây dựng theo quy định hiện hành.</small>
+                            </div>
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -83,6 +94,16 @@
                                         <input type="checkbox" name="required" value="1" {{ old('required', ($question->required) ?? 0) ? 'checked' : '' }}>
                                         Bắt buộc trả lời
                                     </label>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- Ten NGAN in tren thanh 8 buoc o dau trang. --}}
+                        <div class="row mb15">
+                            <div class="col-lg-12">
+                                <div class="form-row">
+                                    <label class="control-label text-left mb10">Tên bước</label>
+                                    <input type="text" name="step_label" value="{{ old('step_label', ($question->step_label) ?? '') }}" class="form-control" autocomplete="off">
+                                    <small class="text-muted">Chữ dưới vòng tròn ở thanh bước. Ví dụ: Đối tượng</small>
                                 </div>
                             </div>
                         </div>

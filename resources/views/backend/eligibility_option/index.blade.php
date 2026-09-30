@@ -40,6 +40,7 @@
                     <thead>
                         <tr>
                             <th style="width:50px;"><input type="checkbox" value="" id="checkAll" class="input-checkbox"></th>
+                            <th style="width:120px;">Hình</th>
                             <th>Đáp án</th>
                             <th style="width:260px;">Thuộc câu hỏi</th>
                             <th class="text-center" style="width:140px;">Kết luận</th>
@@ -51,6 +52,13 @@
                         @foreach($options as $o)
                             <tr>
                                     <td><input type="checkbox" value="{{ $o->id }}" class="input-checkbox checkBoxItem"></td>
+                                    <td>@php [$nen, $net] = $o->mauHinh(); @endphp
+                                        @if(\App\Classes\NoxhIcon::hopLe($o->icon))
+                                            <span style="display:inline-block;padding:3px 9px;border-radius:999px;background:{{ $nen }};color:{{ $net }};font-size:11.5px">{{ \App\Classes\NoxhIcon::DANH_SACH[$o->icon] }}</span>
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
                                     <td>{{ $o->label }}</td>
                                     <td>{{ \Illuminate\Support\Str::limit($o->question->question ?? '—', 60) }}</td>
                                     <td class="text-center"><span class="label label-{{ $o->verdict === 'pass' ? 'success' : ($o->verdict === 'fail' ? 'danger' : 'warning') }}">{{ $o->tenKetLuan() }}</span></td>
@@ -64,7 +72,7 @@
 
                         @if(!$options->count())
                             <tr>
-                                <td colspan="6" class="text-center text-muted" style="padding:30px;">
+                                <td colspan="7" class="text-center text-muted" style="padding:30px;">
                                     Chưa có bản ghi nào. Bấm <strong>Thêm mới</strong> để bắt đầu.
                                 </td>
                             </tr>

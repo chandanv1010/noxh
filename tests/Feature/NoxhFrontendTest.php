@@ -131,10 +131,25 @@ class NoxhFrontendTest extends TestCase
             }
         }
 
-        $response = $this->post('/kiem-tra-dieu-kien/cau-hoi', [
+        // Wizard di tung buoc mot: moi buoc gui dap an cua rieng buoc do, cau
+        // tra loi giu trong phien cho toi buoc cuoi.
+        $tong = $cauHoi->count();
+
+        foreach ($cauHoi as $i => $ch) {
+            $buoc = $i + 1;
+            $this->get('/kiem-tra-dieu-kien/cau-hoi/' . $buoc)->assertOk();
+
+            if ($buoc < $tong) {
+                $this->post('/kiem-tra-dieu-kien/cau-hoi/' . $buoc, [
+                    'traLoi' => $traLoi[$ch->id] ?? '',
+                ])->assertRedirect('/kiem-tra-dieu-kien/cau-hoi/' . ($buoc + 1));
+            }
+        }
+
+        $response = $this->post('/kiem-tra-dieu-kien/hoan-tat', [
             'name' => 'Nguoi thu nghiem tu dong',
             'phone' => '0900000001',
-            'traLoi' => $traLoi,
+            'traLoi' => $traLoi[$cauHoi->last()->id] ?? '',
         ]);
 
         $luot = EligibilityCheck::where('phone', '0900000001')->latest('id')->first();

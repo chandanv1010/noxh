@@ -50,8 +50,12 @@ Route::name('noxh.')->group(function () {
 
     // --- Kiem tra dieu kien --------------------------------------------------
     Route::get('kiem-tra-dieu-kien', [EligibilityController::class, 'index'])->name('check.index');
-    Route::get('kiem-tra-dieu-kien/cau-hoi', [EligibilityController::class, 'form'])->name('check.form');
-    Route::post('kiem-tra-dieu-kien/cau-hoi', [EligibilityController::class, 'submit'])->name('check.submit');
+    // Wizard mot cau mot buoc: /cau-hoi ve buoc 1, /cau-hoi/3 la buoc 3.
+    Route::get('kiem-tra-dieu-kien/cau-hoi/{buoc?}', [EligibilityController::class, 'form'])
+        ->where(['buoc' => '[0-9]+'])->name('check.form');
+    Route::post('kiem-tra-dieu-kien/cau-hoi/{buoc}', [EligibilityController::class, 'step'])
+        ->where(['buoc' => '[0-9]+'])->name('check.step');
+    Route::post('kiem-tra-dieu-kien/hoan-tat', [EligibilityController::class, 'submit'])->name('check.submit');
     Route::get('kiem-tra-dieu-kien/ket-qua/{code}', [EligibilityController::class, 'result'])->name('check.result');
     Route::post('kiem-tra-dieu-kien/tra-cuu', [EligibilityController::class, 'lookup'])->name('check.lookup');
 

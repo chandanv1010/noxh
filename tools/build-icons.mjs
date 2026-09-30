@@ -158,6 +158,23 @@ const BANG = {
     'eye-line': 'visibility:net',     // con mat - luot xem
     'link': 'link',                   // mat xich - nut chep duong dan bai viet
 
+    // --- trang Kiem tra dieu kien, buoc 1 "Doi tuong" (w-1.jpg) ---
+    //
+    // Moi o dap an la mot hinh tron pastel kem mot hinh to dac ben trong.
+    // Ban ve dung tranh minh hoa nhieu mau; o day dung dung bo Material cua
+    // trang cho dong bo, mau lay tu bang NoxhTone.
+    'medal': 'military_tech',            // huy chuong - "Nguoi co cong voi cach mang"
+    'cottage': 'cottage',                // nha mai doc - "Ho ngheo (nong thon)"
+    'storm': 'storm',                    // xoay bao - "Ho ngheo (vung thien tai)"
+    'factory': 'factory',                // nha may - "Cong nhan, nguoi lao dong"
+    'military': 'shield_person',         // khien co nguoi - "Si quan, luc luong vu trang"
+    'badge': 'badge',                    // the ten - "Can bo, cong chuc, vien chuc"
+    'school': 'school',                  // mu tot nghiep - "Hoc sinh, sinh vien"
+    'handshake': 'handshake',            // bat tay - "Doanh nghiep, hop tac xa"
+    'family': 'family_restroom',         // gia dinh - "Nguoi co tu 02 con tro len"
+    'dots': 'more_horiz',                // ba cham - "Chua xac dinh"
+    'wallet': 'account_balance_wallet',  // vi tien - "Nguoi thu nhap thap do thi"
+
     'bullet': 'expand_circle_down',        // tron dac co mui nhon - gach dau dong the can ho
     'gallery': 'photo_library:net',        // chong anh - nut xem album
     'video': 'smart_display',              // man hinh co nut phat - nut xem video

@@ -18,7 +18,8 @@ class EligibilityOption extends Model
     protected $table = 'eligibility_options';
 
     protected $fillable = [
-        'eligibility_question_id', 'label', 'value', 'verdict', 'score', 'note', 'order',
+        'eligibility_question_id', 'label', 'icon', 'icon_tone', 'value',
+        'verdict', 'score', 'note', 'order',
     ];
 
     public const KET_LUAN = [
@@ -30,6 +31,12 @@ class EligibilityOption extends Model
     public function question()
     {
         return $this->belongsTo(EligibilityQuestion::class, 'eligibility_question_id', 'id');
+    }
+
+    /** [nen, net] cua hinh tron pastel - xem App\Classes\NoxhTone. */
+    public function mauHinh(): array
+    {
+        return \App\Classes\NoxhTone::mau($this->icon_tone);
     }
 
     public function tenKetLuan()

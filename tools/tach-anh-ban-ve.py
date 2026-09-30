@@ -15,6 +15,9 @@ Sinh ra:
                                           dung chung cho ca trang chi tiet du an
     public/uploads/noxh/bai-viet-1..5.jpg anh minh hoa nam bai viet mau
     public/uploads/noxh/bai-viet-lon.jpg  anh dau bai cua bai viet mau
+    public/uploads/noxh/kiem-tra-dau-trang.jpg
+                                          day nha o ben phai dai dau trang
+                                          "Kiem tra kha nang mua" (w-1.jpg)
 
 Chay:
     python tools/tach-anh-ban-ve.py
@@ -31,6 +34,7 @@ GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ANH = os.path.join(os.path.dirname(GOC), 'noxh_image')
 BAN_VE = os.path.join(ANH, 'plxh fix.jpg')
 BAN_VE_TIN = os.path.join(ANH, 'tin-tuc-fix.webp')
+BAN_VE_KT = os.path.join(ANH, 'w-1.jpg')
 DICH = os.path.join(GOC, 'public', 'uploads', 'noxh')
 
 
@@ -227,6 +231,66 @@ def anh_bai_viet(im):
     return ket
 
 
+def anh_dau_kiem_tra(im):
+    """
+    Day nha o ben phai dai dau trang "Kiem tra kha nang mua" (w-1.jpg).
+
+    Vung nay bi HAI thu de len:
+
+      - net but do nguoi dung danh dau tren ban ve, nam gon trong x 576..687;
+      - dong chu viet tay "An cu hom nay / Kien tao tuong lai", x 688..866,
+        y 120..222, viet de len khoang troi.
+
+    Net do thi chi can cat tu x=688 tro di la het. Chu viet tay thi khong cat
+    bo duoc vi no nam giua khoang troi can giu, nen xoa bang cach: do tim tung
+    diem muc (xanh dam tren nen troi nhat), no rong ra vai diem cho het vien
+    nhoe, roi to lai bang mau TRUNG VI CUA CHINH HANG DO - troi o day la mot
+    dai mau chuyen deu theo chieu doc nen to lai gan nhu khong thay vet.
+    """
+    TRAI, PHAI = 688, 1154        # het net but do -> mep phai ban ve
+    TREN, DUOI = 68, 356          # duoi thanh dau trang -> tren thanh buoc
+    CHU_TREN, CHU_DUOI = 112, 228  # khung bao dong chu viet tay
+    CHU_PHAI = 872
+
+    im = im.crop((TRAI, TREN, PHAI, DUOI))
+    px = im.load()
+    rong, cao = im.size
+
+    for y in range(CHU_TREN - TREN, min(CHU_DUOI - TREN, cao)):
+        muc = []
+        sach = []
+
+        for x in range(0, CHU_PHAI - TRAI):
+            r, g, b = px[x, y]
+            if b > 110 and b - r > 45 and b - g > 28:
+                muc.append(x)
+            else:
+                sach.append((r, g, b))
+
+        if not muc or len(sach) < 20:
+            continue
+
+        sach.sort(key=lambda c: c[0] + c[1] + c[2])
+        nen = sach[len(sach) // 2]
+
+        # No rong vung muc ba diem moi ben cho het vien nhoe cua JPEG.
+        xoa = set()
+        for x in muc:
+            for d in range(-3, 4):
+                if 0 <= x + d < CHU_PHAI - TRAI:
+                    xoa.add(x + d)
+
+        for x in xoa:
+            px[x, y] = nen
+
+    # Lam min lai dung o khung chu de khong con vet ngang.
+    khung = (0, max(0, CHU_TREN - TREN - 4), CHU_PHAI - TRAI, min(cao, CHU_DUOI - TREN + 4))
+    im.paste(im.crop(khung).filter(ImageFilter.GaussianBlur(1.2)), khung)
+
+    # Gap doi kich thuoc cho man hinh mat do cao.
+    return im.resize((rong * 2, cao * 2), Image.LANCZOS)
+
+
 def main():
     os.makedirs(DICH, exist_ok=True)
 
@@ -235,6 +299,7 @@ def main():
         (BAN_VE, 'tu-van-vien.png', nguoi_tu_van),
         (BAN_VE_TIN, 'bang-ron-trang-trong.png', bang_ron_trang_trong),
         (BAN_VE_TIN, '', anh_bai_viet),
+        (BAN_VE_KT, 'kiem-tra-dau-trang.jpg', anh_dau_kiem_tra),
     )
 
     for nguon, ten, ham in viec:

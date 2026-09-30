@@ -69,11 +69,37 @@
                             </div>
                         </div>
                     </div>
+                    {{-- Hinh tron pastel ben trai o dap an o trang Kiem tra dieu kien
+                         (ban ve noxh_image/w-1.jpg). Bo trong thi o dap an chi co chu. --}}
+                    <div class="row mb15">
+                        <div class="col-lg-6">
+                            <div class="form-row">
+                                <label class="control-label text-left">Hình của đáp án</label>
+                                    <select name="icon" class="form-control">
+                                        @foreach(\App\Classes\NoxhIcon::chon() as $ma => $ten)
+                                            <option value="{{ $ma }}" {{ (string) old('icon', ($option->icon) ?? '') === (string) $ma ? 'selected' : '' }}>{{ $ten }}</option>
+                                        @endforeach
+                                    </select>
+                                    <small class="text-muted">Hiện trong hình tròn bên trái ô đáp án</small>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-row">
+                                <label class="control-label text-left">Màu hình tròn</label>
+                                    <select name="icon_tone" class="form-control">
+                                        @foreach(\App\Classes\NoxhTone::chon() as $ma => $ten)
+                                            <option value="{{ $ma }}" {{ (string) old('icon_tone', ($option->icon_tone) ?? \App\Classes\NoxhTone::MAC_DINH) === (string) $ma ? 'selected' : '' }}>{{ $ten }}</option>
+                                        @endforeach
+                                    </select>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row mb15">
                         <div class="col-lg-12">
                             <div class="form-row">
                                 <label class="control-label text-left">Ghi chú</label>
                                     <textarea name="note" rows="3" class="form-control">{{ old('note', ($option->note) ?? '') }}</textarea>
+                                    <small class="text-muted">Dòng chữ nhỏ màu xám dưới tên đáp án. Ví dụ: (có hiệu lực từ 01/7/2026)</small>
                             </div>
                         </div>
                     </div>

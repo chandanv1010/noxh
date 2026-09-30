@@ -298,6 +298,49 @@ class Introduce
             ],
         ];
 
+        // --- Bo kiem tra dieu kien (wizard nhieu buoc) --------------------------
+        //
+        // Ban ve: noxh_image/w-1.jpg. Cau hoi, dap an, hinh cua tung dap an va
+        // ten tung buoc nam o man hinh "Cau hoi dieu kien" / "Dap an dieu
+        // kien"; o day chi la cac dong chu KHUNG cua trang.
+        $data['wizard'] = [
+            'label' => 'Kiểm tra điều kiện - khung trang',
+            'description' => 'Dải đầu trang, thanh bước và các nút của bộ kiểm tra điều kiện. Câu hỏi và đáp án quản lý ở màn hình Câu hỏi / Đáp án điều kiện.',
+            'value' => [
+                'heading' => ['type' => 'text', 'label' => 'Dải đầu trang - dòng tiêu đề thứ nhất'],
+                'heading_blue' => ['type' => 'text', 'label' => 'Dải đầu trang - dòng tiêu đề thứ hai (màu xanh)'],
+                'subtitle' => [
+                    'type' => 'text',
+                    'label' => 'Dải đầu trang - dòng mô tả',
+                    'title' => 'Dùng {so} thay cho số câu hỏi. Ví dụ: {so} câu hỏi đơn giản – Khoảng 2 phút – Biết ngay kết quả!',
+                ],
+                'image' => ['type' => 'images', 'label' => 'Dải đầu trang - ảnh bên phải'],
+
+                'chip1_text' => ['type' => 'text', 'label' => 'Thẻ 1 - chữ'],
+                'chip1_icon' => ['type' => 'select', 'label' => 'Thẻ 1 - hình', 'option' => $icon],
+                'chip2_text' => ['type' => 'text', 'label' => 'Thẻ 2 - chữ'],
+                'chip2_icon' => ['type' => 'select', 'label' => 'Thẻ 2 - hình', 'option' => $icon],
+                'chip3_text' => ['type' => 'text', 'label' => 'Thẻ 3 - chữ'],
+                'chip3_icon' => ['type' => 'select', 'label' => 'Thẻ 3 - hình', 'option' => $icon],
+
+                'step_text' => [
+                    'type' => 'text',
+                    'label' => 'Nhãn số câu hỏi trong thẻ',
+                    'title' => 'Dùng {so} và {tong}. Ví dụ: Câu {so}/{tong}',
+                ],
+                'back_text' => ['type' => 'text', 'label' => 'Chữ trên nút quay lại'],
+                'next_text' => ['type' => 'text', 'label' => 'Chữ trên nút đi tiếp'],
+                'finish_text' => ['type' => 'text', 'label' => 'Chữ trên nút ở bước cuối'],
+                'require_text' => ['type' => 'text', 'label' => 'Câu nhắc khi chưa chọn đáp án'],
+
+                'contact_heading' => ['type' => 'text', 'label' => 'Bước cuối - tiêu đề khối nhận kết quả'],
+                'contact_description' => ['type' => 'textarea', 'label' => 'Bước cuối - mô tả khối nhận kết quả'],
+                'contact_name' => ['type' => 'text', 'label' => 'Bước cuối - nhãn ô họ tên'],
+                'contact_phone' => ['type' => 'text', 'label' => 'Bước cuối - nhãn ô số điện thoại'],
+                'contact_note' => ['type' => 'textarea', 'label' => 'Bước cuối - dòng cam kết bảo mật'],
+            ],
+        ];
+
         // --- The chuyen gia o cot phai ------------------------------------------
         $data['expert'] = [
             'label' => 'Thẻ chuyên gia (cột phải)',

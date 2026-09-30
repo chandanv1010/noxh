@@ -98,6 +98,19 @@ class NoxhIcon
         'calendar-line' => 'Lịch (nét viền)',
         'eye-line' => 'Con mắt (nét viền)',
         'link' => 'Mắt xích (đường dẫn)',
+
+        // Trang Kiem tra dieu kien - hinh cua tung o dap an
+        'medal' => 'Huy chương',
+        'cottage' => 'Nhà mái dốc (nông thôn)',
+        'storm' => 'Xoáy bão (thiên tai)',
+        'factory' => 'Nhà máy',
+        'military' => 'Khiên có người (lực lượng vũ trang)',
+        'badge' => 'Thẻ tên (cán bộ, viên chức)',
+        'school' => 'Mũ tốt nghiệp',
+        'handshake' => 'Bắt tay (doanh nghiệp)',
+        'family' => 'Gia đình có con',
+        'dots' => 'Ba chấm (chưa xác định)',
+        'wallet' => 'Ví tiền',
     ];
 
     /** Dung lam 'option' cho o chon kieu select trong trang cau hinh. */
