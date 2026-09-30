@@ -11,6 +11,7 @@ use App\Http\Controllers\Backend\V1\Noxh\EligibilityQuestionController;
 use App\Http\Controllers\Backend\V1\Noxh\EligibilityOptionController;
 use App\Http\Controllers\Backend\V1\Noxh\EligibilityOptionGroupController;
 use App\Http\Controllers\Backend\V1\Noxh\EligibilityPanelController;
+use App\Http\Controllers\Backend\V1\Noxh\EligibilityCriterionController;
 use App\Http\Controllers\Backend\V1\Noxh\EligibilityCheckController;
 use App\Http\Controllers\Backend\V1\Noxh\QaQuestionController;
 use App\Http\Controllers\Backend\V1\Noxh\ProjectMilestoneController;
@@ -116,6 +117,17 @@ Route::group(['middleware' => ['admin', 'locale', 'backend_default_locale']], fu
     });
 
     // Tam o cot phai cua tung buoc - ban ve w-3, w-4, w-5.
+    // Sau tieu chi in tren trang ket qua (thanh-cong / luu y / that bai).
+    Route::group(['prefix' => 'eligibility/criterion'], function () {
+        Route::get('index', [EligibilityCriterionController::class, 'index'])->name('eligibility.criterion.index');
+        Route::get('create', [EligibilityCriterionController::class, 'create'])->name('eligibility.criterion.create');
+        Route::post('store', [EligibilityCriterionController::class, 'store'])->name('eligibility.criterion.store');
+        Route::get('{id}/edit', [EligibilityCriterionController::class, 'edit'])->where(['id' => '[0-9]+'])->name('eligibility.criterion.edit');
+        Route::post('{id}/update', [EligibilityCriterionController::class, 'update'])->where(['id' => '[0-9]+'])->name('eligibility.criterion.update');
+        Route::get('{id}/delete', [EligibilityCriterionController::class, 'delete'])->where(['id' => '[0-9]+'])->name('eligibility.criterion.delete');
+        Route::delete('{id}/destroy', [EligibilityCriterionController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('eligibility.criterion.destroy');
+    });
+
     Route::group(['prefix' => 'eligibility/panel'], function () {
         Route::get('index', [EligibilityPanelController::class, 'index'])->name('eligibility.panel.index');
         Route::get('create', [EligibilityPanelController::class, 'create'])->name('eligibility.panel.create');

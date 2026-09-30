@@ -634,4 +634,47 @@ window.NX.tienTuTrieu = function (trieu) {
 })();
 
 </script>
+
+{{-- Chuyen buoc wizard cho muot: bam nut la phu lop mo kem vong xoay.
+     Moi buoc la mot lan tai trang that nen khong co lop nay thi man hinh
+     dung yen mot nhip roi nhay cai - nguoi dung tuong may treo. --}}
+<script>
+    (function () {
+        var form = document.querySelector('form.nx-wz-the');
+
+        if (!form) {
+            return;
+        }
+
+        var dangGui = false;
+
+        form.addEventListener('submit', function () {
+            // Trinh duyet chan vi o bat buoc con trong thi khong tinh la gui.
+            if (dangGui || (form.checkValidity && !form.checkValidity())) {
+                return;
+            }
+
+            dangGui = true;
+
+            var lop = document.createElement('div');
+            lop.className = 'nx-wz-cho';
+            lop.setAttribute('aria-live', 'polite');
+            lop.innerHTML = '<span class="nx-wz-cho__vong"></span>';
+            document.body.appendChild(lop);
+        });
+
+        // Bam nut lui o dinh the cung phu lop cho.
+        var lui = document.querySelector('.nx-wz-the__lui');
+
+        if (lui) {
+            lui.addEventListener('click', function () {
+                var lop = document.createElement('div');
+                lop.className = 'nx-wz-cho';
+                lop.innerHTML = '<span class="nx-wz-cho__vong"></span>';
+                document.body.appendChild(lop);
+            });
+        }
+    })();
+</script>
+
 @stack('script')

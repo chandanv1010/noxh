@@ -104,6 +104,10 @@ return [
                     'route' => 'eligibility/panel/index'
                 ],
                 [
+                    'title' => 'Tiêu chí chấm kết quả',
+                    'route' => 'eligibility/criterion/index'
+                ],
+                [
                     'title' => 'Kết quả khách đã kiểm tra',
                     'route' => 'eligibility/check/index'
                 ],

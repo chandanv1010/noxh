@@ -945,11 +945,14 @@
         background: var(--nx-nen, #{$nx-blue-soft});
     }
 
+    // Ba tam cao bang nhau va cac dong chon THANG HANG: tranh cua tung
+    // tinh huong to nho khac nhau, de tu do thi moi tam mot kieu, nhin rat
+    // cap kenh. Dau tam cao co dinh, khoi chon day xuong day tam.
     &__dau {
         display: flex;
         align-items: center;
         gap: 12px;
-        min-height: 118px;
+        min-height: 126px;
     }
 
     &__anh {
@@ -992,8 +995,10 @@
 
     &__ds {
         display: grid;
+        grid-auto-rows: 1fr;
         gap: 10px;
-        margin-top: 14px;
+        margin-top: auto;
+        padding-top: 14px;
     }
 
     &__le {
@@ -1108,6 +1113,9 @@
 // =============================================================================
 .nx-wz-hang {
     display: grid;
+    // Cac hang cao bang nhau du doan mo ta dai ngan khac nhau - ban ve xep
+    // ba hang deu tap tap, de auto thi hang co mo ta hai dong cao vong len.
+    grid-auto-rows: 1fr;
     gap: 12px;
     margin-top: 24px;
 
@@ -1280,16 +1288,20 @@
     }
 
     &__mo {
+        margin-bottom: 8px;
         color: #7b8497;
         font-size: 15px;
         line-height: 1.42;
     }
 
+    // O tron day xuong day the: ten loai nha dai ngan khac nhau nen de tu
+    // do thi ba o tron moi cai mot cao do.
     &__tron {
         position: relative;
         width: 22px;
         height: 22px;
-        margin-top: 6px;
+        margin-top: auto;
+        padding-top: 0;
         border: 2px solid #c6cedd;
         border-radius: 50%;
     }
@@ -1412,7 +1424,13 @@
         @media (max-width: $nx-md) { grid-template-columns: minmax(0, 1fr); }
     }
 
+    // Hai khoi phai thang hang tung dong mot: tieu de, dong mo ta, hai
+    // nhan va hai o chon. Dong mo ta ben nay mot dong ben kia hai dong la
+    // toan bo o chon lech nhau, nhin rat cap kenh - nen dat chieu cao san
+    // cho phan dau khoi.
     &__khoi {
+        display: flex;
+        flex-direction: column;
         padding: 18px 20px;
         border: 1px solid #eaf0f8;
         border-radius: 14px;
@@ -1422,6 +1440,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            min-height: 34px;
             margin: 0;
             color: $nx-navy;
             font-size: 18px;
@@ -1429,6 +1448,7 @@
         }
 
         p {
+            min-height: 40px;
             margin: 6px 0 0;
             color: #7b8497;
             font-size: 14px;
@@ -1633,6 +1653,577 @@
             border: solid #fff;
             border-width: 0 2.5px 2.5px 0;
             transform: rotate(45deg);
+        }
+    }
+}
+
+// =============================================================================
+// Chuyen giua cac buoc cho muot
+//
+// Moi buoc la mot lan tai trang that (cau tra loi giu trong phien), nen mac
+// dinh man hinh nhay cai mot, rat cung. Them hai thu:
+//
+//   - The buoc moi mo ra bang mot nhip truot len nhe.
+//   - Bam nut la phu mot lop mo kem vong xoay, de nguoi dung biet may dang
+//     lam viec chu khong phai trang treo.
+//
+// Nguoi dat may "giam chuyen dong" thi bo het hieu ung, chi con lop mo.
+// =============================================================================
+@keyframes nx-wz-vao {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+}
+
+@keyframes nx-wz-xoay {
+    to { transform: rotate(360deg); }
+}
+
+.nx-wz-the,
+.nx-wz-buoc-the {
+    animation: nx-wz-vao .32s cubic-bezier(.22, .61, .36, 1) both;
+}
+
+.nx-wz-the { animation-delay: .04s; }
+
+.nx-wz-cho {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    place-items: center;
+    background: rgba(244, 248, 253, .72);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    animation: nx-wz-vao .18s ease-out forwards;
+
+    &__vong {
+        width: 54px;
+        height: 54px;
+        border: 4px solid rgba(10, 120, 245, .22);
+        border-top-color: $nx-blue;
+        border-radius: 50%;
+        animation: nx-wz-xoay .7s linear infinite;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nx-wz-the,
+    .nx-wz-buoc-the,
+    .nx-wz-cho { animation: none; opacity: 1; }
+
+    .nx-wz-cho__vong { animation: none; }
+}
+
+// =============================================================================
+// Trang ket qua (ban ve thanh-cong.jpg / luu y.jpg / that bai.jpg)
+//
+// Ba ban ve la MOT trang, chi khac mau chu dao va vai khoi o cot phai. Mau
+// dat mot cho bang bien --nx-kq-*, doi muc la ca trang doi theo.
+// =============================================================================
+.nx-kq {
+    --nx-kq-dam: #{$nx-blue};
+    --nx-kq-nhat: #{$nx-blue-pale};
+    --nx-kq-vien: #dbe8fa;
+
+    padding-block: 18px 0;
+    background: linear-gradient(180deg, var(--nx-kq-nhat) 0%, $nx-bg 320px);
+
+    &--high {
+        --nx-kq-dam: #1ea34f;
+        --nx-kq-nhat: #eefaf1;
+        --nx-kq-vien: #cdeed8;
+    }
+
+    &--medium {
+        --nx-kq-dam: #e8920c;
+        --nx-kq-nhat: #fff7e8;
+        --nx-kq-vien: #f7e2b6;
+    }
+
+    &--low {
+        --nx-kq-dam: #dc2f37;
+        --nx-kq-nhat: #fdeff0;
+        --nx-kq-vien: #f6ccce;
+    }
+
+    // --- hang tren cung: ve trang chu + gio tao ket qua ---------------------
+    &__dinh {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    &__ve {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        color: $nx-heading;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+
+        &:hover { color: $nx-blue-dark; }
+    }
+
+    &__luc {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 15px;
+        border: 1px solid var(--nx-kq-vien);
+        border-radius: 999px;
+        background: var(--nx-kq-nhat);
+        color: var(--nx-kq-dam);
+        font-size: 13.5px;
+        font-weight: 600;
+    }
+
+    // --- khoi dau trang -----------------------------------------------------
+    &__dau {
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    &__hinh {
+        width: 112px;
+        height: 112px;
+    }
+
+    &__nhan {
+        margin: 10px 0 0;
+        color: $nx-ink;
+        font-size: 17px;
+        font-weight: 600;
+    }
+
+    &__ten {
+        margin: 6px 0 0;
+        color: var(--nx-kq-dam);
+        font-size: 38px;
+        font-weight: 800;
+        line-height: 1.22;
+
+        @media (max-width: $nx-lg) { font-size: 30px; }
+        @media (max-width: $nx-md) { font-size: 23px; }
+    }
+
+    &__mo {
+        max-width: 760px;
+        margin: 14px auto 0;
+        color: #4d566b;
+        font-size: 16.5px;
+        line-height: 1.66;
+    }
+
+    // --- hang hai cot -------------------------------------------------------
+    &__luoi {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 330px;
+        align-items: start;
+        gap: 22px;
+        margin-top: 22px;
+        padding-bottom: 36px;
+
+        @media (max-width: $nx-lg) { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    &__trai {
+        display: grid;
+        gap: 16px;
+    }
+
+    &__phai {
+        display: grid;
+        gap: 16px;
+    }
+}
+
+// --- Thanh diem --------------------------------------------------------------
+.nx-kq-diem {
+    padding: 20px 24px;
+
+    &__hang {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+
+        span {
+            color: $nx-ink;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        strong {
+            color: var(--nx-kq-dam);
+            font-size: 24px;
+            font-weight: 800;
+        }
+    }
+
+    &__thanh {
+        height: 12px;
+        margin-top: 13px;
+        border-radius: 999px;
+        background: #e9eef6;
+        overflow: hidden;
+
+        span {
+            display: block;
+            height: 100%;
+            border-radius: 999px;
+            background: var(--nx-kq-dam);
+        }
+    }
+}
+
+// --- Bang sau tieu chi -------------------------------------------------------
+.nx-kq-bang {
+    padding: 22px 24px 12px;
+
+    h2 {
+        margin: 0 0 6px;
+        color: $nx-navy;
+        font-size: 21px;
+        font-weight: 800;
+    }
+
+    &__hang {
+        display: grid;
+        grid-template-columns: 30px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 14px;
+        padding: 15px 4px;
+        border-bottom: 1px solid #eef2f8;
+
+        &:last-child { border-bottom: 0; }
+
+        @media (max-width: $nx-sm) {
+            grid-template-columns: 30px minmax(0, 1fr);
+
+            .nx-kq-bang__nhan { grid-column: 2; justify-self: start; }
+        }
+    }
+
+    &__dau {
+        display: grid;
+        place-items: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        color: #fff;
+    }
+
+    &__chu {
+        min-width: 0;
+
+        strong {
+            display: block;
+            color: $nx-navy;
+            font-size: 17px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        small {
+            display: block;
+            margin-top: 4px;
+            color: #7b8497;
+            font-size: 14.5px;
+            line-height: 1.42;
+        }
+    }
+
+    &__nhan {
+        padding: 6px 15px;
+        border-radius: 999px;
+        font-size: 13.5px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    // Mau cua tung ket luan KHONG theo mau chu dao cua trang: mot trang that
+    // bai van co dong "Phu hop" mau xanh, dung nhu ban ve.
+    &__hang.la-pass {
+        .nx-kq-bang__dau { background: #1ea34f; }
+        .nx-kq-bang__nhan { background: #eaf8ef; color: #1b8f46; }
+    }
+
+    &__hang.la-unclear {
+        .nx-kq-bang__dau { background: #f0a01c; }
+        .nx-kq-bang__nhan { background: #fff5e4; color: #c47c08; }
+    }
+
+    &__hang.la-fail {
+        .nx-kq-bang__dau { background: #e0353d; }
+        .nx-kq-bang__nhan { background: #fdeced; color: #ca2a32; }
+    }
+
+    &__trong {
+        padding: 18px 0;
+        color: #8b93a3;
+        text-align: center;
+    }
+}
+
+// --- Dai "Luu y quan trong" --------------------------------------------------
+.nx-kq-luuy {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px 24px;
+    border-radius: 16px;
+    background: #eff5fe;
+
+    &__hinh {
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: $nx-blue;
+        color: #fff;
+    }
+
+    strong {
+        display: block;
+        color: $nx-navy;
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    ul {
+        margin: 10px 0 0;
+        padding-left: 20px;
+        color: #5a6479;
+        font-size: 15px;
+        line-height: 1.66;
+    }
+}
+
+// --- Ba nut cuoi -------------------------------------------------------------
+.nx-kq-nut {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+
+    a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 11px;
+        min-height: 62px;
+        padding: 0 26px;
+        border-radius: 14px;
+        font-size: 17px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    &__phu {
+        flex: 1 1 200px;
+        border: 1px solid #d5e2f3;
+        background: #fff;
+        color: $nx-heading;
+
+        &:hover { background: #f4f9ff; }
+    }
+
+    &__chinh {
+        flex: 2 1 300px;
+        background: $nx-blue;
+        color: #fff;
+        box-shadow: 0 8px 20px rgba(10, 120, 245, .25);
+
+        &:hover { background: $nx-blue-dark; }
+    }
+}
+
+// --- Cot phai ----------------------------------------------------------------
+.nx-kq-phai__tranh {
+    width: 100%;
+    border-radius: 16px;
+}
+
+.nx-kq-the {
+    padding: 20px 22px;
+    border: 1px solid var(--nx-kq-vien);
+    border-radius: 16px;
+    background: var(--nx-nen, #{$nx-blue-pale});
+
+    h3 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+        color: $nx-navy;
+        font-size: 18px;
+        font-weight: 800;
+        line-height: 1.3;
+    }
+
+    &__hinh {
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #fff;
+        color: var(--nx-net, #{$nx-blue});
+    }
+
+    p {
+        margin: 12px 0 0;
+        color: #4d566b;
+        font-size: 15px;
+        line-height: 1.6;
+    }
+
+    ul {
+        margin: 14px 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 11px;
+    }
+
+    li {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        color: #3f4859;
+        font-size: 15px;
+        line-height: 1.45;
+
+        svg {
+            flex: 0 0 auto;
+            margin-top: 2px;
+            color: var(--nx-net, #{$nx-blue});
+        }
+    }
+
+    &__tranh {
+        width: 100%;
+        margin-top: 16px;
+        border-radius: 12px;
+    }
+}
+
+// --- Dai anh cuoi trang (chi co o ban thanh cong) ----------------------------
+.nx-kq-dai {
+    min-height: 192px;
+    background: var(--nx-anh) center / cover no-repeat;
+
+    &__trong {
+        display: flex;
+        align-items: center;
+        min-height: 192px;
+    }
+
+    &__cau {
+        max-width: 420px;
+        margin: 0;
+        color: $nx-navy;
+        font-size: 21px;
+        font-style: italic;
+        font-weight: 600;
+        line-height: 1.5;
+    }
+
+    @media (max-width: $nx-md) {
+        &__cau { font-size: 17px; }
+    }
+}
+
+// --- Khoi "Co the ban quan tam" ----------------------------------------------
+.nx-kq-goi {
+    padding-block: 30px 40px;
+    background: #eef4fd;
+
+    &__dau {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 18px;
+        flex-wrap: wrap;
+
+        h2 {
+            margin: 0;
+            color: $nx-navy;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        p {
+            margin: 5px 0 0;
+            color: #6b7484;
+            font-size: 15px;
+        }
+
+        a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: $nx-heading;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+    }
+
+    &__ds {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 18px;
+
+        @media (max-width: $nx-lg) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        @media (max-width: $nx-sm) { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    &__o {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 12px;
+        border-radius: 14px;
+        background: #fff;
+        text-decoration: none;
+        transition: box-shadow .15s, transform .15s;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(17, 58, 116, .1);
+        }
+
+        img {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        strong {
+            color: $nx-navy;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        small {
+            color: #8b93a3;
+            font-size: 13.5px;
+        }
+
+        span {
+            margin-top: auto;
+            color: #d9534f;
+            font-size: 15px;
+            font-weight: 700;
         }
     }
 }

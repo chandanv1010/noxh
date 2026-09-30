@@ -82,6 +82,12 @@
                                     Chọn đáp án này thì bỏ qua các bước còn lại
                                 </label>
                                 <small class="text-muted">Dùng khi đáp án đã đủ kết luận không đạt. Ví dụ: "Đã từng được hỗ trợ".</small>
+                                <label class="control-label text-left mt10">
+                                    <input type="hidden" name="needs_distance" value="0">
+                                    <input type="checkbox" name="needs_distance" value="1" {{ old('needs_distance', ($option->needs_distance) ?? 0) ? 'checked' : '' }}>
+                                    Xét theo khoảng cách
+                                </label>
+                                <small class="text-muted">Đáp án vẫn đạt nếu nhà cách nơi làm việc đủ xa và nơi làm việc gần dự án. Ví dụ: "Có nhà ở".</small>
                             </div>
                         </div>
                         <div class="col-lg-4">

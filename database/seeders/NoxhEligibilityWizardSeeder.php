@@ -119,6 +119,7 @@ class NoxhEligibilityWizardSeeder extends Seeder
         $this->napNhapTin();
         $this->anBuocThua();
         $this->napTamCotPhai();
+        $this->napTieuChi();
         $this->napHinhDapAn();
     }
 
@@ -196,6 +197,76 @@ class NoxhEligibilityWizardSeeder extends Seeder
             'wizard_project_link_text' => 'Xem thông tin',
             'wizard_project_empty_text' => 'Chưa có dự án nào trong khu vực này.',
             'wizard_project_max' => '5',
+
+            // --- luat khoang cach (muc 3 cua cong-thuc.jpg) ---
+            'wizard_dist_home_work_min' => '30',
+            'wizard_dist_work_project_max' => '30',
+
+            // --- trang ket qua: phan dung chung cho ca ba muc ---
+            'result_label' => 'Kết quả kiểm tra sơ bộ',
+            'result_back_text' => 'Quay về trang chủ',
+            'result_time_text' => 'Kết quả được tạo lúc {gio} - {ngay}',
+            'result_score_label' => 'Điểm đánh giá',
+            'result_detail_heading' => 'Chi tiết kết quả theo từng tiêu chí',
+            'result_badge_pass' => 'Phù hợp',
+            'result_badge_unclear' => 'Cần xác minh',
+            'result_badge_fail' => 'Chưa đáp ứng',
+            'result_notice_heading' => 'Lưu ý quan trọng',
+            'result_notice_lines' => "Kết quả này chỉ mang tính chất sơ bộ, tham khảo, dựa trên thông tin bạn cung cấp.\nViệc xác nhận chính thức sẽ do cơ quan có thẩm quyền thực hiện khi bạn nộp hồ sơ đầy đủ.\nQuy định có thể thay đổi theo từng thời điểm và từng địa phương/dự án.",
+            'result_again_text' => 'Kiểm tra lại',
+            'result_expert_text' => 'Tư vấn với chuyên gia ngay',
+            'result_expert_link' => '/cong-hoa/tu-van',
+            'result_suggest_heading' => 'Có thể bạn quan tâm',
+            'result_suggest_description' => 'Một số dự án phù hợp với nhu cầu của bạn',
+            'result_suggest_all_text' => 'Xem tất cả dự án',
+            'result_suggest_price_text' => 'Chỉ từ',
+            'result_banner_image' => '/uploads/noxh/kq-dai-duoi.jpg',
+            'result_banner_quote' => '" Nhà ở xã hội - Vì cuộc sống tốt đẹp hơn "',
+
+            // --- muc THANH CONG (thanh-cong.jpg) ---
+            'result_high_image' => '/uploads/noxh/kq-high.png',
+            'result_high_heading' => 'Bạn có khả năng đáp ứng điều kiện!',
+            'result_high_description' => 'Dựa trên thông tin bạn cung cấp, bạn có khả năng đáp ứng các điều kiện mua nhà ở xã hội theo quy định hiện hành. Vui lòng liên hệ chuyên gia của NOXH.vn để được tư vấn chi tiết và hướng dẫn chuẩn bị hồ sơ.',
+            'result_high_guide_text' => 'Xem hướng dẫn chuẩn bị hồ sơ',
+            'result_high_guide_link' => '/ho-so',
+            'result_high_side_image' => '/uploads/noxh/kq-tranh-high.png',
+            'result_high_side1_heading' => 'Cơ hội an cư đang trong tầm tay!',
+            'result_high_side1_body' => 'Bạn đã đáp ứng sơ bộ các điều kiện. Hãy để NOXH.vn đồng hành cùng bạn trong các bước tiếp theo.',
+            'result_high_side1_lines' => "Tư vấn dự án phù hợp\nHướng dẫn chuẩn bị hồ sơ chi tiết\nCập nhật thông tin mới nhất\nHỗ trợ trong suốt quá trình đăng ký",
+            'result_high_side1_icon' => 'house',
+            'result_high_side1_tone' => 'green',
+
+            // --- muc LUU Y (luu y.jpg) ---
+            'result_medium_image' => '/uploads/noxh/kq-medium.png',
+            'result_medium_heading' => 'Bạn cần kiểm tra thêm một số điều kiện',
+            'result_medium_description' => 'Dựa trên thông tin bạn cung cấp, bạn có thể đáp ứng điều kiện mua nhà ở xã hội, nhưng cần làm rõ thêm một số thông tin hoặc bổ sung hồ sơ để có kết quả chính xác hơn. NOXH.vn sẵn sàng hỗ trợ bạn trong các bước tiếp theo.',
+            'result_medium_guide_text' => 'Xem hướng dẫn chuẩn bị hồ sơ',
+            'result_medium_guide_link' => '/ho-so',
+            'result_medium_side_image' => '/uploads/noxh/kq-tranh-medium.png',
+            'result_medium_side1_heading' => 'Bạn nên làm gì tiếp theo?',
+            'result_medium_side1_lines' => "Liên hệ chuyên gia NOXH.vn để được tư vấn chi tiết\nChuẩn bị và bổ sung hồ sơ còn thiếu\nKiểm tra lại thông tin chưa rõ\nCập nhật quy định tại địa phương/dự án",
+            'result_medium_side1_icon' => 'clipboard',
+            'result_medium_side1_tone' => 'amber',
+            'result_medium_side2_heading' => 'Gợi ý cho bạn',
+            'result_medium_side2_body' => 'Trong nhiều trường hợp, bạn vẫn có thể đủ điều kiện nếu bổ sung thêm thông tin hoặc thuộc trường hợp đặc thù theo quy định hiện hành.',
+            'result_medium_side2_icon' => 'bulb',
+            'result_medium_side2_tone' => 'amber',
+
+            // --- muc THAT BAI (that bai.jpg) ---
+            'result_low_image' => '/uploads/noxh/kq-low.png',
+            'result_low_heading' => 'Hiện có tiêu chí chưa đáp ứng',
+            'result_low_description' => 'Dựa trên thông tin bạn cung cấp, hiện tại bạn chưa đáp ứng một số điều kiện mua nhà ở xã hội theo quy định hiện hành. Tuy nhiên, bạn vẫn có thể được tư vấn cụ thể để xem xét các phương án phù hợp khác.',
+            'result_low_guide_text' => 'Xem quy định chi tiết',
+            'result_low_guide_link' => '/phap-ly-noxh',
+            'result_low_side_image' => '/uploads/noxh/kq-tranh-low.png',
+            'result_low_side1_heading' => 'Lý do chưa đáp ứng',
+            'result_low_side1_body' => 'Xem bảng tiêu chí bên trái: những dòng đánh dấu "Chưa đáp ứng" là phần bạn cần xem lại.',
+            'result_low_side1_icon' => 'warning',
+            'result_low_side1_tone' => 'rose',
+            'result_low_side2_heading' => 'Gợi ý cho bạn',
+            'result_low_side2_lines' => "Kiểm tra lại thông tin nếu bạn cho rằng có nhầm lẫn\nTìm hiểu các chương trình nhà ở phù hợp khác\nLiên hệ chuyên gia NOXH.vn để được tư vấn phương án cụ thể",
+            'result_low_side2_icon' => 'bulb',
+            'result_low_side2_tone' => 'amber',
         ];
 
         $them = 0;
@@ -719,6 +790,85 @@ class NoxhEligibilityWizardSeeder extends Seeder
     }
 
     // -------------------------------------------------------------------------
+
+
+    /**
+     * Sau tieu chi in tren trang ket qua.
+     *
+     * Chep thang tu ba ban ve thanh-cong.jpg / luu y.jpg / that bai.jpg.
+     * Bon tieu chi dau lay ket luan tu bon buoc cau hoi, "Khu vuc cu tru/lam
+     * viec" tinh tu khoang cach, "Ho so co ban" khong hoi ai ca nen luon dat.
+     */
+    private function napTieuChi(): void
+    {
+        // [ten, nguon, doan chu nhan dang buoc, mo ta khi dat / can xac minh / chua dap ung]
+        $ds = [
+            ['Nhóm đối tượng', 'question', 'nhóm đối tượng',
+                'Bạn thuộc nhóm đối tượng được mua nhà ở xã hội',
+                'Cần xác định rõ nhóm đối tượng của bạn',
+                'Bạn chưa thuộc nhóm đối tượng được mua nhà ở xã hội'],
+            ['Điều kiện về nhà ở', 'question', 'có nhà ở thuộc sở hữu không',
+                'Chưa có nhà ở thuộc sở hữu của mình (hoặc thuộc trường hợp được xét theo khoảng cách)',
+                'Cần kiểm tra thêm thông tin về tình trạng nhà ở hiện tại hoặc giấy tờ liên quan',
+                'Bạn đang có nhà ở thuộc sở hữu và không thuộc trường hợp được xét theo khoảng cách'],
+            ['Điều kiện thu nhập', 'question', 'thu nhập hàng tháng',
+                'Tổng thu nhập trong ngưỡng quy định',
+                'Cần đối chiếu lại mức thu nhập với ngưỡng quy định',
+                'Tổng thu nhập vượt ngưỡng quy định'],
+            ['Khu vực cư trú/làm việc', 'area', '',
+                'Phù hợp với phạm vi dự án',
+                'Chưa đủ thông tin nơi làm việc hoặc dự án quan tâm để đối chiếu',
+                'Nơi làm việc cách dự án quá xa so với quy định'],
+            ['Chính sách đã hưởng', 'question', 'chính sách hỗ trợ về nhà ở',
+                'Chưa từng được hỗ trợ nhà ở từ Nhà nước',
+                'Cần xác minh lại các chính sách hỗ trợ đã hưởng',
+                'Đã từng được hưởng chính sách hỗ trợ về nhà ở'],
+            ['Hồ sơ cơ bản', 'fixed', '',
+                'Bạn đã chuẩn bị hoặc có thể chuẩn bị đầy đủ theo hướng dẫn',
+                'Cần bổ sung hoặc kiểm tra thêm một số giấy tờ',
+                'Hồ sơ chưa đáp ứng yêu cầu'],
+        ];
+
+        $them = 0;
+
+        foreach ($ds as $i => [$ten, $nguon, $nhanDang, $dat, $chuaRo, $khongDat]) {
+            $cauId = null;
+
+            if ($nguon === 'question' && $nhanDang !== '') {
+                $cau = $this->timCau('%' . $nhanDang . '%');
+                $cauId = $cau->id ?? null;
+            }
+
+            $dong = [
+                'label' => $ten,
+                'source' => $nguon,
+                'eligibility_question_id' => $cauId,
+                'pass_text' => $dat,
+                'unclear_text' => $chuaRo,
+                'fail_text' => $khongDat,
+                'order' => $i,
+                'publish' => 2,
+                'updated_at' => now(),
+            ];
+
+            $cu = DB::table('eligibility_criteria')->where('label', $ten)->first();
+
+            if ($cu) {
+                DB::table('eligibility_criteria')->where('id', $cu->id)->update($dong);
+                continue;
+            }
+
+            DB::table('eligibility_criteria')->insert($dong + ['created_at' => now()]);
+            $them++;
+        }
+
+        // Muc 3 cua cong thuc: dang co nha o VAN duoc mua neu nha cach noi
+        // lam viec >= 30km va noi lam viec cach du an <= 30km.
+        DB::table('eligibility_options')->where('value', 'co-nha')
+            ->update(['needs_distance' => 1, 'updated_at' => now()]);
+
+        $this->command?->info("Da dung 6 tieu chi cham ket qua ({$them} dong moi).");
+    }
 
     /** Tim cau hoi theo mot trong cac doan chu nhan dang. */
     private function timCau(string ...$doan)

@@ -23,6 +23,7 @@ class StoreEligibilityOptionRequest extends FormRequest
             'value' => 'required|string|max:191',
             'verdict' => 'required|string|max:64',
             'stop_flow' => 'nullable|boolean',
+            'needs_distance' => 'nullable|boolean',
             'score' => 'nullable|integer|min:0',
             'order' => 'nullable|integer|min:0',
             'note' => 'nullable|string|max:20000',

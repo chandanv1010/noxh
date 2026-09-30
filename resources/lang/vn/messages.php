@@ -757,6 +757,21 @@ return [
             'title' => 'Xóa tình huống'
         ],
     ],
+    'eligibilityCriterion' => [
+        'index' => [
+            'title' => 'Tiêu chí chấm kết quả',
+            'table' => 'Danh sách tiêu chí'
+        ],
+        'create' => [
+            'title' => 'Thêm mới tiêu chí'
+        ],
+        'edit' => [
+            'title' => 'Cập nhật tiêu chí'
+        ],
+        'delete' => [
+            'title' => 'Xóa tiêu chí'
+        ],
+    ],
     'eligibilityPanel' => [
         'index' => [
             'title' => 'Tấm cột phải của bước kiểm tra',

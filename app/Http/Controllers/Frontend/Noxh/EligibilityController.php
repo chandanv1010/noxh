@@ -7,6 +7,7 @@ use App\Models\EligibilityAnswer;
 use App\Models\EligibilityCheck;
 use App\Models\EligibilityQuestion;
 use App\Repositories\Noxh\ProjectQuery;
+use App\Services\V1\Eligibility\EligibilityScoreService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -39,10 +40,12 @@ class EligibilityController extends FrontendController
     private const SO_DU_AN_TOI_DA = 5;
 
     protected $projectQuery;
+    protected $chamDiem;
 
-    public function __construct(ProjectQuery $projectQuery)
+    public function __construct(ProjectQuery $projectQuery, EligibilityScoreService $chamDiem)
     {
         $this->projectQuery = $projectQuery;
+        $this->chamDiem = $chamDiem;
         parent::__construct();
     }
 
@@ -175,10 +178,16 @@ class EligibilityController extends FrontendController
         }
 
         $traLoi = $this->traLoiTrongPhien($request);
-        $ketQua = $this->chamDiem($cauHoi, $traLoi, $this->duongDi($cauHoi, $traLoi));
+        $duongDi = $this->duongDi($cauHoi, $traLoi);
         $diaChi = $this->diaChiTrongPhien($request);
 
-        $luot = DB::transaction(function () use ($request, $ketQua, $cauHoi, $diaChi) {
+        // Hai cach dem song song, moi cai mot viec:
+        //   - tieuChi: sau dong in tren trang ket qua va muc dat/luu y/truot
+        //   - traLoiChiTiet: luu tung cau tra loi de quan tri xem lai
+        $tieuChi = $this->chamDiem->cham($cauHoi, $traLoi, $duongDi, $diaChi);
+        $ketQua = $this->tomTatTraLoi($cauHoi, $traLoi, $duongDi);
+
+        $luot = DB::transaction(function () use ($request, $ketQua, $tieuChi, $cauHoi, $diaChi) {
             $luot = EligibilityCheck::create([
                 'code' => $this->sinhMa(),
                 'name' => $request->input('name'),
@@ -194,11 +203,14 @@ class EligibilityController extends FrontendController
                 'project_ids' => $diaChi['project_ids'] ? implode(',', $diaChi['project_ids']) : null,
                 'total_questions' => $ketQua['soCau'],
                 'answered' => $ketQua['daTraLoi'],
-                'passed' => $ketQua['dat'],
-                'unclear' => $ketQua['chuaRo'],
-                'failed' => $ketQua['khongDat'],
-                'score_percent' => $ketQua['phanTram'],
-                'result_level' => $ketQua['muc'],
+                'passed' => $tieuChi['dat'],
+                'unclear' => $tieuChi['chuaRo'],
+                'failed' => $tieuChi['khongDat'],
+                'criteria_total' => $tieuChi['tong'],
+                'criteria_passed' => $tieuChi['dat'],
+                'criteria_json' => json_encode($tieuChi['tieuChi'], JSON_UNESCAPED_UNICODE),
+                'score_percent' => $tieuChi['phanTram'],
+                'result_level' => $tieuChi['muc'],
                 'expires_at' => now()->addDays(self::SO_NGAY_HIEU_LUC),
                 'consent' => true,
                 'ip' => $request->ip(),
@@ -504,7 +516,14 @@ class EligibilityController extends FrontendController
      * tinh bang diem dat duoc chia cho diem toi da co the dat - khong phai
      * dem so cau dung, vi moi cau co trong so khac nhau.
      */
-    private function chamDiem($cauHoi, array $traLoi, array $duongDi = []): array
+    /**
+     * Tom tat cau tra loi de luu vao bang eligibility_answers.
+     *
+     * KHONG quyet dinh muc ket qua nua - viec do la cua
+     * EligibilityScoreService, cham theo tieu chi nhu ba ban ve. O day chi
+     * ghi lai nguoi ta da tra loi gi cho tung buoc de quan tri xem lai.
+     */
+    private function tomTatTraLoi($cauHoi, array $traLoi, array $duongDi = []): array
     {
         $diem = 0;
         $diemToiDa = 0;

@@ -31,6 +31,8 @@ Sinh ra:
                                           sach (w-3.jpg)
     public/uploads/noxh/nh-*.png          hinh tron cua ba loai nha o (w-4.jpg)
     public/uploads/noxh/kt-tam-*.png      tranh o cot phai cac buoc 3, 4, 5
+    public/uploads/noxh/kq-*.png          hinh tron va tranh cua ba trang ket
+                                          qua (thanh-cong / luu y / that bai)
     public/uploads/noxh/kiem-tra-nen.jpg  tranh nen (day nha, hang cay, luoi
                                           cham) cua trang mo dau bo kiem tra
                                           dieu kien (start-fix.jpg)
@@ -57,6 +59,11 @@ BAN_VE_KT2 = os.path.join(ANH, 'w-2.jpg')
 BAN_VE_KT3 = os.path.join(ANH, 'w-3.jpg')
 BAN_VE_KT4 = os.path.join(ANH, 'w-4.jpg')
 BAN_VE_KT5 = os.path.join(ANH, 'w-5.jpg')
+BAN_VE_KQ = {
+    'high': os.path.join(ANH, 'thanh-cong.jpg'),
+    'medium': os.path.join(ANH, 'luu y.jpg'),
+    'low': os.path.join(ANH, 'that bai.jpg'),
+}
 DICH = os.path.join(GOC, 'public', 'uploads', 'noxh')
 
 
@@ -644,6 +651,32 @@ def hinh_nhap_tin(im):
     ]
 
 
+def hinh_ket_qua(im, muc):
+    """
+    Hinh tron lon va buc tranh cot phai cua mot trang ket qua.
+
+    Ba ban ve thanh-cong.jpg / luu y.jpg / that bai.jpg ve cung mot khung,
+    chi khac mau va khac hinh, nen toa do dung chung.
+    """
+    TAM_X, TAM_Y, BAN_KINH = 512, 158, 56
+
+    # Khung buc tranh o cot phai - moi trang mot cho khac nhau.
+    TRANH = {
+        'high': (676, 688, 986, 1012),
+        'medium': (676, 378, 984, 516),
+        'low': (676, 364, 984, 578),
+    }
+
+    ra = [('kq-' + muc + '.png', _cat_tron(im, TAM_X, TAM_Y, BAN_KINH))]
+    ra.append(('kq-tranh-' + muc + '.png', im.crop(TRANH[muc])))
+
+    # Dai anh cuoi trang chi co o ban thanh cong.
+    if muc == 'high':
+        ra.append(('kq-dai-duoi.jpg', im.crop((0, 1232, 1024, 1424))))
+
+    return ra
+
+
 def main():
     os.makedirs(DICH, exist_ok=True)
 
@@ -660,6 +693,9 @@ def main():
         (BAN_VE_KT3, '', hinh_chinh_sach),
         (BAN_VE_KT4, '', hinh_nha_o),
         (BAN_VE_KT5, '', hinh_nhap_tin),
+        (BAN_VE_KQ['high'], '', lambda im: hinh_ket_qua(im, 'high')),
+        (BAN_VE_KQ['medium'], '', lambda im: hinh_ket_qua(im, 'medium')),
+        (BAN_VE_KQ['low'], '', lambda im: hinh_ket_qua(im, 'low')),
     )
 
     for nguon, ten, ham in viec:
