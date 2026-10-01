@@ -159,4 +159,50 @@ class NoxhProjectSaveTest extends TestCase
         DB::table('routers')->where('module_id', $duAn->id)->delete();
         $duAn->forceDelete();
     }
+
+    /**
+     * Man hinh them du an khong con do ra cac o cua ma nguon ban hang.
+     *
+     * Bang `products` von la bang san pham (gia, ton kho, bao hanh, bien
+     * the...). Nguoi nhap du an nhin thay nhung o do thi khong biet dien gi,
+     * nen chung bi an di - nhung VAN phai duoc gui len de khong xoa mat gia
+     * tri cu khi bam Luu.
+     */
+    public function test_man_hinh_du_an_an_cac_o_ban_hang(): void
+    {
+        $html = $this->actingAs($this->quanTri())->get('/product/create')
+            ->assertOk()->getContent();
+
+        // Khong con nhin thay cac khoi cua ban hang.
+        foreach (['Tồn kho', 'Thời gian bảo hành', 'Mã Nhúng Video Demo',
+                  'Cấu hình Ưu đãi', 'Sản phẩm có nhiều phiên bản'] as $chu) {
+            $this->assertStringNotContainsString($chu, $html, "Van con o \"{$chu}\" tren man hinh du an");
+        }
+
+        // Nhung o ay van duoc gui len duoi dang o an - thieu chung thi ban
+        // ghi moi se dung vao cot NOT NULL khong co gia tri.
+        foreach (['code', 'price', 'stock', 'no_offer'] as $cot) {
+            $this->assertMatchesRegularExpression(
+                '/<input type="hidden" name="' . $cot . '"/',
+                $html,
+                "Thieu o an cho cot {$cot}"
+            );
+        }
+
+        // Cac o RIENG cua du an thi van phai co.
+        foreach (['price_from', 'area_from', 'province_code', 'ward_code',
+                  'latitude', 'longitude', 'video_url'] as $cot) {
+            $this->assertStringContainsString('name="' . $cot . '"', $html, "Mat o {$cot} cua du an");
+        }
+    }
+
+    /** Danh sach du an in trang thai du an chu khong phai so ton kho. */
+    public function test_danh_sach_du_an_in_trang_thai_thay_cho_ton_kho(): void
+    {
+        $html = $this->actingAs($this->quanTri())->get('/product/index')
+            ->assertOk()->getContent();
+
+        $this->assertStringContainsString('Trạng thái dự án', $html);
+        $this->assertStringNotContainsString('Tồn kho', $html);
+    }
 }

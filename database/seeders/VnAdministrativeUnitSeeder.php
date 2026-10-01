@@ -46,6 +46,23 @@ class VnAdministrativeUnitSeeder extends Seeder
         $this->command->newLine();
         $this->command->info('=== Nap don vi hanh chinh Viet Nam (2 cap) ===');
 
+        // Giu lai toa do truoc khi xoa bang.
+        //
+        // Hai cot lat/lng KHONG co trong file JSON goc: toa do tinh do
+        // NoxhProvinceCoordSeeder dat, toa do phuong/xa do
+        // `php artisan noxh:toa-do --xa` tra cuu tung cai mot qua
+        // Nominatim - mat gan muoi phut cho moi tinh. Xoa trang roi nap lai
+        // ma khong giu thi ban do du an va luat "cach noi lam viec >= 30km"
+        // deu mat do chinh xac, ma khong ai nhan ra ngay.
+        $toaDoTinh = DB::table('vn_provinces')->whereNotNull('lat')
+            ->pluck('lng', 'code')->toArray();
+        $toaDoTinhLat = DB::table('vn_provinces')->whereNotNull('lat')
+            ->pluck('lat', 'code')->toArray();
+        $toaDoXa = DB::table('vn_wards')->whereNotNull('lat')
+            ->pluck('lng', 'code')->toArray();
+        $toaDoXaLat = DB::table('vn_wards')->whereNotNull('lat')
+            ->pluck('lat', 'code')->toArray();
+
         // Tat kiem tra khoa ngoai de xoa duoc bang cha truoc.
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
         DB::table('vn_wards')->truncate();
@@ -99,8 +116,14 @@ class VnAdministrativeUnitSeeder extends Seeder
             DB::table('vn_wards')->insert($chunk);
         }
 
+        // Tra lai toa do cho nhung ma VAN CON trong ban du lieu moi. Ma nao
+        // bi bo (sap xep lai don vi hanh chinh) thi toa do cu cung het nghia.
+        $traLai = $this->traToaDo('vn_provinces', $toaDoTinhLat, $toaDoTinh)
+            + $this->traToaDo('vn_wards', $toaDoXaLat, $toaDoXa);
+
         $this->command->line(sprintf('  tinh/thanh    : %d', count($provinces)));
         $this->command->line(sprintf('  xa/phuong     : %d', count($wards)));
+        $this->command->line(sprintf('  toa do giu lai: %d', $traLai));
 
         // Doi chieu lai voi con so trong CSDL, khong tin vao bien dem.
         $pDb = DB::table('vn_provinces')->count();
@@ -121,5 +144,27 @@ class VnAdministrativeUnitSeeder extends Seeder
         }
 
         $this->command->newLine();
+    }
+
+    /**
+     * Ghi lai toa do da luu truoc do cho cac ma con ton tai.
+     *
+     * @param  array<string,mixed>  $lat  ma => vi do
+     * @param  array<string,mixed>  $lng  ma => kinh do
+     */
+    private function traToaDo(string $bang, array $lat, array $lng): int
+    {
+        $xong = 0;
+
+        foreach ($lat as $ma => $vi) {
+            if (!isset($lng[$ma])) {
+                continue;
+            }
+
+            $xong += DB::table($bang)->where('code', $ma)
+                ->update(['lat' => $vi, 'lng' => $lng[$ma]]);
+        }
+
+        return $xong;
     }
 }

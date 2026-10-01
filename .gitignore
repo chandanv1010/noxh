@@ -5,7 +5,15 @@
 
 # Anh nguoi dung tai len qua admin. De tren may chu, khong dua vao git:
 # hien dang la 21 MB anh cua ma nguon truoc, va anh moi se do vao day.
-/public/uploads
+#
+# RIENG public/uploads/noxh thi CO dua vao git: do khong phai anh nguoi dung
+# tai len ma la anh cat ra tu cac ban thiet ke trong noxh_image/ bang lenh
+# `python tools/tach-anh-ban-ve.py`. May chu that khong co Python lan ban ve
+# nen khong chay lai duoc - thieu thu muc nay la ca bo kiem tra dieu kien,
+# ba trang ket qua va anh tu van vien deu trong.
+/public/uploads/*
+!/public/uploads/noxh/
+!/public/uploads/van-ban/
 /public/upload
 /public/userfiles
 

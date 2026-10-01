@@ -42,139 +42,17 @@
         </div>
     </div>
 </div>
-<div class="ibox w">
-    <div class="ibox-title">
-        <h5>{{ __('messages.product.information') }}</h5>
-    </div>
-    <div class="ibox-content">
-        <div class="row mb15">
-            <div class="col-lg-12">
-                <div class="form-row">
-                    <label for="">{{ __('messages.product.code') }}</label>
-                    <input type="text" name="code" value="{{ old('code', $product->code ?? time()) }}"
-                        class="form-control">
-                </div>
-            </div>
-        </div>
-        <div class="row mb15">
-            {{-- <div class="col-lg-6">
-                <div class="form-row">
-                    <label for="" class="control-label text-left">Số lượng bài<span class="text-danger">(*)</span></label>
-                    <input
-                        type="text"
-                        name="total_lesson"
-                        value="{{ old('total_lesson', ($product->total_lesson) ?? '' ) }}"
-                        class="form-control change-title int"
-                        placeholder="VD: 23 bài"
-                        autocomplete="off"
-                    >
-                </div>
-            </div>
-            <div class="col-lg-6 mb15">
-                <div class="form-row">
-                    <label for="" class="control-label text-left">Thời lượng<span class="text-danger">(*)</span></label>
-                    <input
-                        type="text"
-                        name="duration"
-                        value="{{ old('duration', ($product->duration) ?? '' ) }}"
-                        class="form-control change-title"
-                        placeholder="VD: 12 tiếng"
-                        autocomplete="off"
-                    >
-                </div>
-            </div> --}}
-            <div class="col-lg-12 hidden">
-                <div class="form-row">
-                    <label for="" class="control-label text-left">Giảng viên<span
-                            class="text-danger">(*)</span></label>
-                    <select name="lecturer_id" class="form-control setupSelect2">
-                        <option value="0">[Chọn Giảng Viên]</option>
-                        @foreach ($lecturers as $key => $val)
-                            <option
-                                {{ $val->id == old('lecturer_id', isset($product->lecturer_id) ? $product->lecturer_id : '') ? 'selected' : '' }}
-                                value="{{ $val->id }}">{{ $val->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-        </div>
-        <div class="row mb15">
-            <div class="col-lg-12">
-                <div class="form-row">
-                    <label for="">{{ __('messages.product.made_in') }}</label>
-                    <input type="text" name="made_in" value="{{ old('made_in', $product->made_in ?? null) }}"
-                        class="form-control ">
-                </div>
-            </div>
-        </div>
+{{--
+    Da bo hai hop "Thong tin san pham" (ma, xuat xu, gia, ton kho, bao hanh,
+    ma nhung video) va "Cau hinh Uu dai" khoi man hinh du an.
 
-        <div class="row mb15">
-            <div class="col-lg-12">
-                <div class="form-row">
-                    <label for="">{{ __('messages.product.price') }}</label>
-                    <input type="text" name="price"
-                        value="{{ old('price', isset($product) ? number_format($product->price, 0, ',', '.') : '') }}"
-                        class="form-control int">
-                </div>
-            </div>
-        </div>
+    Day la o cua ma nguon ban hang goc. Du an nha o xa hoi dung cac o rieng o
+    khoi "Thong tin du an NOXH" ben duoi (gia tu - den, dien tich, so can,
+    chu dau tu, video du an...), hai bo o de canh nhau chi lam nguoi nhap lan.
 
-        <div class="row mb15">
-            <div class="col-lg-12">
-                <div class="form-row">
-                    <label for="">Tồn kho</label>
-                    <input type="text" name="stock"
-                        value="{{ old('stock', optional($product ?? null)->stock ?? 0) }}" class="form-control"
-                        min="0">
-                </div>
-            </div>
-        </div>
-        <div class="form-row mb20">
-            <label for="" class="control-label text-left">Thời gian bảo hành</label>
-            <div class="warranty">
-                <input type="text" name="warranty" value="{{ old('warranty', $product->warranty ?? '') }}"
-                    class="form-control" placeholder="Ví dụ: Bảo hành 12 tháng" autocomplete="off">
-            </div>
-        </div>
-        <div class="form-row mb15">
-            <label for="">Mã Nhúng Video Demo</label>
-            <textarea type="text" name="iframe" class="form-control" style="height:168px;"
-                placeholder="Nhập mã nhúng iframe của video">{{ old('iframe', $product->iframe ?? '') }}</textarea>
-        </div>
-        <div class="form-row hidden">
-            <label for="">Nội dung khóa học</label>
-            <div class="text-danger" style="font-size:12px;font-style:italic">Mỗi nội dung thể hiện trên 1 dòng</div>
-            <textarea type="text" name="lession_content" class="form-control" style="height:168px;">{{ old('lession_content', $product->lession_content ?? '') }}</textarea>
-        </div>
-    </div>
-</div>
-
-<div class="ibox w">
-    <div class="ibox-title">
-        <h5>Cấu hình Ưu đãi</h5>
-    </div>
-    <div class="ibox-content">
-        <div class="row mb15">
-            <div class="col-lg-12">
-                <div class="form-row">
-                    <label style="font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" name="no_offer" value="1" {{ old('no_offer', $product->no_offer ?? 0) == 1 ? 'checked' : '' }}>
-                        <strong>Không hiển thị ưu đãi</strong>
-                    </label>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="form-row">
-                    <label class="control-label">Nội dung ưu đãi riêng</label>
-                    <textarea name="promotion_content" class="form-control" rows="6" placeholder="Nhập danh sách ưu đãi (HTML/Mô tả) cho sản phẩm này. Nếu để trống sẽ dùng ưu đãi chung của hệ thống.">{{ old('promotion_content', $product->promotion_content ?? '') }}</textarea>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
+    Gia tri cu cua chung van duoc giu nguyen - xem
+    component/o-an.blade.php.
+--}}
 
 @include('backend.product.product.component.nhan-vien')
 @include('backend.product.product.component.du-an-tuong-tu')

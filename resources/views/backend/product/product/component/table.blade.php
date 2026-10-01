@@ -10,7 +10,10 @@
             </th>
             <th style="width:700px;">{{ __('messages.tableName') }}</th>
             @include('backend.dashboard.component.languageTh')
-            <th style="width:110px;" class="text-center">{{ __('messages.product.stock') }}</th>
+            {{-- Cot nay truoc la "Ton kho" - so ton kho cua ma nguon ban
+                 hang, khong co nghia voi mot du an. Doi thanh trang thai du
+                 an: thu quan tri can liec thay nhat trong danh sach. --}}
+            <th style="width:130px;" class="text-center">Trạng thái dự án</th>
             <th style="width:80px;" class="text-center">{{ __('messages.tableOrder') }}</th>
             <th class="text-center" style="width:120px;">Duyệt</th>
             <th class="text-center" style="width:100px;">{{ __('messages.tableStatus') }}</th>
@@ -56,8 +59,9 @@
                         'modeling' => 'Product',
                     ])
                     <td class="text-center">
-                        <span class="label label-{{ ($product->stock ?? 0) > 0 ? 'primary' : 'default' }}">
-                            {{ number_format($product->stock ?? 0) }}
+                        @php $tt = \App\Models\Product::TRANG_THAI_DU_AN[$product->status] ?? null; @endphp
+                        <span class="label label-{{ $tt ? 'primary' : 'default' }}">
+                            {{ $tt ?: 'Chưa đặt' }}
                         </span>
                     </td>
                     <td>
