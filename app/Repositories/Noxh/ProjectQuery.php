@@ -98,6 +98,65 @@ class ProjectQuery
         return $ket;
     }
 
+    /**
+     * Du an de ve len ban do - /du-an/ban-do.
+     *
+     * Khac danh sach o cho: KHONG phan trang (ban do phai ve het mot luot,
+     * cat bot la mat ghim) va BAT BUOC co toa do - khong co lat/lng thi
+     * khong biet ve vao dau. So du an chua co toa do duoc dem rieng de bao
+     * cho nguoi xem biet con bao nhieu dung ngoai ban do.
+     */
+    public function choBanDo(array $loc, int $gioiHan = 500)
+    {
+        $query = $this->co();
+        $this->apDungLoc($query, $loc);
+
+        return $query->whereNotNull('p.latitude')
+            ->whereNotNull('p.longitude')
+            ->orderByDesc('p.is_featured')
+            ->orderByDesc('p.id')
+            ->limit($gioiHan)
+            ->get(array_merge(self::COT, [
+                'p.latitude', 'p.longitude', 'p.address', 'p.ward_code',
+            ]));
+    }
+
+    /** Dem du an KHOP BO LOC nhung chua co toa do nen khong ve len ban do. */
+    public function demThieuToaDo(array $loc): int
+    {
+        $query = $this->co();
+        $this->apDungLoc($query, $loc);
+
+        return $query->where(function ($q) {
+            $q->whereNull('p.latitude')->orWhereNull('p.longitude');
+        })->count();
+    }
+
+    /**
+     * Phuong/xa dang co du an trong mot tinh, kem so luong - cho o loc thu
+     * hai cua trang ban do.
+     *
+     * Chi do ra phuong/xa CO du an: o loc nay de thu nho vung dang xem, do
+     * ca 3321 phuong/xa ra thi cuon mai khong het ma phan lon chon vao se
+     * ra trang trong.
+     */
+    public function xaCoDuAn(?string $maTinh)
+    {
+        if (!$maTinh) {
+            return collect();
+        }
+
+        return $this->co()
+            ->where('p.province_code', $maTinh)
+            ->whereNotNull('p.ward_code')
+            ->groupBy('p.ward_code', 'vw.name', 'vw.lat', 'vw.lng')
+            ->orderBy('vw.name')
+            ->get([
+                'p.ward_code', 'vw.name as ward_name', 'vw.lat', 'vw.lng',
+                DB::raw('COUNT(*) as so_du_an'),
+            ]);
+    }
+
     /** Cac tinh dang co du an, kem so luong - dung cho khoi chip o cot phai. */
     public function tinhCoDuAn(int $soLuong = 8)
     {

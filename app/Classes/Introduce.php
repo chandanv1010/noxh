@@ -166,6 +166,58 @@ class Introduce
             ],
         ];
 
+        // --- Trang Ban do du an -----------------------------------------------
+        $data['projectmap'] = [
+            'label' => 'Khối 4c: Trang Bản đồ dự án',
+            'description' => 'Toàn bộ chữ của trang /du-an/ban-do: tiêu đề, bộ lọc, thẻ thông tin hiện khi bấm vào ghim trên bản đồ. Nền bản đồ (OpenStreetMap hay Google Maps) chọn ở mục Cấu hình hệ thống -> Bản đồ dự án.',
+            'value' => [
+                'heading' => ['type' => 'text', 'label' => 'Tiêu đề trang'],
+                'description' => ['type' => 'textarea', 'label' => 'Mô tả dưới tiêu đề'],
+
+                'filter_province_label' => ['type' => 'text', 'label' => 'Bộ lọc - nhãn ô Tỉnh/Thành'],
+                'filter_province_all' => ['type' => 'text', 'label' => 'Bộ lọc - dòng đầu ô Tỉnh/Thành', 'title' => 'Ví dụ: Toàn quốc'],
+                'filter_ward_label' => ['type' => 'text', 'label' => 'Bộ lọc - nhãn ô Phường/Xã'],
+                'filter_ward_all' => ['type' => 'text', 'label' => 'Bộ lọc - dòng đầu ô Phường/Xã'],
+                'filter_ward_empty' => [
+                    'type' => 'text',
+                    'label' => 'Bộ lọc - chữ ô Phường/Xã khi chưa chọn tỉnh',
+                    'title' => 'Ô phường/xã chỉ mở ra sau khi đã chọn một tỉnh/thành.',
+                ],
+                'filter_status_label' => ['type' => 'text', 'label' => 'Bộ lọc - nhãn ô Trạng thái'],
+                'filter_status_all' => ['type' => 'text', 'label' => 'Bộ lọc - dòng đầu ô Trạng thái'],
+                'filter_keyword_label' => ['type' => 'text', 'label' => 'Bộ lọc - nhãn ô Từ khoá'],
+                'filter_keyword_placeholder' => ['type' => 'text', 'label' => 'Bộ lọc - chữ mờ ô Từ khoá'],
+                'filter_button' => ['type' => 'text', 'label' => 'Bộ lọc - chữ trên nút tìm'],
+                'filter_clear' => ['type' => 'text', 'label' => 'Bộ lọc - chữ xoá lọc'],
+
+                'list_heading' => [
+                    'type' => 'text',
+                    'label' => 'Danh sách - tiêu đề',
+                    'title' => 'Dùng {so} để thay bằng số dự án đang hiện, {noi} để thay bằng tên tỉnh/phường đang lọc.',
+                ],
+                'list_empty' => ['type' => 'text', 'label' => 'Danh sách - chữ khi không có dự án nào'],
+                'list_missing' => [
+                    'type' => 'text',
+                    'label' => 'Danh sách - chữ báo dự án chưa có toạ độ',
+                    'title' => 'Hiện khi có dự án khớp bộ lọc nhưng chưa nhập vĩ độ/kinh độ nên không vẽ được lên bản đồ. Dùng {so} để thay bằng số dự án đó.',
+                ],
+
+                'card_detail_text' => ['type' => 'text', 'label' => 'Thẻ trên bản đồ - chữ nút xem chi tiết'],
+                'card_price_unit' => ['type' => 'text', 'label' => 'Thẻ trên bản đồ - đơn vị giá', 'title' => 'Ví dụ: triệu/m²'],
+                'card_group_text' => [
+                    'type' => 'text',
+                    'label' => 'Thẻ trên bản đồ - chữ khi nhiều dự án chung một toạ độ',
+                    'title' => 'Mấy dự án cùng một toạ độ thì gộp thành một ghim ghi chữ này. Dùng {so} để thay bằng số dự án.',
+                ],
+                'card_show_text' => ['type' => 'text', 'label' => 'Thẻ danh sách - chữ nút xem trên bản đồ'],
+                'card_area_label' => ['type' => 'text', 'label' => 'Thẻ trên bản đồ - nhãn diện tích'],
+                'card_unit_label' => ['type' => 'text', 'label' => 'Thẻ trên bản đồ - nhãn số căn'],
+
+                'back_text' => ['type' => 'text', 'label' => 'Chữ nút về danh sách dự án'],
+                'note' => ['type' => 'text', 'label' => 'Ghi chú nhỏ dưới bản đồ'],
+            ],
+        ];
+
         // --- Trang Du an: cot phai va banner tu van ----------------------------
         $data['projectaside'] = [
             'label' => 'Khối 4b: Trang Dự án - cột phải & banner tư vấn',

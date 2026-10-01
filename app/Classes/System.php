@@ -58,6 +58,52 @@ class System{
             ]
         ];
 
+        $data['map'] = [
+            'label' => 'Bản đồ dự án',
+            'description' => 'Trang /du-an/ban-do vẽ dự án lên bản đồ thật. Mặc định dùng nền bản đồ OpenStreetMap - miễn phí, không cần khai báo gì. Muốn đổi sang Google Maps thì chọn Google ở ô đầu rồi dán API key vào ô thứ hai; thiếu key thì trang tự quay về OpenStreetMap chứ không hỏng.',
+            'value' => [
+                'provider' => [
+                    'type' => 'select',
+                    'label' => 'Nền bản đồ',
+                    'title' => 'OpenStreetMap miễn phí hoàn toàn. Google Maps quen mắt người Việt hơn và có ảnh vệ tinh, nhưng tính tiền theo lượt mở bản đồ sau khi hết mức miễn phí hàng tháng.',
+                    'option' => [
+                        'osm' => 'OpenStreetMap (miễn phí, không cần key)',
+                        'google' => 'Google Maps (cần API key)',
+                    ],
+                ],
+                'google_key' => [
+                    'type' => 'text',
+                    'label' => 'Google Maps API key',
+                    'title' => 'Lấy tại console.cloud.google.com: tạo project, bật "Maps JavaScript API", vào Credentials tạo API key. Nhớ vào phần Restrict key, chọn "Websites" và chỉ cho phép tên miền của trang - nếu không ai cũng dùng được key của bạn và hóa đơn sẽ do bạn trả.',
+                ],
+                'tile_url' => [
+                    'type' => 'text',
+                    'label' => 'Đường dẫn ảnh nền (chỉ dùng cho OpenStreetMap)',
+                    'title' => 'Để trống thì dùng máy chủ công cộng của OpenStreetMap. Khi trang đông khách nên thuê một dịch vụ ảnh nền riêng rồi dán đường dẫn dạng https://.../{z}/{x}/{y}.png vào đây.',
+                ],
+                'tile_credit' => [
+                    'type' => 'text',
+                    'label' => 'Dòng ghi nguồn ảnh nền',
+                    'title' => 'In ở góc dưới bản đồ. OpenStreetMap bắt buộc phải ghi nguồn, xóa dòng này là dùng sai giấy phép.',
+                ],
+                'zoom' => [
+                    'type' => 'text',
+                    'label' => 'Mức phóng khi xem cả nước',
+                    'title' => 'Số từ 1 (cả quả đất) tới 18 (một con phố). Để trống thì dùng 5.',
+                ],
+                'zoom_tinh' => [
+                    'type' => 'text',
+                    'label' => 'Mức phóng khi lọc theo một tỉnh/thành',
+                    'title' => 'Để trống thì dùng 11.',
+                ],
+                'zoom_xa' => [
+                    'type' => 'text',
+                    'label' => 'Mức phóng khi lọc theo một phường/xã',
+                    'title' => 'Để trống thì dùng 14 - đủ gần để nhìn ra từng con phố.',
+                ],
+            ]
+        ];
+
         $data['sale'] = [
             'label' => 'Nhân viên kinh doanh',
             'description' => 'Quy định nội dung do nhân viên kinh doanh tạo ra có phải chờ quản trị duyệt hay không. Đổi lúc nào cũng được, không ảnh hưởng tới bản ghi đã lưu trước đó.',

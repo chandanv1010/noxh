@@ -143,7 +143,16 @@ class NoxhProjectListingTest extends TestCase
             ->assertSee($tinh->so . ' dự án tại', false);
     }
 
-    public function test_ma_tinh_khong_co_du_an_thi_ve_ban_do_toan_quoc(): void
+    /**
+     * Chon mot tinh CO THAT nhung chua co du an nao thi bao thang la khong
+     * co, chu khong lang le do ca nuoc ra.
+     *
+     * Truoc day trang ban do bo qua bo loc trong truong hop nay. Tu khi ban
+     * do that thay hinh Viet Nam ve san, o chon tinh do ra ca 34 tinh/thanh
+     * kem so du an - nguoi dung chon Ca Mau la co y, do ca nuoc ra thi ho
+     * tuong bo loc hong.
+     */
+    public function test_tinh_chua_co_du_an_thi_bao_khong_co(): void
     {
         // 96 = Ca Mau; neu tinh nay co du an that thi bo qua.
         $co = DB::table('products')->whereNull('deleted_at')
@@ -153,9 +162,15 @@ class NoxhProjectListingTest extends TestCase
             $this->markTestSkipped('Ca Mau dang co du an, khong thu duoc truong hop rong.');
         }
 
-        $this->get('/du-an/ban-do?province_code=96')
-            ->assertOk()
-            ->assertDontSee('dự án tại Cà Mau', false);
+        $html = $this->get('/du-an/ban-do?province_code=96')->assertOk()->getContent();
+
+        $this->assertStringContainsString('0 dự án tại Cà Mau', $html);
+
+        $trong = DB::table('introduces')->where('keyword', 'projectmap_list_empty')
+            ->where('language_id', 1)->value('content');
+
+        $this->assertNotEmpty($trong);
+        $this->assertStringContainsString(e($trong), $html);
     }
 
     public function test_the_tinh_o_cot_phai_dan_sang_trang_ban_do(): void

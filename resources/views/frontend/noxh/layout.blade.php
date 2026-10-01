@@ -25,6 +25,11 @@
     @endif
 
     @vite('resources/css/app.scss')
+
+    {{-- Trang nao can them thu vien rieng (vi du Leaflet o trang ban do) thi
+         day vao day, de o day chu khong o cuoi trang vi CSS cua ban do phai
+         co san truoc khi ve, neu khong ban do nhay mot cai moi vao khuon. --}}
+    @stack('head')
 </head>
 <body>
 

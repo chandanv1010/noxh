@@ -17,6 +17,8 @@ use App\Models\Province;
 use App\Repositories\Noxh\PostQuery;
 use App\Repositories\Noxh\ProjectQuery;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ProjectController extends FrontendController
 {
@@ -89,47 +91,210 @@ class ProjectController extends FrontendController
     /**
      * Trang ban do du an - /du-an/ban-do.
      *
-     * Bam vao mot tinh tren khoi ban do (o cot phai trang danh sach) hoac
-     * vao chinh hinh ban do deu den day. Co ?province_code thi ghim cua tinh
-     * do duoc to sang va du an cua tinh hien ngay duoi ban do.
+     * Ban do THAT, khong phai hinh Viet Nam ve san nhu truoc: moi du an mot
+     * ghim dat dung toa do, bam vao ghim ra the thong tin, bam tiep vao the
+     * sang trang chi tiet du an.
+     *
+     * Nen ban do do quan tri chon (Cai dat -> Ban do du an): OpenStreetMap
+     * mien phi, hoac Google Maps neu da dan API key. Phan PHP o day khong
+     * biet gi ve hai nha cung cap do - no chi giao ra danh sach ghim va mot
+     * mo cai dat, JS lo phan ve.
      */
     public function map(Request $request)
     {
-        $maTinh = $request->input('province_code') ?: null;
-        $danhSach = $this->projectQuery->tinhCoDuAn(64);
+        $loc = $this->docBoLoc($request);
 
-        $tinhDangXem = $maTinh
-            ? $danhSach->firstWhere('province_code', $maTinh)
+        $tinhDangXem = $loc['province_code']
+            ? DB::table('vn_provinces')->where('code', $loc['province_code'])
+                ->first(['code', 'name', 'lat', 'lng'])
             : null;
 
-        // Ma tinh khong co du an nao thi coi nhu khong loc, thay vi hien mot
-        // trang trong khong giai thich duoc.
+        // Ma tinh khong co that thi coi nhu khong loc, thay vi hien mot trang
+        // trong khong giai thich duoc.
         if (!$tinhDangXem) {
-            $maTinh = null;
+            $loc['province_code'] = null;
         }
+
+        // Phuong/xa chi co nghia trong mot tinh. Con lai o loc tinh da doi roi
+        // ma xa cu van con thi ket qua ra rong ma nguoi dung khong hieu vi sao.
+        $xaCoDuAn = $this->projectQuery->xaCoDuAn($loc['province_code']);
+
+        if (!$loc['province_code'] || !$xaCoDuAn->firstWhere('ward_code', $loc['ward_code'])) {
+            $loc['ward_code'] = null;
+        }
+
+        $xaDangXem = $xaCoDuAn->firstWhere('ward_code', $loc['ward_code']);
+
+        $duAn = $this->projectQuery->choBanDo($loc);
+        $diem = $this->diemBanDo($duAn);
 
         $tongDuAn = $this->projectQuery->tongSoDuAn();
         $tongTinh = $this->projectQuery->tongSoTinh();
 
+        $tenTinh = $tinhDangXem ? nx_ten_dia_gioi_ngan($tinhDangXem->name) : null;
+
         return view('frontend.noxh.project.map', [
             'system' => $this->system,
             'seo' => $this->seoTrang(
-                $tinhDangXem
-                    ? 'Dự án nhà ở xã hội tại ' . nx_ten_dia_gioi_ngan($tinhDangXem->province_name)
-                    : ($this->intro['projectaside_map_heading'] ?? 'Bản đồ dự án'),
+                $tenTinh
+                    ? 'Bản đồ dự án nhà ở xã hội tại ' . $tenTinh
+                    : ($this->intro['projectmap_heading'] ?? 'Bản đồ dự án'),
                 url('/du-an/ban-do')
             ),
-            'ghimBanDo' => $this->ghimBanDo($maTinh),
-            'danhSach' => $danhSach,
-            'maTinh' => $maTinh,
+            'loc' => $loc,
+            'duAn' => $duAn,
+            'diem' => $diem,
+            'thieuToaDo' => $this->projectQuery->demThieuToaDo($loc),
+            'tinhThanh' => $this->projectQuery->moiTinhThanh(),
+            'xaCoDuAn' => $xaCoDuAn,
             'tinhDangXem' => $tinhDangXem,
-            'duAn' => $maTinh
-                ? $this->projectQuery->danhSach(['province_code' => $maTinh], 'moi-nhat', 20)
-                : null,
+            'xaDangXem' => $xaDangXem,
+            'trangThai' => Product::TRANG_THAI_DU_AN,
+            'khungBanDo' => $this->khungBanDo($diem, $tinhDangXem, $xaDangXem),
+            'caiDatBanDo' => $this->caiDatBanDo(),
             'tongDuAn' => $tongDuAn,
             'tongTinh' => $tongTinh,
             'soLieuDau' => $this->soLieuDau($tongDuAn, $tongTinh),
         ]);
+    }
+
+    /**
+     * Doi dong du an thanh ghim ban do.
+     *
+     * Chu in trong the thong tin duoc dung san o day chu khong dung ben JS:
+     * dinh dang tien va dien tich da co ham PHP lo, viet lai mot ban nua bang
+     * JS la hai cho se lech nhau ngay lan sua dau tien.
+     */
+    private function diemBanDo($duAn): array
+    {
+        $ghim = [];
+
+        // So chu bo dau, bo gach noi: dia chi mau hay ghi "Song-Cong" trong
+        // khi ten phuong/xa la "Song Cong" - khong go gach thi hai chuoi do
+        // khong khop va ten bi in hai lan.
+        $gon = fn (string $s) => str_replace('-', ' ', Str::lower(Str::ascii($s)));
+
+        foreach ($duAn as $d) {
+            // Dia chi cua du an thuong da chua san ten phuong/xa va ten tinh.
+            // Noi thang ba manh vao nhau se ra "Phuong Song Cong, Thai Nguyen,
+            // Song Cong, Thai Nguyen" - bo manh nao da nam trong manh truoc.
+            $noi = [];
+
+            $manhDs = [
+                trim((string) $d->address),
+                nx_ten_dia_gioi_ngan($d->ward_name),
+                nx_ten_dia_gioi_ngan($d->province_name),
+            ];
+
+            foreach ($manhDs as $manh) {
+                $manh = trim((string) $manh);
+
+                if ($manh === '' || Str::contains($gon(implode(', ', $noi)), $gon($manh))) {
+                    continue;
+                }
+
+                $noi[] = $manh;
+            }
+
+            $ghim[] = [
+                'id' => (int) $d->id,
+                'ten' => $d->name,
+                'url' => url('/du-an/' . $d->canonical),
+                'anh' => nx_anh($d->image ?? null, 'du-an'),
+                'lat' => (float) $d->latitude,
+                'lng' => (float) $d->longitude,
+                'gia' => khoang_gia($d->price_from, $d->price_to),
+                'giaNgan' => $d->price_from ? rtrim(rtrim(number_format((float) $d->price_from, 1, ',', '.'), '0'), ',') : null,
+                'dienTich' => khoang_so($d->area_from, $d->area_to, ' m²'),
+                'soCan' => $d->total_units ? number_format($d->total_units, 0, ',', '.') : null,
+                'trangThai' => $d->status,
+                'nhanTrangThai' => Product::TRANG_THAI_DU_AN[$d->status] ?? null,
+                'noi' => implode(', ', $noi),
+            ];
+        }
+
+        return $ghim;
+    }
+
+    /**
+     * Diem giua va muc phong ban anh do mo lan dau.
+     *
+     * Co ghim thi lay giua cac ghim - JS con tu nam khung lai cho vua. Khong
+     * co ghim nao (bo loc ra rong) thi lay giua cac tinh dang co trong CSDL,
+     * chu khong ghi cung mot cap toa do vao ma nguon.
+     */
+    private function khungBanDo(array $diem, $tinhDangXem, $xaDangXem = null): array
+    {
+        $cai = $this->caiDatBanDo();
+
+        // Loc den phuong/xa thi phong sat hon nua - nguoi dung dang muon xem
+        // dung khu do chu khong phai ca tinh.
+        if ($xaDangXem && $xaDangXem->lat !== null && $xaDangXem->lng !== null) {
+            return [
+                'lat' => (float) $xaDangXem->lat,
+                'lng' => (float) $xaDangXem->lng,
+                'zoom' => $cai['zoomXa'],
+            ];
+        }
+
+        if ($tinhDangXem && $tinhDangXem->lat !== null && $tinhDangXem->lng !== null) {
+            return [
+                'lat' => (float) $tinhDangXem->lat,
+                'lng' => (float) $tinhDangXem->lng,
+                'zoom' => $cai['zoomTinh'],
+            ];
+        }
+
+        if (count($diem)) {
+            return [
+                'lat' => array_sum(array_column($diem, 'lat')) / count($diem),
+                'lng' => array_sum(array_column($diem, 'lng')) / count($diem),
+                'zoom' => $cai['zoom'],
+            ];
+        }
+
+        $giua = DB::table('vn_provinces')->whereNotNull('lat')->whereNotNull('lng')
+            ->first([DB::raw('AVG(lat) as lat'), DB::raw('AVG(lng) as lng')]);
+
+        return [
+            'lat' => (float) ($giua->lat ?? 0),
+            'lng' => (float) ($giua->lng ?? 0),
+            'zoom' => $cai['zoom'],
+        ];
+    }
+
+    /**
+     * Cai dat nen ban do (Cai dat -> Ban do du an).
+     *
+     * Chon Google ma chua dan API key thi tu quay ve OpenStreetMap: tai thu
+     * vien Google khong co key chi ra mot o xam kem dong chu bao loi, tha de
+     * nguoi xem thay ban do mien phi con hon thay mot o hong.
+     */
+    private function caiDatBanDo(): array
+    {
+        $key = trim((string) cai_dat('map_google_key', ''));
+        $nen = trim((string) cai_dat('map_provider', 'osm'));
+
+        if ($nen !== 'google' || $key === '') {
+            $nen = 'osm';
+            $key = '';
+        }
+
+        $zoom = (int) (cai_dat('map_zoom', '') ?: 5);
+        $zoomTinh = (int) (cai_dat('map_zoom_tinh', '') ?: 11);
+        $zoomXa = (int) (cai_dat('map_zoom_xa', '') ?: 14);
+
+        return [
+            'nen' => $nen,
+            'key' => $key,
+            // Ghi nguon la dieu kien bat buoc cua giay phep OpenStreetMap,
+            // khong phai dong chu trang tri - de trong thi dung ban mac dinh.
+            'anhNen' => trim((string) cai_dat('map_tile_url', '')) ?: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            'nguon' => trim((string) cai_dat('map_tile_credit', '')) ?: '© OpenStreetMap',
+            'zoom' => max(1, min(18, $zoom)),
+            'zoomTinh' => max(1, min(18, $zoomTinh)),
+            'zoomXa' => max(1, min(18, $zoomXa)),
+        ];
     }
 
     /**

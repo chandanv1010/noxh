@@ -9,6 +9,9 @@ export default defineConfig({
             input: [
                 'resources/css/app.scss', 
                 'resources/js/app.js',
+                // Chi trang /du-an/ban-do nap file nay (Leaflet nang,
+                // khong the di theo moi trang).
+                'resources/js/noxh-map.js',
                 'resources/css/app_backend.scss',
                 'resources/js/app.backend.js'
             ],

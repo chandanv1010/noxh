@@ -11,12 +11,13 @@ use Illuminate\Support\Facades\DB;
  * duoc mua neu nha cach noi lam viec >= 30km VA noi lam viec cach du an
  * <= 30km.
  *
- * TOA DO LAY O DAU: uu tien toa do cua chinh phuong/xa; bang vn_wards moi nap
- * ten chu chua co toa do nen tam lay toa do tinh/thanh. Hai diem cung mot
- * tinh ma ca hai deu phai lui ve toa do tinh thi khoang cach ra 0 - ket qua
- * NGHIENG VE PHIA CHAT (khong cho qua luat "cach noi lam viec >= 30km"), dung
- * huong an toan hon la cho qua nham. Nap toa do phuong/xa vao hai cot
- * vn_wards.lat / lng la tinh chinh xac ngay, khong phai sua dong ma nao.
+ * TOA DO LAY O DAU: uu tien toa do cua chinh phuong/xa (vn_wards.lat / lng,
+ * nap bang `php artisan noxh:toa-do --xa`); phuong/xa nao chua nap thi tam
+ * lay toa do tinh/thanh. Hai diem cung mot tinh ma ca hai deu phai lui ve
+ * toa do tinh thi khoang cach ra 0 - ket qua NGHIENG VE PHIA CHAT (khong cho
+ * qua luat "cach noi lam viec >= 30km"), dung huong an toan hon la cho qua
+ * nham. Nap them toa do phuong/xa la tinh chinh xac ngay, khong phai sua
+ * dong ma nao.
  */
 class NoxhKhoangCach
 {

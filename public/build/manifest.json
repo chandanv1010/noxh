@@ -1,6 +1,18 @@
 {
+  "node_modules/leaflet/dist/images/layers-2x.png": {
+    "file": "assets/layers-2x-066daca8.png",
+    "src": "node_modules/leaflet/dist/images/layers-2x.png"
+  },
+  "node_modules/leaflet/dist/images/layers.png": {
+    "file": "assets/layers-1dbbe9d0.png",
+    "src": "node_modules/leaflet/dist/images/layers.png"
+  },
+  "node_modules/leaflet/dist/images/marker-icon.png": {
+    "file": "assets/marker-icon-574c3a5c.png",
+    "src": "node_modules/leaflet/dist/images/marker-icon.png"
+  },
   "resources/css/app.scss": {
-    "file": "assets/app-41369f70.css",
+    "file": "assets/app-cced02e5.css",
     "isEntry": true,
     "src": "resources/css/app.scss"
   },
@@ -18,6 +30,23 @@
     "file": "assets/app-4ed993c7.js",
     "isEntry": true,
     "src": "resources/js/app.js"
+  },
+  "resources/js/noxh-map.css": {
+    "file": "assets/noxh-map-471ed3ce.css",
+    "src": "resources/js/noxh-map.css"
+  },
+  "resources/js/noxh-map.js": {
+    "assets": [
+      "assets/layers-1dbbe9d0.png",
+      "assets/layers-2x-066daca8.png",
+      "assets/marker-icon-574c3a5c.png"
+    ],
+    "css": [
+      "assets/noxh-map-471ed3ce.css"
+    ],
+    "file": "assets/noxh-map-bbe9c50d.js",
+    "isEntry": true,
+    "src": "resources/js/noxh-map.js"
   },
   "resources/vendor/backend/css/patterns/3.png": {
     "file": "assets/3-0791e57f.png",
