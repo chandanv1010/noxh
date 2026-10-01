@@ -104,12 +104,20 @@ class NoxhMenuSeeder extends Seeder
             $soCap1 = 0;
             $soCap2 = 0;
 
+            // Cot `order` chay NGUOC: muc tren cung mang so lon nhat. Day la
+            // quy uoc cua man hinh quan tri - thao tac keo tha ghi
+            // `order = so muc - vi tri`, va danh sach doc lai bang
+            // `order DESC`. Ghi xuoi o day thi quan tri hien menu lon nguoc.
             foreach ($tree as $i => [$name, $url, $show, $children]) {
-                $parentId = $this->insertMenu($mainId, 0, 1, $i, $show, $name, $url, $userId, $now);
+                $parentId = $this->insertMenu(
+                    $mainId, 0, 1, count($tree) - $i, $show, $name, $url, $userId, $now
+                );
                 $soCap1++;
 
                 foreach ($children as $j => [$cName, $cUrl, $cShow]) {
-                    $this->insertMenu($mainId, $parentId, 2, $j, $cShow, $cName, $cUrl, $userId, $now);
+                    $this->insertMenu(
+                        $mainId, $parentId, 2, count($children) - $j, $cShow, $cName, $cUrl, $userId, $now
+                    );
                     $soCap2++;
                 }
             }
@@ -127,7 +135,7 @@ class NoxhMenuSeeder extends Seeder
             ];
 
             foreach ($footer as $i => [$name, $url]) {
-                $this->insertMenu($footerId, 0, 1, $i, true, $name, $url, $userId, $now);
+                $this->insertMenu($footerId, 0, 1, count($footer) - $i, true, $name, $url, $userId, $now);
             }
 
             $this->command->line(sprintf('  menu chinh    : %d muc cap 1, %d muc cap 2', $soCap1, $soCap2));

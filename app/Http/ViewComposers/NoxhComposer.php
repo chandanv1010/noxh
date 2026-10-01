@@ -79,8 +79,15 @@ class NoxhComposer
     /**
      * Doc mot nhom menu thanh cay hai cap.
      *
-     * Bang menus dung nested set (lft/rgt) de sap xep, con quan he cha con thi
-     * doc theo parent_id cho de hieu.
+     * SAP XEP THEO COT `order`, GIAM DAN - dung chinh thu tu man hinh quan
+     * tri dang dung (MenuController::edit doc `order DESC`, va thao tac keo
+     * tha ghi `order = so muc - vi tri` nen muc tren cung mang so lon nhat).
+     *
+     * Truoc day cho nay sap theo `lft`, nhung keo tha trong quan tri chi ghi
+     * lai `order` va `parent_id`; ham dung lai cay nested set thi doc chinh
+     * `lft` cu nen `lft` khong bao gio doi theo. Ket qua: quan tri keo xong
+     * thay dung thu tu minh muon, ra ngoai website van y nguyen thu tu cu.
+     * `lft` chi con dung de tach cac muc bang nhau cho on dinh.
      */
     private function menu(string $keyword): array
     {
@@ -91,6 +98,7 @@ class NoxhComposer
             })
             ->where('mc.keyword', $keyword)
             ->where('m.publish', 2)
+            ->orderByDesc('m.order')
             ->orderBy('m.lft')
             ->get(['m.id', 'm.parent_id', 'ml.name', 'ml.canonical']);
 

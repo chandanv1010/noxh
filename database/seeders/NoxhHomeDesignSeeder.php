@@ -240,10 +240,20 @@ class NoxhHomeDesignSeeder extends Seeder
             ],
         ];
 
+        // Cot `order` chay NGUOC: muc tren cung mang so lon nhat - dung quy
+        // uoc cua man hinh quan tri (keo tha ghi `so muc - vi tri`, danh sach
+        // doc lai bang `order DESC`). Ghi xuoi la chan trang ra mot dang,
+        // man hinh quan tri ra mot dang khac.
         $thuTu = 1;
+        $soCot = count($cot);
+        $viTriCot = 0;
 
         foreach ($cot as $ten => $muc) {
-            $chaId = $this->mucCha($nhomId, $ten, $thuTu++);
+            $chaId = $this->mucCha($nhomId, $ten, $thuTu++, $soCot - $viTriCot);
+            $viTriCot++;
+
+            $soCon = count($muc);
+            $viTriCon = 0;
 
             foreach ($muc as $tenCon => $duongDan) {
                 $conId = DB::table('menus as m')
@@ -258,8 +268,15 @@ class NoxhHomeDesignSeeder extends Seeder
                     $conId = $this->themMuc($nhomId, $tenCon, $duongDan, $thuTu);
                 }
 
-                DB::table('menus')->where('id', $conId)
-                    ->update(['parent_id' => $chaId, 'lft' => $thuTu++, 'level' => 1, 'publish' => 2]);
+                DB::table('menus')->where('id', $conId)->update([
+                    'parent_id' => $chaId,
+                    'lft' => $thuTu++,
+                    'level' => 1,
+                    'order' => $soCon - $viTriCon,
+                    'publish' => 2,
+                ]);
+
+                $viTriCon++;
             }
         }
     }
@@ -293,7 +310,7 @@ class NoxhHomeDesignSeeder extends Seeder
     }
 
     /** Tim (hoac tao) mot muc cha khong co duong dan, chi lam tieu de cot. */
-    private function mucCha(int $nhomId, string $ten, int $thuTu): int
+    private function mucCha(int $nhomId, string $ten, int $thuTu, int $thuHang): int
     {
         $id = DB::table('menus as m')
             ->join('menu_language as ml', function ($join) {
@@ -310,7 +327,7 @@ class NoxhHomeDesignSeeder extends Seeder
                 'lft' => $thuTu,
                 'rgt' => $thuTu,
                 'level' => 0,
-                'order' => $thuTu,
+                'order' => $thuHang,
                 'publish' => 2,
                 'user_id' => 1,
                 'created_at' => now(),
@@ -328,7 +345,8 @@ class NoxhHomeDesignSeeder extends Seeder
             ]);
         }
 
-        DB::table('menus')->where('id', $id)->update(['parent_id' => 0, 'lft' => $thuTu, 'publish' => 2]);
+        DB::table('menus')->where('id', $id)
+            ->update(['parent_id' => 0, 'lft' => $thuTu, 'order' => $thuHang, 'publish' => 2]);
 
         return (int) $id;
     }
