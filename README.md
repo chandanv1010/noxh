@@ -37,8 +37,9 @@ DB_HOST=... DB_DATABASE=... DB_USERNAME=... DB_PASSWORD=...
 
 ### 3. Cơ sở dữ liệu
 
-**Cách A – có sẵn file .sql** (bản bàn giao): nạp thẳng, *không* chạy
-migrate và *không* chạy seeder, vì file đã có đủ cấu trúc lẫn dữ liệu.
+**Cách A – có sẵn file .sql** (bản bàn giao, gửi riêng chứ không nằm trong
+kho mã nguồn): nạp thẳng, *không* chạy migrate và *không* chạy seeder, vì
+file đã có đủ cấu trúc lẫn dữ liệu.
 
 ```bash
 mysql -u <user> -p <ten_db> < noxh-db-xxxx.sql

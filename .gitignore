@@ -36,6 +36,12 @@
 /storage/framework/testing
 /bootstrap/cache/*.php
 
+# Ban xuat CSDL. De ngoai git: file nang vai MB, moi lan xuat lai la mot
+# ban nhi phan moi lam phinh kho, va trong do co mat khau da bam cua tai
+# khoan quan tri. Giu o thu muc rieng ngoai du an.
+/db
+*.sql
+
 # Anh mo phong, ban nhap
 /work
 public.zip
