@@ -15,11 +15,13 @@
 !/public/uploads/noxh/
 !/public/uploads/van-ban/
 /public/upload
-/public/userfiles
+/public/userfiles/*
+!/public/userfiles/.gitignore
 
-# Anh resize tu sinh boi ImageResizerController - tu tao lai duoc.
-# (Dong nay truoc bi dinh chuoi "rm public.zip" o cuoi nen khong an gi ca.)
-/public/image-cache
+# Anh resize tu sinh boi ImageResizerController - tu tao lai duoc. Giu lai
+# chinh thu muc de ban sao moi co san cho ghi.
+/public/image-cache/*
+!/public/image-cache/.gitignore
 
 /public/storage
 /public/hot
