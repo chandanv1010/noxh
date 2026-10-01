@@ -39,7 +39,9 @@ class NoxhHomeDesignSeeder extends Seeder
             'brand_tagline' => 'Rõ pháp lý · Đúng thông tin · Vì an cư',
             'header_search_placeholder' => 'Tìm dự án, tin tức...',
             'header_phone_note' => 'Tư vấn miễn phí 24/7',
+            'footer_contact_heading' => 'Liên hệ',
             'footer_social_heading' => 'Kết nối với chúng tôi',
+            'footer_top_text' => 'Lên đầu trang',
             'footer_slogan' => 'Vì cộng đồng · Vì một Việt Nam an cư',
 
             // --- banner ------------------------------------------------------
@@ -197,11 +199,17 @@ class NoxhHomeDesignSeeder extends Seeder
 
     // ------------------------------------------------------------- menu chan
     /**
-     * Chia nhom footer-menu thanh hai cot co tieu de, dung nhu ban thiet ke:
-     * "Ve chung toi" va "Ho tro".
+     * Chia nhom footer-menu thanh ba cot co tieu de, dung nhu chan trang o
+     * ban ve noxh_image/tin-tuc-fix.webp: "Ve chung toi", "Huong dan",
+     * "Ho tro". Cot thu tu ("Lien he") KHONG nam o day - so dien thoai, email
+     * va dia chi doc thang Cau hinh he thong.
      *
-     * Cac muc dang co deu nam o cap mot. Them hai muc cha roi gan cac muc cu
-     * lam con, khong xoa muc nao.
+     * Ban ve in "Dieu khoan" / "Bao mat" o cot mot va "Dieu khoan su dung" /
+     * "Chinh sach bao mat" o cot ba - cung mot trang goi bang hai ten. O day
+     * moi trang chi dat MOT cho: hai dong dan cung mot noi trong mot chan
+     * trang chi lam nguoi doc phan van.
+     *
+     * Muc nao chua co trong nhom thi them moi, khong xoa muc nao dang co.
      */
     private function napMenuChan(): void
     {
@@ -211,17 +219,33 @@ class NoxhHomeDesignSeeder extends Seeder
             return;
         }
 
+        // tieu de cot => [ten muc => duong dan]
         $cot = [
-            'Về chúng tôi' => ['gioi-thieu', 'chinh-sach-bao-mat', 'dieu-khoan-su-dung', 'lien-he'],
-            'Hỗ trợ' => ['ho-so/can-chuan-bi', 'hoi-dap', 'kiem-tra-dieu-kien', 'phap-ly-noxh/van-ban'],
+            'Về chúng tôi' => [
+                'Giới thiệu' => 'gioi-thieu',
+                'Điều khoản sử dụng' => 'dieu-khoan-su-dung',
+                'Chính sách bảo mật' => 'chinh-sach-bao-mat',
+                'Liên hệ' => 'lien-he',
+            ],
+            'Hướng dẫn' => [
+                'Điều kiện mua NOXH' => 'phap-ly-noxh/dieu-kien',
+                'Hồ sơ cần chuẩn bị' => 'ho-so/can-chuan-bi',
+                'Quy trình mua NOXH' => 'phap-ly-noxh/chinh-sach',
+                'Câu hỏi thường gặp' => 'hoi-dap',
+            ],
+            'Hỗ trợ' => [
+                'Kiểm tra điều kiện' => 'kiem-tra-dieu-kien',
+                'Văn bản pháp luật' => 'phap-ly-noxh/van-ban',
+                'Sitemap' => 'sitemap',
+            ],
         ];
 
         $thuTu = 1;
 
-        foreach ($cot as $ten => $duongDanCon) {
+        foreach ($cot as $ten => $muc) {
             $chaId = $this->mucCha($nhomId, $ten, $thuTu++);
 
-            foreach ($duongDanCon as $duongDan) {
+            foreach ($muc as $tenCon => $duongDan) {
                 $conId = DB::table('menus as m')
                     ->join('menu_language as ml', function ($join) {
                         $join->on('ml.menu_id', '=', 'm.id')->where('ml.language_id', '=', 1);
@@ -230,12 +254,42 @@ class NoxhHomeDesignSeeder extends Seeder
                     ->where('ml.canonical', $duongDan)
                     ->value('m.id');
 
-                if ($conId) {
-                    DB::table('menus')->where('id', $conId)
-                        ->update(['parent_id' => $chaId, 'lft' => $thuTu++, 'level' => 1]);
+                if (!$conId) {
+                    $conId = $this->themMuc($nhomId, $tenCon, $duongDan, $thuTu);
                 }
+
+                DB::table('menus')->where('id', $conId)
+                    ->update(['parent_id' => $chaId, 'lft' => $thuTu++, 'level' => 1, 'publish' => 2]);
             }
         }
+    }
+
+    /** Them mot muc con moi vao nhom menu, tra ve id. */
+    private function themMuc(int $nhomId, string $ten, string $duongDan, int $thuTu): int
+    {
+        $id = DB::table('menus')->insertGetId([
+            'menu_catalogue_id' => $nhomId,
+            'parent_id' => 0,
+            'lft' => $thuTu,
+            'rgt' => $thuTu,
+            'level' => 1,
+            'order' => $thuTu,
+            'publish' => 2,
+            'user_id' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('menu_language')->insert([
+            'menu_id' => $id,
+            'language_id' => 1,
+            'name' => $ten,
+            'canonical' => $duongDan,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return (int) $id;
     }
 
     /** Tim (hoac tao) mot muc cha khong co duong dan, chi lam tieu de cot. */

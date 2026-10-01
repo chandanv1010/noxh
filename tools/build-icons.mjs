@@ -36,6 +36,7 @@ const BANG = {
     'close': 'close',
     'arrow-right': 'arrow_forward',
     'arrow-left': 'arrow_back',
+    'arrow-up': 'arrow_upward',
     'chevron-down': 'keyboard_arrow_down',
     'chevron-right': 'keyboard_arrow_right',
     'download': 'download',
@@ -44,6 +45,7 @@ const BANG = {
     // --- lien he ---
     'phone': 'call:day',      // ong nghe - ban ve dung net day han mac dinh
     'mail': 'mail',
+    'heart': 'favorite',    // trai tim o dong cuoi chan trang
     'send': 'send',
     'chat': 'chat_bubble',
     'globe': 'public',

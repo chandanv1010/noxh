@@ -533,6 +533,49 @@ class NoxhProjectDetailTest extends TestCase
     }
 
     /**
+     * Tu van vien phu trach du an phai hien ANH CHAN DUNG, khong phai dia
+     * chu cai.
+     *
+     * Anh cat tu ban ve (noxh_image/product-detail-fix.jpg) bang lenh
+     * `python tools/tach-anh-ban-ve.py`, roi
+     * `php artisan db:seed --class=NoxhDemoDataSeeder` gan vao tung nguoi.
+     */
+    public function test_tu_van_vien_hien_anh_chan_dung(): void
+    {
+        $duAn = DB::table('product_language')->where('language_id', 1)
+            ->whereNotNull('canonical')->where('canonical', '!=', '')->value('canonical');
+
+        $this->assertNotEmpty($duAn, 'Chua co du an nao de mo');
+
+        $html = $this->get('/du-an/' . $duAn)->assertOk()->getContent();
+
+        if (!str_contains($html, 'nx-pd-tuvan__anh')) {
+            $this->markTestSkipped('Du an nay chua gan tu van vien nao.');
+        }
+
+        $coAnh = DB::table('users')->whereNull('deleted_at')
+            ->whereNotNull('image')->where('image', 'like', '/uploads/noxh/tv-%')
+            ->pluck('image', 'name');
+
+        if ($coAnh->isEmpty()) {
+            $this->markTestSkipped('Chua cat anh tu van vien - chay `python tools/tach-anh-ban-ve.py`.');
+        }
+
+        $hien = 0;
+
+        foreach ($coAnh as $ten => $anh) {
+            if (!str_contains($html, e($ten))) {
+                continue;
+            }
+
+            $this->assertStringContainsString($anh, $html, "Tu van vien {$ten} van chua hien anh");
+            $hien++;
+        }
+
+        $this->assertGreaterThan(0, $hien, 'Khong tu van vien nao co anh xuat hien tren trang');
+    }
+
+    /**
      * Cat lay phan HTML cua MOT khung tab.
      *
      * Phai cat chu khong do ca trang: ten mot giay to cung xuat hien o khung

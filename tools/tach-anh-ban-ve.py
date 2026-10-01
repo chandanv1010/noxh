@@ -33,6 +33,9 @@ Sinh ra:
     public/uploads/noxh/kt-tam-*.png      tranh o cot phai cac buoc 3, 4, 5
     public/uploads/noxh/kq-*.png          hinh tron va tranh cua ba trang ket
                                           qua (thanh-cong / luu y / that bai)
+    public/uploads/noxh/tv-*.png          sau anh chan dung tu van vien cua
+                                          khoi "Danh sach tu van ho tro"
+                                          (product-detail-fix.jpg)
     public/uploads/noxh/kiem-tra-nen.jpg  tranh nen (day nha, hang cay, luoi
                                           cham) cua trang mo dau bo kiem tra
                                           dieu kien (start-fix.jpg)
@@ -59,6 +62,7 @@ BAN_VE_KT2 = os.path.join(ANH, 'w-2.jpg')
 BAN_VE_KT3 = os.path.join(ANH, 'w-3.jpg')
 BAN_VE_KT4 = os.path.join(ANH, 'w-4.jpg')
 BAN_VE_KT5 = os.path.join(ANH, 'w-5.jpg')
+BAN_VE_CT = os.path.join(ANH, 'product-detail-fix.jpg')
 BAN_VE_KQ = {
     'high': os.path.join(ANH, 'thanh-cong.jpg'),
     'medium': os.path.join(ANH, 'luu y.jpg'),
@@ -677,6 +681,50 @@ def hinh_ket_qua(im, muc):
     return ra
 
 
+def hinh_tu_van(im):
+    """
+    Sau anh chan dung cua khoi "DANH SACH TU VAN HO TRO" o trang chi tiet du
+    an (product-detail-fix.jpg).
+
+    Ban ve ve san sau nguoi kem ten; truoc day trang chi ve dia tron mang hai
+    chu cai dau nen khong doi chieu duoc voi ban ve. Cat thang anh ra dung
+    hon la di tim sau buc anh chan dung khac.
+
+    Anh goc chi 44x44 - do la kich thuoc that trong ban ve - nen phong len
+    ba lan cho du net o man hinh mat do cao, khong phong hon duoc nua.
+
+    Ten tep dat theo ten nguoi (bo dau) de seeder gan dung nguoi.
+    """
+    TEN = (
+        'tv-nguyen-van-hung.png',
+        'tv-tran-thi-mai.png',
+        'tv-le-thi-thu.png',
+        'tv-pham-minh-duc.png',
+        'tv-hoang-thi-lan.png',
+        'tv-vu-quang-huy.png',
+    )
+
+    # Tam tung o, do bang cach quet cot x=693 tim cac dai hang co muc. Ban ve
+    # do AI sinh nen khoang cach giua cac hang khong deu (56 - 60.5), phai
+    # ghi tung tam mot chu khong tinh bang mot buoc nhay.
+    TAM_Y = (717.5, 773.5, 830.0, 890.5, 948.5, 1008.0)
+    TAM_X = 691.5
+    NUA = 23
+    PHONG = 3
+
+    ra = []
+
+    for ten, y in zip(TEN, TAM_Y):
+        o = im.crop((
+            int(round(TAM_X - NUA)), int(round(y - NUA)),
+            int(round(TAM_X + NUA)), int(round(y + NUA)),
+        ))
+        o = o.resize((o.size[0] * PHONG, o.size[1] * PHONG), Image.LANCZOS)
+        ra.append((ten, o))
+
+    return ra
+
+
 def main():
     os.makedirs(DICH, exist_ok=True)
 
@@ -693,6 +741,7 @@ def main():
         (BAN_VE_KT3, '', hinh_chinh_sach),
         (BAN_VE_KT4, '', hinh_nha_o),
         (BAN_VE_KT5, '', hinh_nhap_tin),
+        (BAN_VE_CT, '', hinh_tu_van),
         (BAN_VE_KQ['high'], '', lambda im: hinh_ket_qua(im, 'high')),
         (BAN_VE_KQ['medium'], '', lambda im: hinh_ket_qua(im, 'medium')),
         (BAN_VE_KQ['low'], '', lambda im: hinh_ket_qua(im, 'low')),

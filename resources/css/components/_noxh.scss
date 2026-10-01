@@ -871,28 +871,27 @@ html {
     background: $nx-blue-deep;
     color: rgba(255, 255, 255, 0.88);
 
-    // Ban thiet ke chia chan trang thanh nam cot ngan cach bang vach dung mo:
-    // thuong hieu | hai cot lien ket | mang xa hoi | so dien thoai.
+    // Ban ve (tin-tuc-fix.webp) xep mot hang: thuong hieu | cac cot lien ket
+    // | Lien he | Ket noi voi chung toi, ngan nhau bang vach dung mo.
+    //
+    // So cot lien ket do quan tri quyet dinh (nhom footer-menu), nen dung
+    // auto-fit chu khong ghi cung so cot: them mot cot trong quan tri thi
+    // chan trang tu gian ra, khong phai sua CSS.
+    // Dung flex chu khong dung grid co san so cot: so cot lien ket do quan
+    // tri quyet dinh (nhom footer-menu), them mot cot thi chan trang tu gian
+    // ra chu khong phai sua CSS theo.
     &__inner {
         @include nx-container;
-        display: grid;
-        grid-template-columns: 1.55fr 1fr 1fr 1.05fr auto;
-        gap: 30px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 26px;
         padding-block: 34px;
-
-        @media (max-width: 1100px) {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 26px;
-        }
-
-        @media (max-width: $nx-sm) {
-            grid-template-columns: minmax(0, 1fr);
-        }
     }
 
     // Vach ngan giua cac cot. Dung ::before de khong phai them the rong.
     &__cot {
         position: relative;
+        flex: 1 1 118px;
         min-width: 0;
 
         + .nx-footer__cot::before {
@@ -900,7 +899,7 @@ html {
             position: absolute;
             top: 2px;
             bottom: 2px;
-            left: -15px;
+            left: -13px;
             width: 1px;
             background: rgba(255, 255, 255, 0.2);
 
@@ -908,6 +907,40 @@ html {
                 display: none;
             }
         }
+    }
+
+    // Hai cot nay rong hon han cac cot lien ket: mot ben la ten thuong hieu
+    // kem mot doan mo ta, mot ben la bon dia mang xa hoi dat canh nut len
+    // dau trang.
+    &__cot--hieu { flex: 1 1 246px; }
+
+    &__cot--mang { flex: 1 1 190px; }
+
+    // Cot Lien he chua dia chi dai, hep qua thi vo thanh nam dong.
+    &__cot--lienhe { flex: 1 1 172px; }
+
+    &__hang {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+    }
+
+    // Nut tron dua nguoi doc ve dau trang, dung nhu ban ve.
+    &__len {
+        flex: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        border-radius: 50%;
+        color: #fff;
+        text-decoration: none;
+        transition: background 0.15s ease;
+
+        &:hover { background: rgba(255, 255, 255, 0.16); }
     }
 
     &__logo {
@@ -1023,7 +1056,7 @@ html {
             height: 38px;
             border-radius: 50%;
             background: #fff;
-            color: #1877f2;
+            color: #0068ff;
             transition: transform 0.15s ease;
 
             &:hover {
@@ -1036,39 +1069,21 @@ html {
             }
         }
 
+        // Mau lay dung tu ban ve: Facebook dia xanh, YouTube dia do, Zalo
+        // dia trang chu xanh, TikTok dia den.
+        &--facebook { background: #1877f2; color: #fff; }
         &--youtube { background: #ff0000; color: #fff; }
-        &--zalo { background: #0068ff; color: #fff; }
+        &--zalo { background: #fff; color: #0068ff; }
         &--tiktok { background: #000; color: #fff; }
     }
 
-    // Khoi so dien thoai: the trang noi len nen xanh.
-    &__phone {
-        display: flex;
+    // Khau hieu o goc phai dai duoi cung, kem trai tim hong nhu ban ve.
+    &__cau {
+        display: inline-flex;
         align-items: center;
-        gap: 10px;
-        padding: 10px 18px 10px 14px;
-        border-radius: 12px;
-        background: #fff;
-        color: $nx-blue;
-        text-decoration: none;
-        white-space: nowrap;
+        gap: 8px;
 
-        &:hover {
-            background: #eef5ff;
-        }
-
-        strong {
-            display: block;
-            font-size: 19px;
-            font-weight: 800;
-            line-height: 1.15;
-        }
-
-        span span {
-            display: block;
-            color: $nx-text;
-            font-size: 11.5px;
-        }
+        svg { color: #ff7aa8; }
     }
 
     &__bottom {

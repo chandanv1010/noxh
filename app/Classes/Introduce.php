@@ -513,7 +513,17 @@ class Introduce
             'description' => 'Mô tả, tiêu đề cột mạng xã hội và dòng chữ ở thanh cuối cùng',
             'value' => [
                 'description' => ['type' => 'textarea', 'label' => 'Mô tả ở chân trang'],
+                'contact_heading' => [
+                    'type' => 'text',
+                    'label' => 'Tiêu đề cột Liên hệ',
+                    'title' => 'Số điện thoại, email và địa chỉ bên dưới lấy từ Cấu hình hệ thống, sửa ở đó.',
+                ],
                 'social_heading' => ['type' => 'text', 'label' => 'Tiêu đề cột mạng xã hội'],
+                'top_text' => [
+                    'type' => 'text',
+                    'label' => 'Chú thích nút lên đầu trang',
+                    'title' => 'Không hiện ra chữ, chỉ dùng cho trình đọc màn hình và tooltip.',
+                ],
                 'slogan' => [
                     'type' => 'text',
                     'label' => 'Dòng chữ bên phải thanh cuối cùng',

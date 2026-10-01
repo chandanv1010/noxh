@@ -50,24 +50,37 @@ class NoxhDemoDataSeeder extends Seeder
             return;
         }
 
-        // Ho ten va khu vuc lay dung theo ban thiet ke.
+        // Ho ten, khu vuc va ANH lay dung theo ban thiet ke
+        // (noxh_image/product-detail-fix.jpg, khoi "Danh sach tu van ho tro").
+        // Sau tep anh do `python tools/tach-anh-ban-ve.py` cat ra - thu muc
+        // public/uploads nam trong .gitignore nen may khac phai chay lai lenh
+        // do, thieu tep thi o duoi tu bo qua va trang ve lai dia chu cai.
         $nguoi = [
-            ['Nguyễn Văn Hùng', 'hung.nv', '0912 001 001', 'Thái Nguyên'],
-            ['Trần Thị Mai', 'mai.tt', '0912 001 002', 'Thái Nguyên'],
-            ['Lê Thị Thu', 'thu.lt', '0912 001 003', 'Thái Nguyên'],
-            ['Phạm Minh Đức', 'duc.pm', '0912 001 004', 'Thái Nguyên'],
-            ['Hoàng Thị Lan', 'lan.ht', '0912 001 005', 'Bắc Ninh'],
-            ['Vũ Quang Huy', 'huy.vq', '0912 001 006', 'Hà Nội'],
+            ['Nguyễn Văn Hùng', 'hung.nv', '0912 001 001', 'Thái Nguyên', 'tv-nguyen-van-hung.png'],
+            ['Trần Thị Mai', 'mai.tt', '0912 001 002', 'Thái Nguyên', 'tv-tran-thi-mai.png'],
+            ['Lê Thị Thu', 'thu.lt', '0912 001 003', 'Thái Nguyên', 'tv-le-thi-thu.png'],
+            ['Phạm Minh Đức', 'duc.pm', '0912 001 004', 'Thái Nguyên', 'tv-pham-minh-duc.png'],
+            ['Hoàng Thị Lan', 'lan.ht', '0912 001 005', 'Bắc Ninh', 'tv-hoang-thi-lan.png'],
+            ['Vũ Quang Huy', 'huy.vq', '0912 001 006', 'Hà Nội', 'tv-vu-quang-huy.png'],
         ];
 
         $them = 0;
+        $ganAnh = 0;
 
-        foreach ($nguoi as $i => [$ten, $tenHop, $dienThoai, $khuVuc]) {
+        foreach ($nguoi as [$ten, $tenHop, $dienThoai, $khuVuc, $tepAnh]) {
             $email = $tenHop . '@noxh.vn';
+            $anh = $this->anhTuVan($tepAnh);
 
             // withTrashed: tai khoan da xoa mem van giu email, tao lai se
             // dung vao rang buoc duy nhat cua cot email.
-            if (User::withTrashed()->where('email', $email)->exists()) {
+            if ($cu = User::withTrashed()->where('email', $email)->first()) {
+                // Nguoi da co roi thi chi bu them anh neu dang bo trong -
+                // khong de len anh that quan tri da tai len.
+                if ($anh && trim((string) $cu->image) === '') {
+                    $cu->forceFill(['image' => $anh])->save();
+                    $ganAnh++;
+                }
+
                 continue;
             }
 
@@ -75,6 +88,7 @@ class NoxhDemoDataSeeder extends Seeder
                 'name' => $ten,
                 'title' => 'Tư vấn hồ sơ NOXH',
                 'email' => $email,
+                'image' => $anh,
                 'password' => Hash::make(self::MAT_KHAU_DEMO),
                 'phone' => $dienThoai,
                 'zalo' => preg_replace('/\D/', '', $dienThoai),
@@ -91,6 +105,23 @@ class NoxhDemoDataSeeder extends Seeder
         $this->command?->info($them > 0
             ? "Da them {$them} tu van vien mau."
             : 'Tu van vien mau da co du, khong them gi.');
+
+        if ($ganAnh) {
+            $this->command?->info("Da gan anh ban ve cho {$ganAnh} tu van vien.");
+        }
+    }
+
+    /**
+     * Duong dan anh tu van vien, hoac null neu tep chua duoc cat ra.
+     *
+     * Ghi bua duong dan vao CSDL khi tep chua co thi trang se hien mot o anh
+     * vo - te hon han dia chu cai ma ham avatar ve san.
+     */
+    private function anhTuVan(string $tep): ?string
+    {
+        $duong = '/uploads/noxh/' . $tep;
+
+        return is_file(public_path($duong)) ? $duong : null;
     }
 
     // -------------------------------------------------- chuyen muc cho bai cu
