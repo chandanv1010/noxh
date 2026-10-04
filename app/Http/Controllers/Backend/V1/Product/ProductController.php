@@ -127,7 +127,7 @@ class ProductController extends Controller
             'attributeCatalogue',
             'queryUrl',
             'lecturers'
-        ) + $this->duLieuDuAn());
+        ) + $this->duLieuDuAn($product));
     }
 
     public function update($id, UpdateProductRequest $request)
@@ -191,14 +191,52 @@ class ProductController extends Controller
     }
 
     /**
+     * Danh sach tinh/thanh cho o chon trong form du an.
+     *
+     * Lay tu vn_provinces - bang 34 tinh/thanh theo co cau hanh chinh hai cap
+     * tu 01/07/2025, cung nguon voi trang chu, bo loc du an va ban do. Bang
+     * `provinces` (63 tinh, ba cap) la du lieu cu, con ten cac tinh da sap
+     * nhap nhu Bac Giang, Thai Binh - dung vao day la form cho chon don vi
+     * khong con ton tai, va ma tinh cung khac nen phuong/xa se khong khop.
+     */
+    private function tinhThanh()
+    {
+        return \Illuminate\Support\Facades\DB::table('vn_provinces')
+            ->orderBy('order')
+            ->orderBy('name')
+            ->get(['code', 'name']);
+    }
+
+    /**
+     * Ten phuong/xa dang luu cua du an, de form sua hien san o chon Phuong/Xa.
+     *
+     * Select2 chi hien duoc lua chon co san neu trong the <select> da co option
+     * tuong ung, ma danh sach phuong/xa thi nap bang JS sau khi chon tinh. Nen
+     * phai render san MOT option mang ma va ten cua phuong/xa hien tai.
+     */
+    private function phuongXaDangLuu($product): ?object
+    {
+        $ma = $product->ward_code ?? null;
+
+        if (! $ma) {
+            return null;
+        }
+
+        $xa = \Illuminate\Support\Facades\DB::table('vn_wards')->where('code', $ma)->first(['code', 'name']);
+
+        return $xa ?: (object) ['code' => $ma, 'name' => $ma];
+    }
+
+    /**
      * Du lieu cho khoi "Thong tin du an nha o xa hoi" trong form san pham.
      */
-    private function duLieuDuAn(): array
+    private function duLieuDuAn($product = null): array
     {
         return [
             'chuDauTu' => \App\Models\Investor::where('publish', 2)->orderBy('order')->get(['id', 'name']),
             'trangThaiDuAn' => \App\Models\Product::TRANG_THAI_DU_AN,
-            'tinhThanh' => \App\Models\Province::select('code', 'name')->orderBy('name')->get(),
+            'tinhThanh' => $this->tinhThanh(),
+            'phuongXa' => $this->phuongXaDangLuu($product),
             'nhanVienKinhDoanh' => $this->nhanVienKinhDoanh(),
             'duAnKhac' => $this->duAnKhac(),
         ];

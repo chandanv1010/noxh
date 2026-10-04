@@ -3,7 +3,7 @@
 @php
     $url = ($config['method'] == 'create') ? route('product.store') : route('product.update', [$product->id, $queryUrl ?? '']);
 @endphp
-<form action="{{ $url }}" method="post" class="box">
+<form action="{{ $url }}" method="post" class="box nx-form-du-an">
     @csrf
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">

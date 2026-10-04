@@ -7,10 +7,10 @@ use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Models\Investor;
 use App\Models\Product;
-use App\Models\Province;
 use App\Repositories\Product\ProductRepository;
 use App\Services\V1\Product\ProductService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Du an trong bang dieu khien cua nhan vien kinh doanh.
@@ -120,7 +120,7 @@ class ProjectController extends SaleController
             'album' => json_decode($product->album),
             'cachLam' => 'edit',
             'tieuDe' => 'Sửa dự án',
-        ] + $this->duLieuForm());
+        ] + $this->duLieuForm($product));
     }
 
     public function update($id, UpdateProductRequest $request)
@@ -165,13 +165,35 @@ class ProjectController extends SaleController
         abort_unless($co, 404);
     }
 
-    private function duLieuForm(): array
+    private function duLieuForm($product = null): array
     {
         return [
             'dropdown' => $this->nestedset->Dropdown(),
             'chuDauTu' => Investor::where('publish', 2)->orderBy('order')->get(['id', 'name']),
             'trangThaiDuAn' => Product::TRANG_THAI_DU_AN,
-            'tinhThanh' => Province::select('code', 'name')->orderBy('name')->get(),
+            // vn_provinces: bang 34 tinh/thanh theo co cau hai cap, cung nguon
+            // voi form quan tri. Bang `provinces` cu (63 tinh, ba cap) van con
+            // ten cac tinh da sap nhap, chon vao se luu mot ma tinh khong dung.
+            'tinhThanh' => DB::table('vn_provinces')->orderBy('order')->orderBy('name')->get(['code', 'name']),
+            // Ten phuong/xa dang luu, de the <select> co san option ma Select2
+            // can de hien thi lua chon khi mo form sua.
+            'phuongXa' => $this->phuongXaDangLuu($product),
         ];
+    }
+
+    /**
+     * Ten phuong/xa dang luu cua du an - giong ham cua form quan tri.
+     */
+    private function phuongXaDangLuu($product): ?object
+    {
+        $ma = $product->ward_code ?? null;
+
+        if (! $ma) {
+            return null;
+        }
+
+        $xa = DB::table('vn_wards')->where('code', $ma)->first(['code', 'name']);
+
+        return $xa ?: (object) ['code' => $ma, 'name' => $ma];
     }
 }

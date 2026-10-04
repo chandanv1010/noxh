@@ -7,6 +7,38 @@
 --}}
 @php $duAn = $product ?? null; @endphp
 
+{{-- In MOT lan du partial duoc nhung nhieu lan. --}}
+@once
+<style>
+    /*
+     * Cho cac o trong form du an cao bang nhau.
+     *
+     * CSS cua theme dat .select2-container .select2-selection--single { height:32px }
+     * trong khi .form-control (o select thuong va o nhap chu) cao 40px ke ca
+     * padding - lech nhau 8px, nhin so le. Do la ly do khoi "Thong tin du an"
+     * trong nhu bi lech hang.
+     *
+     * Do bang Chrome: o Select2 32px, o thuong 40px. Bon tri so duoi day dua ca
+     * hai ve 40px; dung !important vi rule cua theme cung dung !important.
+     * Doi 40px thi phai doi CA BON, khong thi lech lai.
+     */
+    .nx-form-du-an .select2-container .select2-selection--single {
+        height: 40px !important;
+    }
+
+    .nx-form-du-an .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 28px !important;
+        /* 40 - 6 - 6 = 28: khop padding cua .form-control */
+        padding: 6px 24px 6px 6px;
+        font-size: 14px;
+    }
+
+    .nx-form-du-an .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 38px;
+    }
+</style>
+@endonce
+
 <div class="ibox">
     <div class="ibox-title">
         <h5>Thông tin dự án nhà ở xã hội</h5>
@@ -47,33 +79,41 @@
         </div>
 
         <h4 class="mt20 mb10">Vị trí</h4>
+        {{-- Tu 01/07/2025 Viet Nam bo cap quan/huyen: duoi tinh/thanh la thang
+             phuong/xa. Khong con o "Quan/Huyen" - no vua khong con don vi de
+             chon, vua lam o Phuong/Xa khong nap duoc vi danh sach phuong/xa cu
+             duoc loc theo ma huyen. --}}
         <div class="row mb15">
-            <div class="col-lg-4">
+            <div class="col-lg-6">
                 <div class="form-row">
                     <label class="control-label text-left">Tỉnh/Thành</label>
-                    <select name="province_code" class="form-control setupSelect2 province location" data-target="districts">
+                    <select name="province_code" id="nx-tinh" class="form-control setupSelect2">
                         <option value="">[Chọn Tỉnh/Thành]</option>
                         @foreach($tinhThanh ?? [] as $tinh)
-                            <option value="{{ $tinh->code }}" {{ old('province_code', ($duAn->province_code) ?? '') == $tinh->code ? 'selected' : '' }}>{{ $tinh->name }}</option>
+                            <option value="{{ $tinh->code }}" {{ (string) old('province_code', ($product->province_code) ?? '') === (string) $tinh->code ? 'selected' : '' }}>{{ $tinh->name }}</option>
                         @endforeach
                     </select>
                 </div>
             </div>
-            <div class="col-lg-4">
-                <div class="form-row">
-                    <label class="control-label text-left">Quận/Huyện</label>
-                    <select class="form-control districts setupSelect2 location" data-target="wards">
-                        <option value="">[Chọn Quận/Huyện]</option>
-                    </select>
-                    <small class="text-muted">Chỉ dùng để lọc ra phường/xã, không lưu lại.</small>
-                </div>
-            </div>
-            <div class="col-lg-4">
+            <div class="col-lg-6">
                 <div class="form-row">
                     <label class="control-label text-left">Phường/Xã</label>
-                    <select name="ward_code" class="form-control wards setupSelect2">
-                        <option value="">[Chọn Phường/Xã]</option>
+                    {{-- O nay KHONG co option render san tu PHP: danh sach phuong/xa
+                         tuy tung tinh nen nap bang fetch, roi giao cho Select2 quan
+                         ly (nho vay co san o tim kiem cua Select2, go khong dau
+                         cung loc duoc).
+
+                         Khac cac o con lai: Select2 o day duoc khoi tao bang JS
+                         SAU khi tai xong danh sach, chu khong de library.js khoi
+                         tao luc trang san sang - luc do chua co du lieu nao. --}}
+                    <select name="ward_code" id="nx-xa" class="form-control setupSelect2">
+                        @if(!empty($phuongXa))
+                            {{-- Option nay phai co san thi Select2 moi hien duoc
+                                 lua chon dang luu khi mo form sua. --}}
+                            <option value="{{ $phuongXa->code }}" selected>{{ $phuongXa->name }}</option>
+                        @endif
                     </select>
+                    <small class="text-muted">Danh sách phường/xã tải theo tỉnh/thành đã chọn. Gõ vào ô để tìm nhanh.</small>
                 </div>
             </div>
         </div>
@@ -271,12 +311,133 @@
 </div>
 
 <script>
-    // location.js doc ba bien nay de nap lai Quan/Huyen va Phuong/Xa khi mo
-    // form sua - hai danh sach do lay bang ajax nen khong render san tu PHP.
-    //
-    // Du an chi luu tinh va phuong/xa (bo cap huyen theo don vi hanh chinh
-    // moi), nhung van phai cho chon huyen de loc ra danh sach phuong/xa.
-    var province_id = '{{ old('province_code', ($product->province_code) ?? '') }}'
-    var district_id = ''
-    var ward_id = '{{ old('ward_code', ($product->ward_code) ?? '') }}'
+    /**
+     * O chon Phuong/Xa nap theo Tinh/Thanh dang chon.
+     *
+     * Truoc day viec nay do location.js lam, nhung no di qua cap Quan/Huyen va
+     * doc bang `wards` cu (ba cap) - ma phuong/xa cua du an luu theo ma moi nam
+     * chu so trong vn_wards, hai bo ma khong khop nhau. Doan nay goi thang
+     * endpoint /dia-gioi/phuong-xa/{maTinh}, cung nguon voi thanh tim o trang
+     * chu, nen chi con MOT cho dinh nghia danh sach phuong/xa.
+     *
+     * Dung Select2 chu khong tu ve mot o loc rieng: Select2 da co san o tim
+     * kiem, va no tu bo dau khi loc ("da mai" tim ra "Phường Đa Mai").
+     *
+     * Ba dieu phai lam dung thu tu, da kiem chung bang Chrome that:
+     *   1. Select2 KHONG tu goi ajax khi khoi tao - phai mo dropdown no moi goi.
+     *      Nen nap danh sach bang fetch roi dua vao `data`, khong dung `ajax`.
+     *   2. `.val(ma)` tra ve null neu trong the <select> khong co option mang ma
+     *      do, nen khi mo form sua phai render san option cua phuong/xa dang luu
+     *      (lam o PHP trong $phuongXa), roi chi can `trigger('change')`.
+     *   3. Doi tinh thi phai `select2('destroy')` roi khoi tao lai voi danh sach
+     *      moi, khong thi Select2 giu du lieu cua tinh cu.
+     *
+     * Nam ngoai $(document).ready de khong phu thuoc thu tu nap.
+     *
+     * CHUA CO SELECT2 NGAY LUC NAY - phai doi:
+     * script nay nam trong than trang, ma Select2 chi duoc nap o cuoi trang
+     * (trong ckeditor.js; the script tu CDN dat ngay truoc do, nhung may khong
+     * ra duoc Internet thi no khong nap duoc). Neu doi co Select2 moi gan su kien
+     * cho o Tinh/Thanh thi su kien KHONG BAO GIO duoc gan - chon tinh xong khong
+     * co gi xay ra. Nen: gan su kien NGAY, con khoi tao Select2 thi doi.
+     */
+    (function () {
+        var oTinh = document.getElementById('nx-tinh');
+        var oXa = document.getElementById('nx-xa');
+
+        if (!oTinh || !oXa) {
+            return;
+        }
+
+        var goc = @json(url('/dia-gioi/phuong-xa'));
+        var $xa = null;
+
+        /** Cho toi khi Select2 co mat (no nap o cuoi trang), roi moi chay. */
+        function khiCoSelect2(chay) {
+            if (window.jQuery && jQuery.fn.select2) {
+                chay();
+
+                return;
+            }
+
+            var soLan = 0;
+            var hen = setInterval(function () {
+                soLan++;
+
+                if (window.jQuery && jQuery.fn.select2) {
+                    clearInterval(hen);
+                    chay();
+                } else if (soLan > 100) {
+                    // 5 giay khong co Select2 thi thoi, khong de interval chay mai.
+                    clearInterval(hen);
+                }
+            }, 50);
+        }
+
+        function khoiTao(danhSach) {
+            // destroy truoc: Select2 cu con giu du lieu cua tinh truoc do.
+            if ($xa.data('select2')) {
+                $xa.select2('destroy');
+            }
+
+            $xa.empty();
+
+            $xa.select2({
+                placeholder: '[Chọn Phường/Xã]',
+                allowClear: true,
+                width: '100%',
+                language: {
+                    noResults: function () { return 'Không tìm thấy phường/xã'; },
+                },
+                data: (danhSach || []).map(function (x) {
+                    return { id: x.code, text: x.name };
+                }),
+            });
+        }
+
+        function nap(maTinh) {
+            if (!$xa) {
+                return;
+            }
+
+            if (!maTinh) {
+                if ($xa.data('select2')) {
+                    $xa.select2('destroy');
+                }
+                $xa.empty();
+                $xa.append(new Option('[Chọn Tỉnh/Thành trước]', ''));
+
+                return;
+            }
+
+            fetch(goc + '/' + encodeURIComponent(maTinh), { headers: { Accept: 'application/json' } })
+                .then(function (r) { return r.ok ? r.json() : []; })
+                .catch(function () { return []; })
+                .then(function (ds) { khoiTao(ds); });
+        }
+
+        if (window.jQuery) {
+            // Gan su kien NGAY, khong doi Select2: o Tinh/Thanh bi Select2 boc
+            // nen phai nghe bang jQuery chu KHONG phai addEventListener -
+            // jQuery.trigger('change') chi goi handler gan qua jQuery.
+            jQuery(oTinh).on('change', function () { nap(oTinh.value); });
+
+            khiCoSelect2(function () {
+                $xa = jQuery(oXa);
+
+                if (oTinh.value) {
+                    nap(oTinh.value);
+                } else {
+                    $xa.empty();
+                    $xa.append(new Option('[Chọn Tỉnh/Thành trước]', ''));
+                }
+            });
+        } else {
+            // Khong co jQuery thi khong the co Select2. Van phai gan de doi tinh
+            // thi o Phuong/Xa khong giu lai ma cu cua tinh truoc.
+            oTinh.addEventListener('change', function () {
+                oXa.innerHTML = '<option value="">[Chọn Phường/Xã]</option>';
+            });
+        }
+    })();
 </script>

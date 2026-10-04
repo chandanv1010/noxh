@@ -13,7 +13,6 @@ use App\Models\ProjectHighlight;
 use App\Models\ProjectMilestone;
 use App\Models\ProjectUnit;
 use App\Models\User;
-use App\Models\Province;
 use App\Repositories\Noxh\PostQuery;
 use App\Repositories\Noxh\ProjectQuery;
 use Illuminate\Http\Request;
@@ -73,7 +72,14 @@ class ProjectController extends FrontendController
             'duAn' => $duAn,
             'loc' => $loc,
             'locTho' => $request->all(),
-            'tinhThanh' => Province::select('code', 'name')->orderBy('name')->get(),
+            // Bo loc tinh cua thanh ben: lay tu vn_provinces (34 tinh/thanh,
+            // co cau hai cap) chu khong phai bang `provinces` 63 tinh cu -
+            // bang cu con ten cac tinh da sap nhap nen nguoi xem chon vao se
+            // ra trang trong.
+            'tinhThanh' => DB::table('vn_provinces')
+                ->orderBy('order')
+                ->orderBy('name')
+                ->get(['code', 'name']),
             'tinhCoDuAn' => $tinhCoDuAn,
             'ghimBanDo' => $this->ghimBanDo(),
             'tinTuc' => $this->postQuery->moiNhat(self::SO_TIN_COT_PHAI),

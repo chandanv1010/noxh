@@ -11,7 +11,7 @@
         : route('sale.project.update', $product->id);
 @endphp
 
-<form action="{{ $duong }}" method="post" class="box">
+<form action="{{ $duong }}" method="post" class="box nx-form-du-an">
     @csrf
 
     <div class="row">
