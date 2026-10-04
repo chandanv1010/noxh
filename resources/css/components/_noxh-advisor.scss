@@ -20,12 +20,24 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    // Chi con mot nguoi sau khi loc khu vuc: cho the chiem ca be ngang.
+    // Class nay do JS o trang chu bat/tat, xem home/index.blade.php.
+    &--mot {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
     @media (max-width: $nx-md) {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    // Dien thoai: GIU 2 cot chu khong ve 1 cot.
+    //
+    // Ban thiet ke ve 1 cot, nhung the nhan vien chi gom anh tron + ten + nut
+    // nen 2 cot van doc duoc, va danh sach 6 nguoi gon hon han ve 1 cot.
+    // Doi ve 1 cot thi phai sua ca day so duoi day, khong thi the bi bop lai.
     @media (max-width: $nx-sm) {
-        grid-template-columns: minmax(0, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
     }
 }
 
@@ -85,6 +97,52 @@
     &__nut {
         width: 100%;
         justify-content: center;
+    }
+}
+
+// Dien thoai: the bi chia doi be ngang nen phai thu nho anh, chu va nut.
+//
+// Ban thiet ke ve 1 cot o man hinh nho, nhung the nhan vien chi gom anh tron
+// + ten + nut nen 2 cot van doc duoc, va danh sach 6 nguoi gon hon han. Doi ve
+// 1 cot thi phai sua ca day so duoi day, khong thi the bi bop lai.
+//
+// Phai viet la .nx-advisors .nx-advisor__... chu khong long trong .nx-advisor:
+// long vao thi ra selector ".nx-advisor .nx-advisor__ten" (sai), va _noxh-home.scss
+// cung dat .nx-advisor__than { width: auto } nen can do cu the cao hon moi thang.
+@media (max-width: $nx-sm) {
+    .nx-advisors .nx-advisor {
+        padding: 11px 8px;
+        gap: 7px;
+    }
+
+    .nx-advisors .nx-advisor__anh {
+        width: 46px;
+        height: 46px;
+    }
+
+    // min-width: 0 de ten dai xuong dong thay vi keo rong ca o luoi;
+    // overflow-wrap de ten dai khong tran ra ngoai the.
+    .nx-advisors .nx-advisor__than {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .nx-advisors .nx-advisor__ten {
+        font-size: 12.5px;
+        line-height: 1.3;
+        overflow-wrap: anywhere;
+    }
+
+    .nx-advisors .nx-advisor__chuc,
+    .nx-advisors .nx-advisor__khu {
+        font-size: 11px;
+        line-height: 1.3;
+        overflow-wrap: anywhere;
+    }
+
+    .nx-advisors .nx-advisor__nut {
+        padding-block: 7px;
+        font-size: 12px;
     }
 }
 

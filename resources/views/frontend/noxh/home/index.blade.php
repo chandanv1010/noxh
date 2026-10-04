@@ -64,6 +64,16 @@
 @endphp
 
 {{-- 1. BANNER ------------------------------------------------------------- --}}
+@php
+    // Anh banner doc cho dien thoai, theo thu tu uu tien:
+    //   1. o "Anh nen banner (dien thoai)" trong Cau hinh -> Gioi thieu  <-- cho sua CHINH
+    //   2. slide nhom 'mobile-slide'  (du phong, khi o tren de trong)
+    //   3. anh may tinh
+    // O trong Cau hinh -> Gioi thieu phai dung TRUOC: do moi la cho quan tri
+    // nhin thay va sua. De slide dung truoc thi sua o do khong thay gi doi.
+    $anhBannerDoc = $intro['hero_image_mobile'] ?? ($slideBannerMobile['item'][0]['image'] ?? '');
+    $anhBannerDoc = trim((string) $anhBannerDoc);
+@endphp
 <section class="nx-hero">
     @if(!empty($intro['hero_image']))
         {{-- Hai ban anh banner: ban ngang cho man hinh rong, ban DOC cho dien
@@ -74,10 +84,10 @@
              chi tai DUNG mot anh no can, cach kia tai ca hai. --}}
         <div class="nx-hero__bg">
             <picture>
-                @if(!empty($intro['hero_image_mobile']))
-                    <source media="(max-width: 1024px)" srcset="{{ $intro['hero_image_mobile'] }}">
+                @if($anhBannerDoc !== '')
+                    <source media="(max-width: 1024px)" srcset="{{ nx_anh($anhBannerDoc, 'du-an') }}">
                 @endif
-                <img src="{{ $intro['hero_image'] }}" alt="{{ $intro['hero_title'] ?? '' }}"
+                <img src="{{ nx_anh($intro['hero_image'], 'du-an') }}" alt="{{ $intro['hero_title'] ?? '' }}"
                      fetchpriority="high" decoding="async">
             </picture>
         </div>
@@ -120,7 +130,17 @@
             </div>
         </div>
 
-        @if(count($soLieu))
+        {{--
+            Khoi "Bang so lieu canh banner" dang duoc AN TAM - ca may tinh lan
+            dien thoai.
+
+            Du lieu van duoc dung san o $soLieu (Cau hinh -> Gioi thieu, nhom
+            "Khoi 1b") nen khong phai nhap lai gi. Muon hien lai thi bo doan
+            `false &&` trong dieu kien duoi day.
+
+            CSS cua khoi nay (.nx-hero__so, .nx-so-the) giu nguyen, khong xoa.
+        --}}
+        @if(false && count($soLieu))
             <div class="nx-hero__so">
                 @foreach($soLieu as $s)
                     <div class="nx-so-the">
@@ -485,12 +505,19 @@
     if (oChon && oTuVan) {
         oChon.addEventListener('change', function () {
             var kv = oChon.value;
+            var conLai = 0;
 
             [].forEach.call(oTuVan.children, function (the) {
                 var o = the.querySelector('.nx-advisor__khu');
                 var cua = o ? o.textContent.replace('Khu vực:', '').trim() : '';
                 the.hidden = kv !== '' && cua !== kv;
+
+                if (!the.hidden) { conLai++; }
             });
+
+            // Chi con MOT nguoi thi cho the chiem ca be ngang. Luoi 2 cot de
+            // nguyen thi mot nua man hinh trong tron, nhin nhu loi.
+            oTuVan.classList.toggle('nx-advisors--mot', conLai === 1);
         });
     }
 })();

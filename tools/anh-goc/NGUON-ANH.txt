@@ -1,0 +1,35 @@
+NGUỒN ẢNH BANNER TRANG CHỦ
+==========================
+
+Ảnh gốc dùng để sinh ra banner-pc.jpg và banner-mobile.jpg:
+
+  Tệp        : linh-dam-01.jpg  (6000x3375, 9,2 MB)
+  Tên gốc    : Chung cư HH Linh Đàm, Hoàng Mai, Hà Nội 001.jpg
+  Tác giả    : Phan Minh Tuấn
+  Nguồn     : Wikimedia Commons
+               https://commons.wikimedia.org/wiki/File:Chung_c%C6%B0_HH_Linh_%C4%90%C3%A0m,_Ho%C3%A0ng_Mai,_H%C3%A0_N%E1%BB%99i_001.jpg
+  Giấy phép  : CC BY-SA 4.0
+               https://creativecommons.org/licenses/by-sa/4.0/
+
+ĐÂY LÀ ẢNH DEMO, KHÔNG PHẢI ẢNH CỦA DỰ ÁN.
+
+Giấy phép CC BY-SA 4.0 cho phép dùng miễn phí, kể cả cho mục đích thương mại,
+với HAI điều kiện:
+
+  1. Ghi công tác giả (Phan Minh Tuấn) và ghi rõ giấy phép CC BY-SA 4.0.
+  2. Nếu bạn sửa ảnh rồi phát hành bản đã sửa thì bản đó cũng phải theo
+     CC BY-SA 4.0.
+
+Trước khi chạy thật, nên thay bằng ảnh do chủ dự án cung cấp hoặc ảnh đã mua
+bản quyền, để không phải ghi công và không bị ràng buộc chia sẻ tương tự.
+
+Cách thay ảnh
+-------------
+1. Bỏ ảnh mới vào tools/anh-goc/ rồi sửa đường dẫn NGUON_PC và vùng 'cat'
+   trong tools/lam-anh-banner.py (hoặc chỉnh trực tiếp trên trang quản trị).
+2. Chạy:  python tools/lam-anh-banner.py
+   Script sẽ báo lỗi nếu phải phóng to ảnh (tức là ảnh gốc quá nhỏ) hoặc nếu
+   vùng cắt lệch tỉ lệ khung.
+3. Nhớ cập nhật lại tệp này nếu đổi ảnh.
+
+Muốn tải lại ảnh gốc: pwsh -File tools/tai-anh-goc.ps1

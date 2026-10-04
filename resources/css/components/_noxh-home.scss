@@ -36,7 +36,11 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center right;
+            // Anh banner co toa nha o NUA TREN va tan dan xuong nen o nua duoi
+            // (xem tools/lam-anh-banner.py). Khung banner thap hon anh rat nhieu
+            // nen phai neo vao mep TREN, khong thi phan nhin thay roi vao cho
+            // trong va banner trang tron.
+            object-position: center top;
         }
 
         // Chu nam de len anh nen phai co lop chuyen sac tu trai, neu khong
@@ -152,9 +156,8 @@
     @media (max-width: $nx-lg) {
         &__bg {
             img {
-                // Lay phan tren toa nha lam trong tam - day anh la san cay,
-                // khong phai thu can khoe.
-                object-position: center 18%;
+                // Anh doc cung co toa nha o nua tren - giu nguyen mep tren.
+                object-position: center top;
             }
 
             &::after {
@@ -203,6 +206,25 @@
         &__slogan {
             font-size: 16px;
         }
+
+        // Hai nut nam CHUNG MOT HANG tren dien thoai.
+        // Mac dinh `flex-wrap: wrap` nen khi khong du cho thi nut thu hai roi
+        // xuong hang duoi: banner cao them va chu bi day len. Doi sang nowrap
+        // roi chia deu be ngang, chu tu xuong dong ben trong nut neu can.
+        &__nut {
+            flex-wrap: nowrap;
+            gap: 10px;
+
+            .nx-btn {
+                flex: 1 1 0;
+                min-width: 0;
+                padding: 12px 10px;
+                font-size: 13px;
+                gap: 7px;
+                line-height: 1.25;
+                text-align: center;
+            }
+        }
     }
 
     @media (max-width: $nx-sm) {
@@ -212,6 +234,34 @@
 
         &__so {
             grid-template-columns: minmax(0, 1fr);
+        }
+
+        &__nut {
+            gap: 8px;
+
+            .nx-btn {
+                padding: 11px 7px;
+                // Co chu theo be ngang man hinh. Hai nut chia deu be ngang khung
+                // nen be rong nut ti le voi be rong man hinh, vi vay co chu cung
+                // phai theo ti le do thi chu moi vua MOT dong o moi co man hinh.
+                // Do bang scratch/do-nut-hero.cjs: 12px o >=375px, 10px o 320px.
+                // Neu doi chu tren nut dai hon thi phai do lai.
+                font-size: clamp(10px, 3.1vw, 12px);
+                gap: 5px;
+                letter-spacing: 0;
+
+                svg {
+                    width: 14px;
+                    height: 14px;
+                }
+            }
+
+            // Mui ten chi de trang tri, bo di cho du cho o man hinh 320px.
+            // `:last-child` de khong dung vao hinh cai file cua nut thu hai
+            // (hinh do la con DAU cua nut do).
+            .nx-btn:first-child svg:last-child {
+                display: none;
+            }
         }
     }
 }

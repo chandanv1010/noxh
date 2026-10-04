@@ -76,7 +76,7 @@ class Introduce
                 'image_mobile' => [
                     'type' => 'images',
                     'label' => 'Ảnh nền banner (điện thoại)',
-                    'title' => 'Ảnh DỌC, nên khoảng 900x1900. Trên điện thoại chữ nằm đè lên ảnh nên ảnh ngang sẽ không đủ chỗ. Để trống thì dùng luôn ảnh máy tính.',
+                    'title' => 'Đây là ô quyết định ảnh banner trên điện thoại. Ảnh DỌC tỉ lệ 0,62 (ví dụ 1200x1938). Trên điện thoại chữ nằm đè lên ảnh nên ảnh ngang sẽ không đủ chỗ. Để trống thì lấy ảnh ở slide nhóm "mobile-slide" (nếu có), không có nữa thì dùng luôn ảnh máy tính.',
                 ],
                 'label' => ['type' => 'text', 'label' => 'Dòng chữ nhỏ phía trên (VD: Cổng thông tin)'],
                 'title' => ['type' => 'text', 'label' => 'Tiêu đề lớn (VD: Nhà ở xã hội)'],
