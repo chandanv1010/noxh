@@ -222,15 +222,42 @@ if(!function_exists('renderSystemInput')){
 
 
 if(!function_exists('renderSystemImages')){
+    /**
+     * O nhap duong dan anh, kem ANH XEM TRUOC ben phai.
+     *
+     * Truoc day cho nay chi co mot <input>: quan tri go/re mot duong dan ma khong
+     * thay minh vua chon anh nao. Anh xem truoc lay dung gia tri dang luu, cap
+     * nhat khi go tay (su kien input/change) va khi chon xong trong CKFinder
+     * (xem HT.capNhatXemTruocAnh trong public/vendor/backend/library/finder.js).
+     */
     function renderSystemImages(string $name = '', $systems = null){
-        return '<input 
-            type="text"
-            name="config['.$name.']"
-            value="'.old($name, ($systems[$name]) ?? '').'"
-            class="form-control upload-image"
-            placeholder=""
-            autocomplete="off"
-        >';
+        // CSS chi in ra MOT lan cho ca trang, du trang co bao nhieu o anh.
+        static $daInCss = false;
+        $css = '';
+        if(!$daInCss){
+            $daInCss = true;
+            $css = '<style>
+                .o-anh{display:flex;align-items:flex-start;gap:10px}
+                .o-anh>.form-control{flex:1 1 auto;min-width:0}
+                .o-anh__xem{flex:0 0 auto;width:118px;height:66px;border:1px solid #e2e8f0;border-radius:6px;background:#f7fafc;overflow:hidden}
+                .o-anh__xem img{display:block;width:100%;height:100%;object-fit:cover}
+                .o-anh__xem.trong{display:none}
+            </style>';
+        }
+
+        $giaTri = (string) old($name, ($systems[$name]) ?? '');
+
+        return $css.'<div class="o-anh">
+            <input
+                type="text"
+                name="config['.$name.']"
+                value="'.e($giaTri).'"
+                class="form-control upload-image"
+                placeholder=""
+                autocomplete="off"
+            >
+            <span class="o-anh__xem'.($giaTri === '' ? ' trong' : '').'"><img src="'.e($giaTri).'" alt=""></span>
+        </div>';
     }
 }
 

@@ -1,2 +1,11 @@
+# Mac dinh: khong dua anh nguoi dung tai len vao git.
 *
 !.gitignore
+
+# Ngoai le: anh co ngon ngu do `python tools/lam-anh-co.py` ve ra, khong phai
+# anh nguoi dung tai len. Thieu thi moi trang quan tri 404 mot anh co, vi
+# languages.image trong CSDL tro vao day.
+# Phai mo lai tung cap thu muc cha thi git moi di vao duoc.
+!image/
+!image/language/
+!image/language/*.png

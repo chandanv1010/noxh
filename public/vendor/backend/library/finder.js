@@ -62,6 +62,47 @@
         });
     }
 
+    /**
+     * Cap nhat anh xem truoc cua o nhap anh (xem renderSystemImages trong
+     * app/Helpers/MyHelper.php).
+     *
+     * Goi o ba cho: luc tai trang, khi go tay (input/change), va sau khi chon
+     * anh trong CKFinder. Cho cuoi phai goi tay vi CKFinder dat gia tri bang
+     * jQuery .val(), ma .val() KHONG phat sinh su kien change.
+     */
+    HT.capNhatXemTruocAnh = (input) => {
+        let o = input.closest('.o-anh')
+        if(!o) return
+        let khung = o.querySelector('.o-anh__xem')
+        let anh = khung && khung.querySelector('img')
+        if(!khung || !anh) return
+
+        // Duong dan sai (tep khong ton tai) thi an khung di, khong hien bieu
+        // tuong anh hong.
+        anh.onerror = () => khung.classList.add('trong')
+        anh.onload = () => khung.classList.remove('trong')
+
+        let giaTri = (input.value || '').trim()
+        if(!giaTri){
+            khung.classList.add('trong')
+            anh.removeAttribute('src')
+            return
+        }
+        if(anh.getAttribute('src') !== giaTri){
+            anh.setAttribute('src', giaTri)
+        }
+        khung.classList.remove('trong')
+    }
+
+    HT.xemTruocAnh = () => {
+        $(document).on('input change', '.upload-image', function(){
+            HT.capNhatXemTruocAnh(this)
+        })
+        $('.upload-image').each(function(){
+            HT.capNhatXemTruocAnh(this)
+        })
+    }
+
     HT.uploadImageToInput = () => {
         $('.upload-image').click(function(){
             let input = $(this)
@@ -86,6 +127,7 @@
         finder.resourceType = type;
         finder.selectActionFunction = function( fileUrl, data ) {
             object.val(fileUrl)
+            HT.capNhatXemTruocAnh(object[0])
         }
         finder.popup();
     }
@@ -223,6 +265,7 @@
         HT.addItem()
         HT.removeItem()
         HT.uploadImageToInput();
+        HT.xemTruocAnh();
         HT.setupCkeditor();
         HT.uploadImageAvatar();
         HT.multipleUploadImageCkeditor();
