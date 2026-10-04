@@ -55,6 +55,11 @@ class NoxhSeeder extends Seeder
 
             // --- 4. Noi dung tung trang ------------------------------------
             NoxhFrontendContentSeeder::class,
+            // Noi lai danh muc cho du an da co. RemoveLegacyCatalogDataSeeder
+            // xoa sach product_catalogue_product, ma seeder noi dung o tren lai
+            // bo qua du an da ton tai - thieu buoc nay thi trang quan tri
+            // /product/index hien trong.
+            NoxhProjectCatalogueSeeder::class,
             NoxhHomeDesignSeeder::class,
             NoxhProjectPageSeeder::class,
             NoxhProjectDetailSeeder::class,
