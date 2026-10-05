@@ -505,19 +505,16 @@
     if (oChon && oTuVan) {
         oChon.addEventListener('change', function () {
             var kv = oChon.value;
-            var conLai = 0;
 
             [].forEach.call(oTuVan.children, function (the) {
                 var o = the.querySelector('.nx-advisor__khu');
                 var cua = o ? o.textContent.replace('Khu vực:', '').trim() : '';
+
+                // Chi an/hien. KHONG keo the cuoi cung rong ra: loc con mot
+                // nguoi thi the do phai giu DUNG be ngang mot cot nhu cac the
+                // khac, khong chiem ca hang.
                 the.hidden = kv !== '' && cua !== kv;
-
-                if (!the.hidden) { conLai++; }
             });
-
-            // Chi con MOT nguoi thi cho the chiem ca be ngang. Luoi 2 cot de
-            // nguyen thi mot nua man hinh trong tron, nhin nhu loi.
-            oTuVan.classList.toggle('nx-advisors--mot', conLai === 1);
         });
     }
 })();

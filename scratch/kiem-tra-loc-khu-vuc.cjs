@@ -23,6 +23,9 @@ const PORT = 9411;
 const UDD = path.join(os.tmpdir(), 'loc-kv-' + Date.now());
 const TRANG = 'http://noxh.test/';
 const KHU = process.argv[2] || 'Thái Nguyên';
+// Bề rộng màn hình giả lập; có thể truyền qua --rong 390. Mặc định để rộng.
+const iRong = process.argv.indexOf('--rong');
+const RONG_MH = iRong >= 0 ? Number(process.argv[iRong + 1]) : 0;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /** "Thái Nguyên" -> "thai-nguyen", để đặt tên tệp ảnh. */
@@ -66,8 +69,14 @@ const boDauTen = (s) => s.normalize('NFD')
     const sid = a.sessionId;
     await gui('Page.enable', {}, sid);
     await gui('Runtime.enable', {}, sid);
+    if (RONG_MH) {
+      await gui('Emulation.setDeviceMetricsOverride',
+        { width: RONG_MH, height: 1000, deviceScaleFactor: 1, mobile: RONG_MH <= 768 }, sid);
+    }
     await gui('Page.navigate', { url: TRANG }, sid);
     await sleep(4500);
+
+    if (RONG_MH) console.log('màn hình giả lập: ' + RONG_MH + 'px');
 
     const chay = async (expr) => {
       const r = await gui('Runtime.evaluate', {
@@ -93,11 +102,15 @@ const boDauTen = (s) => s.normalize('NFD')
         soThe: the.length,
         the: the.map(function (x) {
           var k = x.querySelector('.nx-advisor__khu');
+          var r = x.getBoundingClientRect();
           return {
             khu: k ? k.textContent.trim() : '(không có ô khu vực)',
             thuocTinhHidden: x.hasAttribute('hidden'),
             display: getComputedStyle(x).display,
-            cao: Math.round(x.getBoundingClientRect().height),
+            cao: Math.round(r.height),
+            // Bề ngang: thẻ lọc còn một người phải RỘNG BẰNG một cột bình
+            // thường, không được kéo dài hết hàng.
+            rong: Math.round(r.width),
           };
         }),
       };
@@ -109,7 +122,7 @@ const boDauTen = (s) => s.normalize('NFD')
     console.log('dropdown tự vẽ      : ' + truoc.coDropdownTuVe);
     console.log('số thẻ tư vấn       : ' + truoc.soThe);
     truoc.the.forEach((x, i) => console.log('   [' + i + '] ' + x.khu.padEnd(22) +
-      ' hidden=' + x.thuocTinhHidden + '  display=' + x.display + '  cao=' + x.cao));
+      ' hidden=' + x.thuocTinhHidden + '  display=' + x.display + '  cao=' + x.cao + '  rong=' + x.rong));
 
     const demHien = (tt) => tt.the.filter((x) => x.cao > 0).length;
 
@@ -161,7 +174,7 @@ const boDauTen = (s) => s.normalize('NFD')
         const sauA = await chay(DO);
         console.log('  giá trị select sau khi bấm: ' + JSON.stringify(sauA.giaTriSelect));
         sauA.the.forEach((x, i) => console.log('   [' + i + '] ' + x.khu.padEnd(22) +
-          ' hidden=' + x.thuocTinhHidden + '  display=' + x.display + '  cao=' + x.cao));
+          ' hidden=' + x.thuocTinhHidden + '  display=' + x.display + '  cao=' + x.cao + '  rong=' + x.rong));
         console.log('  => số thẻ CÒN HIỆN: ' + demHien(sauA) + ' / ' + sauA.soThe +
                     '  (mong đợi: đúng số thẻ thuộc "' + KHU + '")');
         console.log('  class nx-advisors--mot (1 thẻ chiếm cả hàng): ' + sauA.coMot);
@@ -202,7 +215,7 @@ const boDauTen = (s) => s.normalize('NFD')
     const sauB = await chay(DO);
     console.log('  giá trị select: ' + JSON.stringify(sauB.giaTriSelect));
     sauB.the.forEach((x, i) => console.log('   [' + i + '] ' + x.khu.padEnd(22) +
-      ' hidden=' + x.thuocTinhHidden + '  display=' + x.display + '  cao=' + x.cao));
+      ' hidden=' + x.thuocTinhHidden + '  display=' + x.display + '  cao=' + x.cao + '  rong=' + x.rong));
     console.log('  => số thẻ CÒN HIỆN: ' + demHien(sauB) + ' / ' + sauB.soThe);
 
   } catch (e) {

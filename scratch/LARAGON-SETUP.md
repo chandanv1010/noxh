@@ -457,9 +457,25 @@ Phải vá **cả** `public/build/assets/app-fb4cf9c4.css` (không có `node_mod
 > khối `[hidden]` còn nguyên.
 
 Kiểm chứng: `node scratch/kiem-tra-loc-khu-vuc.cjs "Thái Nguyên"` — chọn Thái
-Nguyên còn đúng **4/6** thẻ; `"Bắc Ninh"` còn đúng **1/6** và class
-`nx-advisors--mot` bật lên (một thẻ chiếm cả hàng). Script đo cả hai đường: bấm
-thật vào dropdown tự vẽ, và đặt `select.value` rồi phát `change`.
+Nguyên còn đúng **4/6** thẻ; `"Bắc Ninh"` còn đúng **1/6**, và thẻ còn lại giữ
+**đúng bề ngang một cột** (204px trên màn rộng, 161px ở 390px) chứ không bị kéo
+dài hết hàng. Script đo cả hai đường: bấm thật vào dropdown tự vẽ, và đặt
+`select.value` rồi phát `change`; thêm `--rong 390` để đo ở bề rộng điện thoại.
+
+### Bản CSS đã biên dịch chứa luật cũ đã bị xoá khỏi nguồn
+
+`public/build/assets/app-fb4cf9c4.css` là tệp **được commit sẵn** và còn được vá
+tay, nên nó **lệch khỏi SCSS**. Cụ thể: luật
+`.nx-advisors--mot { grid-template-columns: minmax(0,1fr) }` **không còn trong**
+`resources/css/components/_noxh-advisor.scss` nữa, nhưng vẫn nằm trong bản đã
+biên dịch (**2 chỗ**) và vì thế **vẫn có tác dụng khi chạy** — làm thẻ tư vấn
+viên cuối cùng bị kéo rộng hết hàng sau khi lọc.
+
+Đã gỡ bằng `node scratch/xoa-css-cu.cjs`.
+
+> **Bài học:** khi bản CSS đã biên dịch được commit sẵn, xoá luật trong SCSS là
+> **chưa đủ** — phải xoá cả trong bản đã biên dịch, nếu không luật cũ vẫn sống
+> và rất khó truy: đọc SCSS thì không thấy gì, mà chạy thì thấy sai.
 
 ## Khối "Bảng số liệu cạnh banner" đang ẩn
 
