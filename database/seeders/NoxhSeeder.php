@@ -66,6 +66,14 @@ class NoxhSeeder extends Seeder
             NoxhNewsPageSeeder::class,
             NoxhLegalPageSeeder::class,
             NoxhProjectMapSeeder::class,
+            // Anh banner trang chu (hero_image, hero_image_mobile) va ban ghi
+            // slide nhom 'mobile-slide'. Day la seeder DUY NHAT ghi hai khoa do,
+            // nen dat o cuoi nhom nay cho chac chan bang introduces da co.
+            //
+            // LUU Y: seeder nay GHI DE anh banner. Sau khi quan tri doi anh
+            // trong Cau hinh -> Gioi thieu ma chay lai db:seed thi anh ve mac
+            // dinh. Muon giu anh quan tri chon thi dung chay lai no.
+            NoxhSlideMobileSeeder::class,
 
             // --- 5. Bo kiem tra dieu kien ----------------------------------
             NoxhEligibilityWizardSeeder::class,
