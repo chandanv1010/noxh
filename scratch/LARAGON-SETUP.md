@@ -415,6 +415,52 @@ Bản clone không kèm theo thư mục `public/userfiles/`, nhưng CSDL lại t
 Kiểm chứng: chạy `node scratch/kiem-tra-o-anh.cjs <cookie> /introduce/index` →
 `khong co loi js nao` (trước đó là 2 dòng 404).
 
+## Bộ lọc tư vấn viên theo khu vực không lọc được — vì CSS, không phải JS
+
+Chọn một khu vực trong "Chọn khu vực" ở trang chủ thì danh sách tư vấn viên
+không đổi. Nhìn thì tưởng logic lọc sai, nhưng **JS hoàn toàn đúng**.
+
+Nguyên nhân: `[hidden] { display: none }` là **kiểu của trình duyệt**, độ ưu tiên
+thấp nhất, nên **mọi khai báo `display` của tác giả đều đè được nó**. JS đặt
+`the.hidden = true` chuẩn, mà thẻ vẫn hiện vì khối tư vấn ở trang chủ nằm trong
+`.nx-doi-tu-van`, và có luật `.nx-doi-tu-van .nx-advisor { display: grid }` —
+cùng độ ưu tiên 0,2,0 với `.nx-advisor[hidden]`, nên **thứ tự tệp quyết định**,
+rất mong manh.
+
+Đo được trước khi sửa: thẻ Bắc Ninh có `hidden=true` **mà `display: grid`**,
+chiều cao 115px → vẫn hiện. Sau khi sửa: `display: none`, chiều cao 0.
+
+**Quy ước cũ của dự án là thêm `&[hidden] { display: none }` cho TỪNG phần tử bị
+ẩn** — đã có 6 luật như vậy (`.nx-modal`, `.nx-modal__bao`, `.nx-chon__bang`,
+`.nx-chon__tim`, `.nx-pd-video`, `.nx-hop`) và cái thứ 7 bị quên đúng ở
+`.nx-advisor`. Kiểu quy ước này hỏng lại được bất cứ lúc nào có người quên.
+
+Đã thay bằng **một luật chung** trong `resources/css/components/_noxh.scss`:
+
+```scss
+[hidden] {
+    display: none !important;
+}
+```
+
+Đúng như cách Bootstrap làm (Bootstrap cũng đặt
+`[hidden]{display:none!important}`). `!important` làm thứ tự tệp không còn
+quan trọng.
+
+Phải vá **cả** `public/build/assets/app-fb4cf9c4.css` (không có `node_modules`
+để build lại) — chạy `node scratch/them-css-hidden.cjs`.
+
+> **Cẩn thận khi chạy hai script vá CSS:** `them-css-nut-hero.cjs` gỡ khối cũ
+> bằng cách **cắt tệp tại dấu của chính nó**, nên mọi thứ nằm SAU dấu đó sẽ bị
+> xoá khi chạy lại. Vì vậy `them-css-hidden.cjs` phải **chèn TRƯỚC** dấu của
+> nut-hero, không phải nối xuống cuối. Đã chạy lại nut-hero sau đó và xác nhận
+> khối `[hidden]` còn nguyên.
+
+Kiểm chứng: `node scratch/kiem-tra-loc-khu-vuc.cjs "Thái Nguyên"` — chọn Thái
+Nguyên còn đúng **4/6** thẻ; `"Bắc Ninh"` còn đúng **1/6** và class
+`nx-advisors--mot` bật lên (một thẻ chiếm cả hàng). Script đo cả hai đường: bấm
+thật vào dropdown tự vẽ, và đặt `select.value` rồi phát `change`.
+
 ## Khối "Bảng số liệu cạnh banner" đang ẩn
 
 Bốn ô số liệu (120+ dự án / 38 tỉnh / 15250+ tư vấn / 100%) trong banner trang chủ **đang được

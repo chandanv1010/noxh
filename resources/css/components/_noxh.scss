@@ -156,6 +156,27 @@ html {
 }
 
 // =============================================================================
+// THUOC TINH hidden PHAI LUON AN DUOC
+// =============================================================================
+//
+// Trinh duyet da co san [hidden] { display: none }, nhung do la kieu CUA TRINH
+// DUYET - do uu tien thap nhat - nen BAT KY khai bao `display` nao cua tac gia
+// cung de duoc no. Dat the.hidden = true trong JS se khong an duoc gi ca.
+//
+// Da dinh dung loi nay: bo loc tu van vien theo khu vuc o trang chu dat
+// `the.hidden = ...` HOAN TOAN DUNG, ma the van hien vi
+// `.nx-doi-tu-van .nx-advisor { display: grid }` de len. Nhin tuong nhu bo loc
+// hong, trong khi loi that nam o CSS.
+//
+// Quy uoc cu cua du an la them `&[hidden] { display: none }` cho TUNG phan tu
+// bi an; da co 6 luat nhu vay va cai thu 7 bi quen - dung cho nay. Mot luat
+// chung o day dung dung y nghia cua thuoc tinh hidden, va giong cach Bootstrap
+// lam (Bootstrap cung dat [hidden] { display: none !important }).
+[hidden] {
+    display: none !important;
+}
+
+// =============================================================================
 // NUT
 // =============================================================================
 .nx-btn {
