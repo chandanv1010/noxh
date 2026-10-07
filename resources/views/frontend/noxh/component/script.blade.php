@@ -383,6 +383,212 @@ window.NX.tienTuTrieu = function (trieu) {
     });
 })();
 
+// --- Lightbox anh du an -----------------------------------------------------
+//
+// Truoc day moi anh trong album la <a target="_blank">: bam vao la roi khoi
+// trang de xem mot tep anh. Nay bam vao thi hien lop phu ngay tai cho, co nut
+// lui/toi de xem het bo anh.
+//
+// The <a href> VAN DUOC GIU LAI, chi chan hanh vi mac dinh khi JS chay. Nho vay
+// neu JS loi hoac bi tat thi nguoi dung van mo duoc anh, chi la mo kieu cu.
+//
+// Bo anh gom MOI anh cua cung mot du an (anh lon, dai anh nho, album o tab Hinh
+// anh) chu khong rieng mot khoi - de bam mui ten la di het, khong bi nhot trong
+// khoi dang bam.
+(function () {
+    var goi = document.querySelectorAll('[data-nx-lb]');
+
+    if (!goi.length) return;
+
+    var ICON = {
+        dong: '<path d="M480-424 284-228q-11 11-25 11t-25-11q-11-11-11-25.5t11-25.5l196-196-196-196q-11-11-11-25.5t11-25.5q11-11 25.5-11t25.5 11l195 196 196-196q11-11 25.5-11t25.5 11q11 11 11 25.5T828-480L632-284l196 196q11 11 11 25.5T828-37q-11 11-25.5 11T777-37L581-233 385-37q-11 11-25.5 11T334-37q-11-11-11-25.5t11-25.5l196-196Z"/>',
+        truoc: '<path d="M589-305 394-500q-5-5-7-10.5t-2-11.5q0-6 2-11.5t7-10.5l195-195q6-6 14-6t14 6q6 6 6 14t-6 14L435-522l182 182q6 6 6 14t-6 14q-6 6-14 6t-14-6Z"/>',
+        sau: '<path d="M491-305q-6 6-14 6t-14-6q-6-6-6-14t6-14l182-182-182-182q-6-6-6-14t6-14q6-6 14-6t14 6l195 195q5 5 7 10.5t2 11.5q0 6-2 11.5t-7 10.5L491-305Z"/>'
+    };
+
+    var lop = null, anhLon = null, oDem = null, nutTruoc = null, nutSau = null, nutDong = null;
+    var ds = [], viTri = 0, dangMo = false, noiDaLuu = null, theDangBam = null;
+    var cuonTruoc = '';
+
+    function svg(duong, co) {
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="' + co + '" height="' + co +
+            '" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true" focusable="false">' +
+            duong + '</svg>';
+    }
+
+    // Ghep bo anh cua mot nhom, BO TRUNG theo duong dan: anh dai dien va anh
+    // nho dau tien thuong tro cung mot tep, de nguyen thi nguoi dung bam "toi"
+    // se gap lai dung tam anh do hai lan.
+    function gomAnh(nhom) {
+        var ra = [], daCo = {};
+
+        document.querySelectorAll('[data-nx-lb]').forEach(function (e) {
+            if (nhom && e.getAttribute('data-nx-nhom') !== nhom) return;
+
+            var u = e.getAttribute('data-nx-lb');
+
+            if (!u || daCo[u]) return;
+
+            daCo[u] = 1;
+            ra.push(u);
+        });
+
+        return ra;
+    }
+
+    function taoLop() {
+        if (lop) return;
+
+        lop = document.createElement('div');
+        lop.className = 'nx-lb';
+        lop.setAttribute('role', 'dialog');
+        lop.setAttribute('aria-modal', 'true');
+        lop.setAttribute('aria-label', 'Thư viện ảnh dự án');
+        lop.hidden = true;
+        lop.innerHTML =
+            '<img class="nx-lb__anh" alt="">' +
+            '<button type="button" class="nx-lb__nut nx-lb__truoc" aria-label="Ảnh trước">' + svg(ICON.truoc, 26) + '</button>' +
+            '<button type="button" class="nx-lb__nut nx-lb__sau" aria-label="Ảnh sau">' + svg(ICON.sau, 26) + '</button>' +
+            '<button type="button" class="nx-lb__nut nx-lb__dong" aria-label="Đóng">' + svg(ICON.dong, 24) + '</button>' +
+            '<p class="nx-lb__dem" aria-live="polite"></p>';
+
+        document.body.appendChild(lop);
+
+        anhLon = lop.querySelector('.nx-lb__anh');
+        oDem = lop.querySelector('.nx-lb__dem');
+        nutTruoc = lop.querySelector('.nx-lb__truoc');
+        nutSau = lop.querySelector('.nx-lb__sau');
+        nutDong = lop.querySelector('.nx-lb__dong');
+
+        nutDong.addEventListener('click', dong);
+        nutTruoc.addEventListener('click', function () { di(-1); });
+        nutSau.addEventListener('click', function () { di(1); });
+
+        // Bam ra nen (khong phai vao anh hay nut) thi dong.
+        lop.addEventListener('click', function (e) {
+            if (e.target === lop) dong();
+        });
+
+        // Anh xong moi hien: khong hien thi anh cu roi nhay sang anh moi.
+        anhLon.addEventListener('load', function () { anhLon.classList.add('is-xong'); });
+
+        // Vuot tren dien thoai.
+        var x0 = null;
+        lop.addEventListener('touchstart', function (e) {
+            x0 = e.changedTouches[0].clientX;
+        }, { passive: true });
+        lop.addEventListener('touchend', function (e) {
+            if (x0 === null) return;
+            var lech = e.changedTouches[0].clientX - x0;
+            if (Math.abs(lech) > 45) di(lech < 0 ? 1 : -1);
+            x0 = null;
+        }, { passive: true });
+    }
+
+    function napAnh(u) {
+        anhLon.classList.remove('is-xong');
+        anhLon.setAttribute('src', u);
+        // Anh trong bo dem thi gan nhu chac chan da co san; dat lai lop la de
+        // truong hop doc tu cache van hien ra (su kien load co the khong ban).
+        if (anhLon.complete) anhLon.classList.add('is-xong');
+    }
+
+    // Tai truoc anh ke ben de bam mui ten khong phai cho.
+    function taiTruoc() {
+        [viTri - 1, viTri + 1].forEach(function (i) {
+            if (i < 0 || i >= ds.length) return;
+            var a = new Image();
+            a.src = ds[i];
+        });
+    }
+
+    function ve() {
+        napAnh(ds[viTri]);
+        oDem.textContent = (viTri + 1) + ' / ' + ds.length;
+
+        var motAnh = ds.length < 2;
+        nutTruoc.hidden = motAnh;
+        nutSau.hidden = motAnh;
+        oDem.hidden = motAnh;
+
+        taiTruoc();
+    }
+
+    function di(lech) {
+        if (ds.length < 2) return;
+        viTri = (viTri + lech + ds.length) % ds.length;
+        ve();
+    }
+
+    function mo(boAnh, duong, the) {
+        ds = boAnh;
+        viTri = Math.max(0, ds.indexOf(duong));
+        theDangBam = the || null;
+
+        taoLop();
+        ve();
+
+        // Khoa cuon trang nen, bu lai phan thanh cuon bi mat de trang khong
+        // nhay sang phai khi lop phu hien ra.
+        cuonTruoc = document.documentElement.style.overflow;
+        var rong = window.innerWidth - document.documentElement.clientWidth;
+        document.documentElement.style.overflow = 'hidden';
+        if (rong > 0) document.body.style.paddingRight = rong + 'px';
+
+        noiDaLuu = document.activeElement;
+        lop.hidden = false;
+        dangMo = true;
+        nutDong.focus();
+
+        document.addEventListener('keydown', phim);
+    }
+
+    function dong() {
+        if (!dangMo) return;
+        dangMo = false;
+        lop.hidden = true;
+        anhLon.removeAttribute('src');
+
+        document.documentElement.style.overflow = cuonTruoc;
+        document.body.style.paddingRight = '';
+
+        document.removeEventListener('keydown', phim);
+
+        // Tra tieu diem ve dung cho cu - nguoi dung bam ban phim khong bi lac.
+        var ve = theDangBam || noiDaLuu;
+        if (ve && typeof ve.focus === 'function') ve.focus();
+    }
+
+    function phim(e) {
+        if (!dangMo) return;
+
+        if (e.key === 'Escape') { e.preventDefault(); dong(); return; }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); di(-1); return; }
+        if (e.key === 'ArrowRight') { e.preventDefault(); di(1); return; }
+
+        // Tab chi chay vong trong ba nut cua lop phu.
+        if (e.key !== 'Tab') return;
+
+        var nut = [nutDong, nutTruoc, nutSau].filter(function (n) { return n && !n.hidden; });
+        var dau = nut[0], cuoi = nut[nut.length - 1];
+
+        if (e.shiftKey && document.activeElement === dau) { e.preventDefault(); cuoi.focus(); }
+        else if (!e.shiftKey && document.activeElement === cuoi) { e.preventDefault(); dau.focus(); }
+    }
+
+    document.addEventListener('click', function (e) {
+        var the = e.target.closest ? e.target.closest('[data-nx-lb]') : null;
+
+        if (!the) return;
+
+        // Chan hanh vi mac dinh cua the <a>: neu khong thi trinh duyet van mo
+        // anh sang tab moi song song voi viec hien lop phu.
+        e.preventDefault();
+
+        mo(gomAnh(the.getAttribute('data-nx-nhom')), the.getAttribute('data-nx-lb'), the);
+    });
+})();
+
 // --- Nut "Xem video du an" --------------------------------------------------
 // Chi dung mot lop phu duy nhat, tao luc bam lan dau. Dong lai thi GO HAN
 // the iframe chu khong chi an di - de an thi YouTube van chay tieng ngam.

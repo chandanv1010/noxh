@@ -7,6 +7,15 @@
     O an co_gan_nhan_vien la dau hieu "form nay co quyen dong vao danh sach".
     Khong co no thi khong phan biet duoc "bo het nguoi ra khoi du an" voi "form
     khong gui o nay len" - trinh duyet khong gui o chon nhieu khi khong chon gi.
+
+    NGUON DU LIEU CUA O CHON NAY (truoc day khong ghi ro nen rat de hieu nham la
+    danh sach cung):
+      ProductController::nhanVienKinhDoanh()
+        = thanh vien dang hoat dong (users.publish = 2)
+          thuoc mot nhom co bat co "La nhom nhan vien kinh doanh"
+          (user_catalogues.is_sale = 1).
+    Them mot nhom nua co bat co do, hoac them nguoi vao nhom do, la danh sach
+    nay dai ra ngay - khong phai sua ma nguon.
 --}}
 @php
     $dangPhuTrach = [];
@@ -48,5 +57,18 @@
                 <em>Là nhóm nhân viên kinh doanh</em> cho một nhóm, rồi thêm thành viên vào nhóm đó.
             </p>
         @endif
+
+        {{-- Noi ro du lieu o tren den tu dau. Khong co dong nay thi rat de tuong
+             danh sach la co dinh trong ma nguon, nhat la khi CSDL dang co san vai
+             nhan vien mau do seeder tao ra. --}}
+        <div style="margin-top:9px;padding-top:9px;border-top:1px dashed #e3e7ec;font-size:12.5px;color:#7b8794;line-height:1.6">
+            Danh sách trên lấy tự động từ
+            <a href="{{ route('user.index') }}" target="_blank">QL Thành viên</a>:
+            những người <strong>đang hoạt động</strong> và thuộc một nhóm có bật ô
+            <em>Là nhóm nhân viên kinh doanh</em>
+            (<a href="{{ route('user.catalogue.index') }}" target="_blank">Nhóm thành viên</a>).
+            Hiện có <strong>{{ count($nhanVienKinhDoanh ?? []) }}</strong> người.
+            Muốn thêm người vào danh sách này thì thêm thành viên vào nhóm đó — không phải sửa mã nguồn.
+        </div>
     </div>
 </div>

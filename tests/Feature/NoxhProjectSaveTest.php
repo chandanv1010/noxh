@@ -205,4 +205,64 @@ class NoxhProjectSaveTest extends TestCase
         $this->assertStringContainsString('Trạng thái dự án', $html);
         $this->assertStringNotContainsString('Tồn kho', $html);
     }
+
+    /**
+     * Luu du an ma form KHONG gui danh muc len thi du an van phai hien o trang
+     * quan tri.
+     *
+     * Trang /product/index liet ke bang INNER JOIN product_catalogue_product, nen
+     * du an khong co dong lien ket se bien mat khoi danh sach - trong khi web
+     * ngoai van hien binh thuong. Do la loi "bai nay khong thay trong admin de
+     * sua" da gap that.
+     */
+    public function test_luu_ma_khong_chon_danh_muc_thi_van_hien_o_trang_quan_tri(): void
+    {
+        $u = $this->quanTri();
+
+        // Don truoc: bai kiem tra khong dung RefreshDatabase, ma `products.code`
+        // khong phai khoa duy nhat - chay lai lan hai ma con ban ghi cu thi
+        // `first()` se tra ve dung ban cu do va ket qua doc ra sai.
+        $this->xoaDuAnTheoMa('DA-KHONG-DM');
+
+        $this->actingAs($u)->post('/product/store', [
+            'name' => 'Du an khong chon danh muc',
+            'canonical' => 'du-an-khong-chon-danh-muc',
+            'code' => 'DA-KHONG-DM',
+            'publish' => 2,
+            // Co y KHONG gui product_catalogue_id.
+        ]);
+
+        $duAn = Product::where('code', 'DA-KHONG-DM')->latest('id')->first();
+        $this->assertNotNull($duAn, 'Khong luu duoc du an');
+
+        $this->assertTrue(
+            $duAn->product_catalogues()->exists(),
+            'Du an khong thuoc danh muc nao thi se khong hien o trang quan tri'
+        );
+
+        $html = $this->actingAs($u)->get('/product/index')->assertOk()->getContent();
+        $this->assertStringContainsString('Du an khong chon danh muc', $html);
+
+        $this->xoaDuAnTheoMa('DA-KHONG-DM');
+    }
+
+    /**
+     * Xoa sach moi ban ghi du an mang ma nay, ke ca ban con sot tu lan chay truoc.
+     *
+     * Phai xoa ca dong trong `routers`: `canonical` co rang buoc unique, nen neu
+     * con sot thi lan chay sau se hong ngay o buoc kiem tra du lieu chu khong
+     * phai o cho dang kiem.
+     */
+    private function xoaDuAnTheoMa(string $ma): void
+    {
+        $ids = DB::table('products')->where('code', $ma)->pluck('id')->all();
+
+        if ($ids) {
+            DB::table('product_catalogue_product')->whereIn('product_id', $ids)->delete();
+            DB::table('product_language')->whereIn('product_id', $ids)->delete();
+            DB::table('products')->whereIn('id', $ids)->delete();
+        }
+
+        DB::table('routers')->where('canonical', 'du-an-khong-chon-danh-muc')->delete();
+    }
 }

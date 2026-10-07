@@ -1968,6 +1968,118 @@
     a:hover img { transform: scale(1.05); }
 }
 
+// --- Lightbox anh du an ----------------------------------------------------------
+//
+// Truoc day moi anh trong album la mot the <a target="_blank">, bam vao la mo tab
+// moi chi de xem mot tep anh. Nay bam vao thi hien lop phu ngay tai cho.
+//
+// z-index phai cao hon ca header (9999) va menu di dong (10001).
+.nx-lb {
+    position: fixed;
+    inset: 0;
+    z-index: 10050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(6, 12, 28, 0.93);
+    padding: 56px 68px;
+
+    &[hidden] { display: none; }
+
+    @media (max-width: $nx-md) {
+        padding: 52px 8px 64px;
+    }
+
+    &__anh {
+        max-width: 100%;
+        max-height: 100%;
+        display: block;
+        border-radius: 6px;
+        background: #0b1226;
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+        // Anh dang tai xong moi hien, tranh nhay tu anh cu sang anh moi.
+        opacity: 0;
+        transition: opacity 0.18s;
+
+        &.is-xong { opacity: 1; }
+    }
+
+    // Nut chung: dong, lui, toi.
+    &__nut {
+        position: absolute;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.14);
+        color: #fff;
+        cursor: pointer;
+        transition: background 0.15s;
+
+        &:hover { background: rgba(255, 255, 255, 0.26); }
+        &:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+    }
+
+    &__dong {
+        top: 14px;
+        right: 14px;
+    }
+
+    &__truoc,
+    &__sau {
+        top: 50%;
+        margin-top: -22px;
+    }
+
+    &__truoc { left: 12px; }
+    &__sau { right: 12px; }
+
+    &__dem {
+        position: absolute;
+        bottom: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        background: rgba(0, 0, 0, 0.35);
+        padding: 4px 12px;
+        border-radius: 999px;
+        white-space: nowrap;
+    }
+
+    // Moi anh trong album: con tro zoom la tin hieu quen thuoc, de hieu hon la
+    // doi con tro pointer - nguoi dung biet bam vao se phong to tai cho.
+    &__goi {
+        cursor: zoom-in;
+    }
+}
+
+// Nut "phong to" phu len anh lon o dau trang chi tiet.
+.nx-pd-anh__to {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(6, 12, 28, 0.62);
+    color: #fff;
+    cursor: zoom-in;
+    transition: background 0.15s;
+
+    &:hover { background: rgba(6, 12, 28, 0.85); }
+    &:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+}
+
 // --- Du an tuong tu --------------------------------------------------------------
 .nx-pd-tt-luoi {
     display: grid;

@@ -341,9 +341,15 @@
                             @endif
 
                             @if(count($album))
+                                {{-- Anh trong album mo bang LIGHTBOX ngay tai cho.
+                                     Truoc day moi anh la mot the <a target="_blank">
+                                     nen bam vao la nhay sang tab moi chi de xem mot
+                                     tep anh - roi khoi trang dang xem. --}}
                                 <div class="nx-pd-album">
                                     @foreach($album as $a)
-                                        <a href="{{ $a }}" target="_blank" rel="noopener">
+                                        <a href="{{ $a }}" class="nx-lb__goi"
+                                           data-nx-lb="{{ e($a) }}"
+                                           data-nx-nhom="du-an-{{ $duAn->id }}">
                                             <img src="{{ $a }}" alt="{{ $duAn->name }}" loading="lazy" decoding="async">
                                         </a>
                                     @endforeach

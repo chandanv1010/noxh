@@ -89,6 +89,32 @@ class SystemController extends Controller
         }
         return redirect()->route('system.index')->with('error','Cập nhật bản ghi không thành công. Hãy thử lại');
     }
+
+    /**
+     * Kiểm tra cấu hình Telegram ngay trong trang quản trị.
+     *
+     * Vi sao can: cau hinh Telegram sai thi bieu hien duy nhat la "khong thay
+     * thong bao nao ve may", ma co it nhat bon nguyen nhan khac nhau. Ngoi doan
+     * tung cai rat mat thoi gian, nen cho quan tri bam mot nut ra cau tra loi.
+     *
+     * @param  string  $viec  token | chat-id | gui-thu
+     */
+    public function kiemTraTelegram(Request $request, \App\Services\Noxh\TelegramService $telegram)
+    {
+        if (!$request->expectsJson() && !$request->ajax()) {
+            return redirect()->route('system.index');
+        }
+
+        $viec = (string) $request->input('viec', 'token');
+
+        $ketQua = match ($viec) {
+            'chat-id' => $telegram->timChatId(),
+            'gui-thu' => $telegram->guiThu(),
+            default => $telegram->kiemTraToken(),
+        };
+
+        return response()->json($ketQua);
+    }
     
     private function config(){
         return [

@@ -6,44 +6,32 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Noi lai danh muc cho cac du an NOXH da co trong CSDL.
+ * Noi lai danh muc cho MOI du an trong CSDL.
  *
- * VI SAO CAN SEEDER RIENG:
- * NoxhFrontendContentSeeder tao du an kem dong lien ket trong
- * product_catalogue_product, nhung no bo qua du an da ton tai
- * (`if product_language where canonical exists -> continue`). Ma
- * RemoveLegacyCatalogDataSeeder lai xoa sach product_catalogue_product va
- * ca product_catalogues. Hau qua: CSDL nao da chay seeder danh muc mot lan
- * roi chay lai seeder noi dung thi du an van con, nhung bang lien ket rong.
- *
+ * VI SAO CAN:
  * Trang quan tri /product/index lay danh sach bang query co
- * `INNER JOIN product_catalogue_product`, nen bang lien ket rong lam trang
- * do hien ra TRONG - du web ngoai van hien du du an (ProjectQuery chi join
- * product_language). Do la loi da gap that.
+ * `INNER JOIN product_catalogue_product`. Du an nao khong co dong lien ket
+ * trong bang do thi KHONG BAO GIO hien ra o trang quan tri - du web ngoai van
+ * hien binh thuong, vi ProjectQuery chi join product_language. Do la mot loi da
+ * gap that, va no rat de gay hieu nham: "bai nay khong thay trong admin".
  *
- * Seeder nay chay lai duoc nhieu lan va KHONG de len du lieu quan tri da
- * sua tay:
- *   - du an da tro dung vao mot danh muc CON TON TAI  -> giu nguyen
- *   - du an chua co danh muc, hoac dang tro vao id da bi xoa (mo coi)
- *     -> gan vao danh muc dau tien, dung quy uoc cua NoxhFrontendContentSeeder
+ * BAN CU CUA SEEDER NAY CHI XU LY 6 DU AN MAU:
+ * no liet ke cung 6 canonical trong mot mang hang so. Du an nao them sau - do
+ * quan tri tu tao, hoac do ban dung CSDL khac - khong nam trong mang do nen
+ * KHONG BAO GIO duoc noi danh muc. Dung loi nay khi mot du an that (vi du
+ * noxh-machino-elite-phu-xuan) bien mat khoi trang quan tri.
+ * Ban hien tai bo han mang hang so: quet TAT CA san pham.
+ *
+ * Seeder nay chay lai duoc nhieu lan va KHONG de len du lieu quan tri da sua tay:
+ *   - san pham da tro dung vao mot danh muc CON TON TAI  -> giu nguyen
+ *   - san pham chua co danh muc, hoac tro vao id da bi xoa (mo coi)
+ *     -> gan vao danh muc dau tien
+ *   - dong lien ket da co -> khong them ban trung
  *
  * Chay: php artisan db:seed --class=NoxhProjectCatalogueSeeder --force
  */
 class NoxhProjectCatalogueSeeder extends Seeder
 {
-    /**
-     * Du an mau, nhan dien bang canonical trong product_language.
-     * Trung voi danh sach trong NoxhFrontendContentSeeder::napDuAn().
-     */
-    private const DU_AN = [
-        'noxh-tuc-duyen',
-        'noxh-hong-tien',
-        'noxh-evergreen-bac-giang',
-        'noxh-iec-residences',
-        'noxh-phuc-thinh',
-        'noxh-song-cong',
-    ];
-
     private const LANG = 1;
 
     public function run(): void
@@ -69,44 +57,44 @@ class NoxhProjectCatalogueSeeder extends Seeder
 
         $this->command?->line(sprintf('  danh muc dich        : #%d %s', $danhMuc, $tenDanhMuc));
 
-        $idsDanhMucConTonTai = DB::table('product_catalogues')->pluck('id')->all();
+        $idsDanhMucConTonTai = array_map('intval', DB::table('product_catalogues')->pluck('id')->all());
 
-        $daNoi = 0;
-        $giuNguyen = 0;
+        // Ten hien thi de bao cao cho de hieu, khong phai id kho khan.
+        $tenTheoSanPham = DB::table('product_language')
+            ->where('language_id', self::LANG)
+            ->pluck('name', 'product_id');
+
+        $sanPham = DB::table('products')
+            ->whereNull('deleted_at')
+            ->orderBy('id')
+            ->get(['id', 'product_catalogue_id']);
+
+        $ganMoi = 0;
         $suaMoCoi = 0;
-        $khongThay = 0;
+        $themLienKet = 0;
 
-        foreach (self::DU_AN as $canonical) {
-            $productId = DB::table('product_language')
-                ->where('canonical', $canonical)
-                ->where('language_id', self::LANG)
-                ->value('product_id');
+        foreach ($sanPham as $sp) {
+            $hienTai = $sp->product_catalogue_id;
+            $hopLe = in_array((int) $hienTai, $idsDanhMucConTonTai, true);
 
-            if (! $productId) {
-                $khongThay++;
-                $this->command?->line(sprintf('    thieu du an        : %s', $canonical));
-
-                continue;
-            }
-
-            $hienTai = DB::table('products')->where('id', $productId)->value('product_catalogue_id');
-            $hopLe = in_array((int) $hienTai, array_map('intval', $idsDanhMucConTonTai), true);
-
-            if ($hopLe && (int) $hienTai !== (int) $danhMuc) {
-                // Quan tri da chu dong doi danh muc - khong dung vao.
-                $giuNguyen++;
-            } elseif (! $hopLe) {
+            if (! $hopLe) {
                 DB::table('products')
-                    ->where('id', $productId)
+                    ->where('id', $sp->id)
                     ->update(['product_catalogue_id' => $danhMuc, 'updated_at' => now()]);
 
-                if ($hienTai === null) {
-                    $daNoi++;
+                $ten = $tenTheoSanPham[$sp->id] ?? ('#' . $sp->id);
+
+                // Cot products.product_catalogue_id la int NOT NULL default 0, nen
+                // "chua gan" hien ra la so 0 chu khong phai NULL. Van de phong
+                // truong hop NULL o ban CSDL khac.
+                if ($hienTai === null || (int) $hienTai === 0) {
+                    $ganMoi++;
+                    $this->command?->line(sprintf('    chua gan danh muc   : %s', $ten));
                 } else {
                     $suaMoCoi++;
                     $this->command?->line(sprintf(
-                        '    id danh muc mo coi : #%d tro vao %s -> %d',
-                        $productId,
+                        '    id danh muc mo coi : %s tro vao %s -> %d',
+                        $ten,
                         var_export($hienTai, true),
                         $danhMuc
                     ));
@@ -116,24 +104,44 @@ class NoxhProjectCatalogueSeeder extends Seeder
             // Dong lien ket la thu trang quan tri dung de liet ke. Chi them khi
             // chua co, de khong tao ban trung.
             $coLienKet = DB::table('product_catalogue_product')
-                ->where('product_id', $productId)
+                ->where('product_id', $sp->id)
                 ->where('product_catalogue_id', $danhMuc)
                 ->exists();
 
             if (! $coLienKet) {
                 DB::table('product_catalogue_product')->insert([
-                    'product_id' => $productId,
+                    'product_id' => $sp->id,
                     'product_catalogue_id' => $danhMuc,
                 ]);
+
+                $themLienKet++;
+                $this->command?->line(sprintf(
+                    '    them lien ket      : %s',
+                    $tenTheoSanPham[$sp->id] ?? ('#' . $sp->id)
+                ));
             }
         }
 
+        // Bao cao them: san pham nao khong nam trong danh muc nao. Con so nay
+        // phai bang 0 sau khi chay - khac 0 nghia la trang quan tri van se thieu.
+        $khongThuocDanhMuc = DB::table('products')
+            ->leftJoin('product_catalogue_product as pcp', 'pcp.product_id', '=', 'products.id')
+            ->whereNull('products.deleted_at')
+            ->whereNull('pcp.product_id')
+            ->count();
+
+        $tongSanPham = $sanPham->count();
         $tongLienKet = DB::table('product_catalogue_product')->count();
 
-        $this->command?->line(sprintf('  du an gan danh muc   : %d', $daNoi));
+        $this->command?->line(sprintf('  tong du an           : %d', $tongSanPham));
+        $this->command?->line(sprintf('  gan danh muc moi     : %d', $ganMoi));
         $this->command?->line(sprintf('  sua id mo coi        : %d', $suaMoCoi));
-        $this->command?->line(sprintf('  giu nguyen (da dung) : %d', $giuNguyen));
-        $this->command?->line(sprintf('  khong tim thay       : %d', $khongThay));
+        $this->command?->line(sprintf('  them dong lien ket   : %d', $themLienKet));
         $this->command?->line(sprintf('  tong dong lien ket   : %d', $tongLienKet));
+        $this->command?->line(sprintf(
+            '  con sot (phai = 0)   : %d %s',
+            $khongThuocDanhMuc,
+            $khongThuocDanhMuc === 0 ? '' : '<-- se khong hien o trang quan tri'
+        ));
     }
 }

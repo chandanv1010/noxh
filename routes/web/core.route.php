@@ -24,6 +24,9 @@ Route::group(['middleware' => ['admin','locale','backend_default_locale']], func
     Route::group(['prefix' => 'system'], function () {
         Route::get('index', [SystemController::class, 'index'])->name('system.index');
         Route::post('store', [SystemController::class, 'store'])->name('system.store');
+        // Kiểm tra cấu hình Telegram (token, chat id, gửi thử) — trả JSON cho
+        // nút bấm trong trang cấu hình, không phải một trang riêng.
+        Route::post('telegram/kiem-tra', [SystemController::class, 'kiemTraTelegram'])->name('system.telegram.kiem-tra');
         Route::get('{languageId}/translate', [SystemController::class, 'translate'])->where(['languageId' => '[0-9]+'])->name('system.translate');
         Route::post('{languageId}/saveTranslate', [SystemController::class, 'saveTranslate'])->where(['languageId' => '[0-9]+'])->name('system.save.translate');
     });

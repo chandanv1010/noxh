@@ -18,6 +18,7 @@ use App\Services\V1\Product\ProductCatalogueService;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Pagination\Paginator;
@@ -373,9 +374,46 @@ class ProductService extends BaseService
         return $this->productRepository->createPivot($product, $payload, 'languages');
     }
 
+    /**
+     * Gan danh muc cho san pham.
+     *
+     * KHONG BAO GIO de san pham mo coi (khong thuoc danh muc nao).
+     * Trang quan tri /product/index liet ke bang query co
+     * `INNER JOIN product_catalogue_product`, nen san pham khong co dong lien
+     * ket se BIEN MAT khoi danh sach - trong khi web ngoai van hien binh thuong
+     * (ProjectQuery chi join product_language). Do dung la loi da gap: mot du an
+     * that khong tim thay trong trang quan tri de sua.
+     *
+     * Truoc day ham nay goi thang sync($this->catalogue($request)), ma
+     * catalogue() tra ve [null] khi form khong gui product_catalogue_id - tuc la
+     * xoa sach lien ket roi bo lai mot san pham khong hien o dau ca.
+     */
     private function updateCatalogueForProduct($product, $request)
     {
-        $product->product_catalogues()->sync($this->catalogue($request));
+        $danhSach = $this->catalogue($request);
+
+        if (empty($danhSach)) {
+            // Form khong gui danh muc nao len. KHONG duoc de san pham mo coi:
+            // trang quan tri liet ke bang INNER JOIN product_catalogue_product,
+            // nen no se bien mat khoi danh sach du web ngoai van hien binh thuong.
+            // Gan vao danh muc dau tien la lua chon it thiet hai nhat - nguoi
+            // quan tri van tim thay no de sua lai.
+            $dauTien = DB::table('product_catalogues')->orderBy('id')->value('id');
+
+            if ($dauTien) {
+                Log::info('San pham #' . $product->id . ' khong duoc chon danh muc, tam gan vao danh muc #' . $dauTien);
+                $danhSach = [$dauTien];
+            } elseif ($product->product_catalogues()->exists()) {
+                // Khong co danh muc nao de gan: giu nguyen cai dang co.
+                return;
+            } else {
+                Log::warning('San pham #' . $product->id . ' khong thuoc danh muc nao, ma CSDL cung chua co danh muc nao.');
+
+                return;
+            }
+        }
+
+        $product->product_catalogues()->sync($danhSach);
     }
 
     /**
@@ -439,12 +477,23 @@ class ProductService extends BaseService
     }
 
 
+    /**
+     * Danh sach id danh muc lay tu form.
+     *
+     * Loc bo gia tri rong: form khong chon danh muc nao thi
+     * $request->product_catalogue_id la null, va [null] lot xuong sync() se tao
+     * mot dong lien ket voi id 0 - vua sai vua lam san pham khong hien o dau.
+     */
     private function catalogue($request)
     {
-        if ($request->input('catalogue') != null) {
-            return array_unique(array_merge($request->input('catalogue'), [$request->product_catalogue_id]));
+        $ds = $request->input('catalogue');
+        $ds = is_array($ds) ? $ds : [];
+
+        if ($request->product_catalogue_id) {
+            $ds[] = $request->product_catalogue_id;
         }
-        return [$request->product_catalogue_id];
+
+        return array_values(array_filter(array_unique($ds)));
     }
 
 
