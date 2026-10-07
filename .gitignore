@@ -64,6 +64,10 @@ public.zip
 # `node scratch/chup-banner.cjs` hoac `node scratch/do-nut-hero.cjs`.
 /scratch/anh-chup/
 
+# Noi dung commit viet san ra tep roi `git commit -F` - de giu nguyen dau xuong
+# dong va tranh PowerShell an mat chu. Chi la tep tam, khong thuoc ma nguon.
+/scratch/commit-*.txt
+
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
