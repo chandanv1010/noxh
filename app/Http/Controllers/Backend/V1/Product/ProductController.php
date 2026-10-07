@@ -238,8 +238,23 @@ class ProductController extends Controller
             'tinhThanh' => $this->tinhThanh(),
             'phuongXa' => $this->phuongXaDangLuu($product),
             'nhanVienKinhDoanh' => $this->nhanVienKinhDoanh(),
+            'nhomKinhDoanh' => $this->nhomKinhDoanh(),
             'duAnKhac' => $this->duAnKhac(),
         ];
+    }
+
+    /**
+     * Nhom duoc danh dau la nhan vien kinh doanh, de form du an dan thang toi
+     * danh sach thanh vien cua nhom do.
+     *
+     * Khong co duong dan nay thi nguoi quan tri phai tu mo QL Thanh vien, tu do
+     * xem nhom nao dang bat co - khong ro rang chut nao.
+     */
+    private function nhomKinhDoanh()
+    {
+        return \App\Models\UserCatalogue::where('is_sale', 1)
+            ->orderBy('id')
+            ->first(['id', 'name']);
     }
 
     /**

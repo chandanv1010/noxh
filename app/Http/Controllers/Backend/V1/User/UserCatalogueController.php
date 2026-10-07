@@ -130,4 +130,32 @@ class UserCatalogueController extends Controller
         return redirect()->route('user.catalogue.index')->with('error','Có vấn đề xảy ra, Hãy thử lại');
     }
 
+    /**
+     * Bật/tắt cờ "Là nhóm nhân viên kinh doanh" ngay trong danh sách nhóm.
+     *
+     * Cờ này quyết định khá nhiều thứ: thành viên của nhóm đăng nhập ở /sale thay
+     * vì trang quản trị, và họ có xuất hiện ở ô chọn "nhân viên phụ trách" trong
+     * form dự án hay không. Trước đây muốn đổi phải mở từng nhóm ra sửa, mà danh
+     * sách thì không hiện cờ - nên không ai biết nhóm nào đang bật.
+     */
+    public function doiCoSale(Request $request, $id)
+    {
+        $this->authorize('modules', 'user.catalogue.update');
+
+        $nhom = $this->userCatalogueRepository->findById($id);
+
+        if (!$nhom) {
+            return response()->json(['ok' => false, 'loi' => 'Không tìm thấy nhóm thành viên.'], 404);
+        }
+
+        $bat = $request->boolean('is_sale');
+        $this->userCatalogueRepository->update($id, ['is_sale' => $bat ? 1 : 0]);
+
+        return response()->json([
+            'ok' => true,
+            'is_sale' => $bat ? 1 : 0,
+            'so_thanh_vien' => $nhom->users()->count(),
+        ]);
+    }
+
 }

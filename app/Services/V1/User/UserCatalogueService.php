@@ -154,6 +154,10 @@ class UserCatalogueService extends BaseService
             'name', 
             'description',
             'publish',
+            // Thieu cot nay thi danh sach nhom luon hien o "Nhan vien kinh doanh"
+            // la CHUA bat, du CSDL dang bat - vi $userCatalogue->is_sale la null.
+            // Loi nay im lang: khong bao loi, chi hien sai trang thai.
+            'is_sale',
 
         ];
     }

@@ -23,9 +23,14 @@
                         <option {{ ($publish == $key)  ? 'selected' : '' }} value="{{ $key }}">{{ $val }}</option>
                         @endforeach
                     </select>
+                    @php $nhomDangChon = (string) (request('user_catalogue_id') ?: old('user_catalogue_id')); @endphp
                     <select name="user_catalogue_id" class="form-control mr10 setupSelect2">
-                        <option value="0" selected="selected">Chọn Nhóm Thành Viên</option>
-                        <option value="1">Quản trị viên</option>
+                        <option value="0">Tất cả nhóm thành viên</option>
+                        @foreach($nhomThanhVien ?? [] as $nhom)
+                            <option value="{{ $nhom->id }}" {{ $nhomDangChon === (string) $nhom->id ? 'selected' : '' }}>
+                                {{ $nhom->name }}@if($nhom->is_sale) — nhân viên kinh doanh @endif
+                            </option>
+                        @endforeach
                     </select>
                     <div class="uk-search uk-flex uk-flex-middle mr10">
                         <div class="input-group">

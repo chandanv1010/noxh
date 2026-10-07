@@ -29,6 +29,7 @@ class UserService extends BaseService
     public function paginate($request){
         $condition['keyword'] = addslashes($request->input('keyword'));
         $condition['publish'] = $request->integer('publish');
+        $condition['user_catalogue_id'] = $request->integer('user_catalogue_id');
         $perPage = $request->integer('perpage');
         $users = $this->userRepository->userPagination(
             $this->paginateSelect(), 

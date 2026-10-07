@@ -29,6 +29,9 @@ Route::group(['middleware' => ['admin','locale','backend_default_locale']], func
         Route::post('{id}/update', [UserCatalogueController::class, 'update'])->where(['id' => '[0-9]+'])->name('user.catalogue.update');
         Route::get('{id}/delete', [UserCatalogueController::class, 'delete'])->where(['id' => '[0-9]+'])->name('user.catalogue.delete');
         Route::delete('{id}/destroy', [UserCatalogueController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('user.catalogue.destroy');
+        // Bat/tat co "La nhom nhan vien kinh doanh" ngay trong danh sach, khong
+        // phai mo tung nhom ra sua.
+        Route::post('{id}/is-sale', [UserCatalogueController::class, 'doiCoSale'])->where(['id' => '[0-9]+'])->name('user.catalogue.is-sale');
         Route::get('permission', [UserCatalogueController::class, 'permission'])->name('user.catalogue.permission');
         Route::post('updatePermission', [UserCatalogueController::class, 'updatePermission'])->name('user.catalogue.updatePermission');
     });

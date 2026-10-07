@@ -31,7 +31,11 @@ class UserController extends Controller
     public function index(Request $request){
         $this->authorize('modules', 'user.index');
         $users = $this->userService->paginate($request);
-      
+
+        // Danh sach nhom de do vao o loc. Truoc day o nay viet cung hai lua chon
+        // ("Quan tri vien", id 1) nen khong loc duoc theo nhom nao that ca.
+        $nhomThanhVien = \App\Models\UserCatalogue::orderBy('name')->get(['id', 'name', 'is_sale']);
+
         $config = [
             'extendJs' => true,
             'model' => 'User'
@@ -41,7 +45,8 @@ class UserController extends Controller
         return view('backend.dashboard.layout', compact(
             'template',
             'config',
-            'users'
+            'users',
+            'nhomThanhVien'
         ));
     }
 

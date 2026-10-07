@@ -1,0 +1,30 @@
+Quan ly nhom thanh vien: hien va bat/tat co is_sale ngay trong danh sach
+
+TRA LOI CAU HOI "o chon nhan vien phu trach lay du lieu tu dau":
+co `is_sale` CO that, nam trong form sua nhom (QL Thanh vien > Nhom thanh vien),
+nhung DANH SACH nhom khong hien no ra - nen nhin vao khong biet nhom nao dang bat,
+rat de tuong danh sach nhan vien trong form du an la du lieu cung.
+
+Bon cho da sua:
+
+1. Danh sach nhom thanh vien co them cot "Nhan vien kinh doanh" bat/tat duoc ngay
+   tai cho (khong phai mo tung nhom). Co nay quyet dinh thanh vien dang nhap o
+   /sale hay trang quan tri, va co xuat hien o chon nhan vien phu trach hay khong.
+
+2. UserCatalogueService::paginateSelect() thieu cot `is_sale`, nen lan dau lam cot
+   moi thi danh sach hien MOI o deu TRONG du nhom dang bat co - thuoc tinh doc ra
+   null. Loi im lang, khong bao gi. Da them cot va them bai kiem tra bat dung
+   truong hop nay (neu chi kiem tra "co cot" thi da bo lot).
+
+3. O loc "Chon Nhom Thanh Vien" o danh sach thanh vien truoc day chi co HAI lua
+   chon VIET CUNG ("Quan tri vien", id 1) va khong he duoc dung trong truy van -
+   chon kieu gi cung ra ca danh sach. Nay do ra tu CSDL va loc that.
+
+4. UserRepository::userPagination() viet chuoi OR cua tu khoa lan thang vao where
+   ngoai, thanh `a OR b AND c` - SQL hieu la `a OR (b AND c)` nen moi bo loc dat
+   sau deu bi vo hieu khi tu khoa khop. Da boc chuoi OR vao closure rieng.
+
+Ngoai ra form du an dan thang toi danh sach thanh vien cua nhom kinh doanh, de
+khong phai tu mo QL Thanh vien roi tu do xem nhom nao dang bat co.
+
+Kiem tra: 314 bai test qua (them 6 bai cho nhom thanh vien).
