@@ -55,7 +55,14 @@ class LeadController extends FrontendController
 
         $this->baoTelegram('Khách để lại thông tin', $duLieu);
 
-        return back()->with('nx_success', 'Đã nhận thông tin của bạn. Chuyên viên sẽ liên hệ trong thời gian sớm nhất.');
+        // Cau xac nhan phai noi dung viec nguoi dung vua lam. Form o trang Ho so
+        // hua hen gui bo ho so, nen tra loi chung chung "chuyen vien se lien he"
+        // se lam ho tuong minh bam hut.
+        $loiNhan = ($duLieu['source'] ?? '') === 'ho-so'
+            ? 'Đã gửi thông tin cho chuyên viên phụ trách. Trong lúc chờ, bạn xem và tải từng mẫu đơn ở phía trên trang này.'
+            : 'Đã nhận thông tin của bạn. Chuyên viên sẽ liên hệ trong thời gian sớm nhất.';
+
+        return back()->with('nx_success', $loiNhan);
     }
 
     /**
@@ -161,15 +168,30 @@ class LeadController extends FrontendController
         }
     }
 
+    /**
+     * Ten trang gui len, doc cho nguoi nhan tin Telegram hieu ngay.
+     * Khong co bang nay thi quan tri nhan duoc dong "Từ trang: ho-so" - ma khoa
+     * noi bo thi khong noi len duoc gi.
+     */
+    private const NHAN_NGUON = [
+        'ho-so' => 'Trang Hồ sơ',
+        'website' => 'Form chung',
+        'du-an' => 'Trang dự án',
+        'tu-van' => 'Trang tư vấn',
+        'lien-he' => 'Trang liên hệ',
+    ];
+
     private function baoTelegram(string $tieuDe, array $duLieu): void
     {
+        $nguon = $duLieu['source'] ?? 'website';
+
         $this->telegram->baoLienHe($tieuDe, [
             'Họ tên' => $duLieu['name'],
             'Điện thoại' => $duLieu['phone'],
             'Email' => $duLieu['email'] ?? null,
             'Quan tâm' => $duLieu['interest'] ?? null,
             'Dự kiến mua' => $duLieu['buy_timeline'] ?? null,
-            'Từ trang' => $duLieu['source'] ?? 'website',
+            'Từ trang' => self::NHAN_NGUON[$nguon] ?? $nguon,
             'Lời nhắn' => $duLieu['message'] ?? null,
         ]);
     }

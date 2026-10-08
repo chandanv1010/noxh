@@ -42,10 +42,17 @@
             </div>
         @endif
 
-        @include('frontend.noxh.component.expert-box')
+        {{-- The chuyen gia KHONG con o day.
+             Tren dien thoai cot phu duoc day len TRUOC phan noi dung, nen the do
+             hien ra lung lo giua trang, cat ngang danh sach ho so dang doc. No da
+             duoc thay bang form "Dien form de nhan ho so" o CUOI trang. --}}
     </aside>
 
     <div>
+        {{-- Khoi thong bao phai o DAU cot noi dung: gui form o cuoi trang xong may
+             chu tra ve dau trang, dat thong bao o cuoi thi khong ai thay. --}}
+        @include('frontend.noxh.component.alert')
+
         @if($kieu === 'checklist')
             <div class="nx-alert nx-alert--info">
                 Tích vào từng giấy tờ đã chuẩn bị xong để theo dõi tiến độ.
@@ -111,6 +118,14 @@
                 @endif
             </div>
         @endforelse
+
+        {{-- Cuoi trang: form nhan ho so. Dat o cot noi dung chu khong o cot phu,
+             de tren dien thoai no nam dung CUOI trang thay vi chen giua. --}}
+        @include('frontend.noxh.component.ho-so-form', [
+            'tatCaBo' => $tatCaBo,
+            'boChon' => $boChon,
+            'intro' => $intro,
+        ])
     </div>
 </div>
 

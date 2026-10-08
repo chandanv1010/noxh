@@ -1,14 +1,13 @@
 /**
- * Chụp ảnh vài trang trong khu quản trị, sau khi đăng nhập.
+ * Chụp ảnh trang web (công khai hoặc trong khu quản trị).
  *
  * Chạy:
- *   $env:NOXH_ADMIN_EMAIL="..."; $env:NOXH_ADMIN_PASS="..."
- *   node scratch/chup-trang-quan-tri.cjs /user/catalogue/index
- *   node scratch/chup-trang-quan-tri.cjs "/product/create|.ibox.w"   <- chỉ chụp một khối
+ *   node scratch/chup-trang.cjs /ho-so
+ *   node scratch/chup-trang.cjs "/ho-so|#nx-nhan-ho-so"          <- chỉ chụp một khối
+ *   node scratch/chup-trang.cjs /ho-so --rong=390 --ca-trang     <- khổ điện thoại, cả trang
  *
- * Cú pháp mỗi tham số: "<đường dẫn>" hoặc "<đường dẫn>|<selector>".
- * Có selector thì cuộn tới phần tử đó rồi chụp ĐÚNG phần tử ấy thôi — form dự án
- * dài hơn màn hình rất nhiều, chụp cả trang thì khối cần xem bé tí.
+ * Đăng nhập chỉ chạy khi CÓ đặt NOXH_ADMIN_EMAIL và NOXH_ADMIN_PASS. Trang công
+ * khai thì không cần, và cũng không nên đăng nhập làm gì cho thừa.
  *
  * Không ghi tài khoản vào tệp này: tệp nằm trong kho mã.
  */
@@ -22,31 +21,29 @@ const CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const GOC = process.env.NOXH_URL || 'http://noxh.test';
 const EMAIL = process.env.NOXH_ADMIN_EMAIL || '';
 const MAT_KHAU = process.env.NOXH_ADMIN_PASS || '';
-const PORT = 9437;
-const UDD = path.join(os.tmpdir(), 'chup-qt-' + Date.now());
+const PORT = 9438;
+const UDD = path.join(os.tmpdir(), 'chup-trang-' + Date.now());
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const DUONG_DAN = process.argv.slice(2).filter((a) => a.startsWith('/'));
+const THAM_SO = process.argv.slice(2);
+const RONG = Number((THAM_SO.find((a) => a.startsWith('--rong=')) || '').slice(7)) || 1440;
+const CA_TRANG = THAM_SO.includes('--ca-trang');
+const MUC = THAM_SO.filter((a) => !a.startsWith('--'));
 
-if (!EMAIL || !MAT_KHAU) {
-  console.error('Thiếu tài khoản quản trị: đặt NOXH_ADMIN_EMAIL và NOXH_ADMIN_PASS.');
+if (!MUC.length) {
+  console.error('Chưa cho đường dẫn nào. Ví dụ: node scratch/chup-trang.cjs /ho-so');
   process.exit(2);
 }
 
-if (!DUONG_DAN.length) {
-  console.error('Chưa cho đường dẫn nào. Ví dụ: /user/catalogue/index');
-  process.exit(2);
-}
-
-/** "user/catalogue/index" -> "user-catalogue-index.png" */
-function tenAnh(duongDan) {
-  return duongDan.replace(/^\//, '').replace(/[^a-z0-9]+/gi, '-').replace(/-+$/, '') + '.png';
+/** "ho-so" hoặc "ho-so#nx-nhan-ho-so" -> tên tệp png an toàn. */
+function tenAnh(chuoi) {
+  return chuoi.replace(/^\//, '').replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '') + '.png';
 }
 
 (async () => {
   const chrome = spawn(CHROME, [
     '--headless=new', '--disable-gpu', '--no-sandbox', '--no-first-run',
-    '--no-default-browser-check', '--window-size=1440,1100',
+    '--no-default-browser-check', `--window-size=${RONG},1000`,
     '--user-data-dir=' + UDD, '--remote-debugging-port=' + PORT, 'about:blank',
   ], { stdio: ['ignore', 'ignore', 'pipe'] });
 
@@ -77,35 +74,42 @@ function tenAnh(duongDan) {
     const doc = (e) => gui('Runtime.evaluate', { expression: e, returnByValue: true, awaitPromise: true }, a.sessionId)
       .then((r) => (r.exceptionDetails ? 'LỖI: ' + r.exceptionDetails.text : r.result.value));
 
-    await gui('Page.navigate', { url: GOC + '/admin' }, a.sessionId);
-    await sleep(2500);
-    await doc(`(function () {
-      var e = document.querySelector('input[name="email"]');
-      var p = document.querySelector('input[name="password"]');
-      if (!e || !p) return 'khong thay o dang nhap';
-      e.value = ${JSON.stringify(EMAIL)};
-      p.value = ${JSON.stringify(MAT_KHAU)};
-      var f = e.closest('form');
-      if (f) { f.submit(); return 'ok'; }
-      return 'khong thay form';
-    })()`);
-    await sleep(4000);
-    console.log('sau đăng nhập: ' + (await doc('location.href')));
+    // Khổ điện thoại: Chrome headless mặc định coi bề rộng cửa sổ là bề rộng
+    // trang, nhưng vẫn cần khai device metrics để ảnh chụp đúng tỉ lệ và để
+    // trang áp đúng breakpoint di động.
+    await gui('Emulation.setDeviceMetricsOverride', {
+      width: RONG, height: 1000, deviceScaleFactor: 1, mobile: RONG < 700,
+    }, a.sessionId);
+
+    if (EMAIL && MAT_KHAU) {
+      await gui('Page.navigate', { url: GOC + '/admin' }, a.sessionId);
+      await sleep(2500);
+      const dangNhap = await doc(`(function () {
+        var e = document.querySelector('input[name="email"]');
+        var p = document.querySelector('input[name="password"]');
+        if (!e || !p) return 'khong thay o dang nhap';
+        e.value = ${JSON.stringify(EMAIL)};
+        p.value = ${JSON.stringify(MAT_KHAU)};
+        var f = e.closest('form');
+        if (f) { f.submit(); return 'ok'; }
+        return 'khong thay form';
+      })()`);
+      await sleep(4000);
+      console.log('đăng nhập: ' + dangNhap + '  ->  ' + (await doc('location.href')));
+    }
 
     const thuMuc = path.join(__dirname, 'anh-chup');
     fs.mkdirSync(thuMuc, { recursive: true });
 
-    for (const muc of DUONG_DAN) {
+    for (const muc of MUC) {
       const [duongDan, selector] = muc.split('|');
 
       await gui('Page.navigate', { url: GOC + duongDan }, a.sessionId);
-      await sleep(3500);
+      await sleep(3000);
 
       let clip = null;
 
       if (selector) {
-        // Cuộn tới khối cần chụp, rồi đo lại. Phải đo SAU khi cuộn: toạ độ đọc
-        // trước khi cuộn là toạ độ cũ.
         const co = await doc(`(function () {
           var e = document.querySelector(${JSON.stringify(selector)});
           if (!e) return false;
@@ -123,13 +127,10 @@ function tenAnh(duongDan) {
         const o = JSON.parse(await doc(`(function () {
           var e = document.querySelector(${JSON.stringify(selector)});
           var r = e.getBoundingClientRect();
-          return JSON.stringify({
-            x: r.left, y: r.top + window.scrollY, width: r.width, height: r.height
-          });
+          return JSON.stringify({ x: r.left, y: r.top + window.scrollY, width: r.width, height: r.height });
         })()`));
 
-        // Clip của CDP dùng toạ độ TRANG (đã cộng scrollY), không phải toạ độ
-        // khung nhìn.
+        // Clip của CDP dùng toạ độ TRANG (đã cộng scrollY).
         const le = 14;
         clip = {
           x: Math.max(0, o.x - le),
@@ -138,12 +139,18 @@ function tenAnh(duongDan) {
           height: o.height + le * 2,
           scale: 1,
         };
+      } else if (CA_TRANG) {
+        const cao = await doc('Math.ceil(document.documentElement.scrollHeight)');
+        await gui('Emulation.setDeviceMetricsOverride', {
+          width: RONG, height: Math.min(cao, 12000), deviceScaleFactor: 1, mobile: RONG < 700,
+        }, a.sessionId);
+        await sleep(400);
       }
 
-      const duong = path.join(thuMuc, tenAnh(duongDan + (selector ? '-' + selector : '')));
+      const duong = path.join(thuMuc, tenAnh(duongDan + (selector ? '-' + selector : '') + (RONG !== 1440 ? '-' + RONG : '')));
       const r = await gui('Page.captureScreenshot', clip ? { format: 'png', clip } : { format: 'png' }, a.sessionId);
       fs.writeFileSync(duong, Buffer.from(r.data, 'base64'));
-      console.log('  ' + muc + '  ->  ' + duong);
+      console.log('  ' + muc + (RONG !== 1440 ? ' (' + RONG + 'px)' : '') + '  ->  ' + duong);
     }
   } catch (e) {
     console.error('LỖI: ' + e.message);
