@@ -185,11 +185,17 @@ class LeadController extends FrontendController
     {
         $nguon = $duLieu['source'] ?? 'website';
 
+        // O `interest` mang hai nghia khac nhau tuy form: form chung hoi "nhu cau
+        // quan tam", con form trang Ho so dung no de chua NHOM DOI TUONG khach
+        // chon. Gui Telegram ma de nguyen nhan "Quan tâm: Hộ gia đình nghèo..."
+        // thi chuyen vien doc khong hieu khach muon gi.
+        $nhanQuanTam = ($nguon === 'ho-so') ? 'Đối tượng' : 'Quan tâm';
+
         $this->telegram->baoLienHe($tieuDe, [
             'Họ tên' => $duLieu['name'],
             'Điện thoại' => $duLieu['phone'],
             'Email' => $duLieu['email'] ?? null,
-            'Quan tâm' => $duLieu['interest'] ?? null,
+            $nhanQuanTam => $duLieu['interest'] ?? null,
             'Dự kiến mua' => $duLieu['buy_timeline'] ?? null,
             'Từ trang' => self::NHAN_NGUON[$nguon] ?? $nguon,
             'Lời nhắn' => $duLieu['message'] ?? null,

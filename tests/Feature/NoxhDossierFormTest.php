@@ -161,9 +161,16 @@ class NoxhDossierFormTest extends TestCase
         $this->assertSame('new', $dong->status);
 
         Http::assertSent(function ($yeuCau) {
+            $chu = $yeuCau['text'] ?? '';
+
             return str_contains($yeuCau->url(), 'api.telegram.org')
-                && str_contains($yeuCau['text'] ?? '', 'Nhóm thử nghiệm A')
-                && str_contains($yeuCau['text'] ?? '', 'Trang Hồ sơ');
+                && str_contains($chu, 'Nhóm thử nghiệm A')
+                && str_contains($chu, 'Trang Hồ sơ')
+                // Form nay dung o `interest` de chua NHOM DOI TUONG, nen nhan phai
+                // la "Đối tượng". De nguyen "Quan tâm" thi chuyen vien doc khong
+                // hieu khach dang noi ve cai gi.
+                && str_contains($chu, 'Đối tượng:')
+                && !str_contains($chu, 'Quan tâm:');
         });
     }
 
