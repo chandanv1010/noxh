@@ -33,7 +33,7 @@
     <div class="nx-vb__chu">
         <strong>{{ $vb->title }}</strong>
         @if($vb->summary)
-            <p>{{ \Illuminate\Support\Str::words(strip_tags($vb->summary), 18, '…') }}</p>
+            <p>{{ nx_chu_thuan($vb->summary, 18) }}</p>
         @endif
 
         {{-- Chua nhap tom tat thi dong ngay thay luon cho tom tat, co them

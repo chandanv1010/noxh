@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\DossierItem;
 use App\Models\DossierSet;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -45,7 +46,8 @@ class NoxhDossierFormTest extends TestCase
         parent::tearDown();
     }
 
-    /** Hai nhom doi tuong tam, de bai kiem tra khong phu thuoc du lieu that. */
+    /** Hai nhom doi tuong tam, moi nhom mot giay to — de bai kiem tra khong phu
+     *  thuoc du lieu that cua may dang chay. */
     private function dungHaiNhom(): void
     {
         foreach ([['Nhóm thử nghiệm A', 'nhom-thu-a'], ['Nhóm thử nghiệm B', 'nhom-thu-b']] as $i => [$ten, $canonical]) {
@@ -58,6 +60,17 @@ class NoxhDossierFormTest extends TestCase
             ]);
 
             $this->idNhomTam[] = $bo->id;
+
+            DossierItem::create([
+                'dossier_set_id' => $bo->id,
+                'title' => 'Giấy tờ thử nghiệm ' . ($i + 1),
+                'description' => 'Mô tả giấy tờ thử nghiệm',
+                'issued_by' => 'UBND phường/xã',
+                'copies' => 2,
+                'is_required' => 1,
+                'publish' => 2,
+                'order' => 0,
+            ]);
         }
     }
 
@@ -233,5 +246,94 @@ class NoxhDossierFormTest extends TestCase
             $vtThongBao,
             'Thông báo nằm sau danh sách hồ sơ - người dùng sẽ không nhìn thấy'
         );
+    }
+
+    /**
+     * Mo ta luu dang HTML entity van phai hien ra chu co dau.
+     *
+     * Trinh soan thao luu "sách" thanh "s&aacute;ch". Ham strip_tags khong dung
+     * toi entity, ma Blade `{{ }}` lai escape dau `&` - nen nguoi doc nhan duoc
+     * nguyen si "s&aacute;ch" tren trang. Loi nay co that tren may chu.
+     */
+    public function test_mo_ta_luu_dang_html_entity_van_hien_dung_chu_co_dau(): void
+    {
+        $this->dungHaiNhom();
+
+        DossierSet::where('id', $this->idNhomTam[0])->update([
+            'description' => 'Danh s&aacute;ch gi&#7845;y t&#7901; c&#7847;n chu&#7849;n b&#7883;.',
+        ]);
+
+        $html = $this->get('/ho-so')->assertOk()->getContent();
+
+        $this->assertStringContainsString('Danh sách giấy tờ cần chuẩn bị.', $html);
+        $this->assertStringNotContainsString('s&aacute;ch', $html, 'Còn thấy entity thô trong trang');
+        $this->assertStringNotContainsString('s&amp;aacute;ch', $html, 'Entity bị escape hai lần');
+    }
+
+    public function test_trang_ho_so_co_nut_download_tron_bo(): void
+    {
+        $this->dungHaiNhom();
+
+        $html = $this->get('/ho-so')->assertOk()->getContent();
+
+        $this->assertStringContainsString('Download trọn bộ', $html);
+        $this->assertStringContainsString('/ho-so/nhom-thu-a/tron-bo', $html);
+    }
+
+    public function test_tai_tron_bo_tra_ve_zip_kem_ban_huong_dan(): void
+    {
+        $this->dungHaiNhom();
+
+        $tra = $this->get('/ho-so/nhom-thu-a/tron-bo')->assertOk();
+
+        $this->assertSame('application/zip', $tra->headers->get('content-type'));
+        $this->assertStringContainsString('ho-so-nhom-thu-a.zip', (string) $tra->headers->get('content-disposition'));
+
+        $tep = $tra->baseResponse->getFile()->getPathname();
+        $this->assertFileExists($tep, 'Không tìm thấy tệp nén vừa tạo');
+
+        $zip = new \ZipArchive();
+        $this->assertTrue($zip->open($tep) === true, 'Tệp tải về không phải ZIP hợp lệ');
+
+        $huongDan = $zip->getFromName('Huong-dan-ho-so.html');
+        $zip->close();
+
+        $this->assertNotFalse($huongDan, 'Gói ZIP thiếu bản hướng dẫn');
+        $this->assertStringContainsString('Nhóm thử nghiệm A', $huongDan);
+        $this->assertStringContainsString('Giấy tờ thử nghiệm 1', $huongDan);
+        $this->assertStringContainsString('bắt buộc', $huongDan);
+
+        @unlink($tep);
+    }
+
+    public function test_tai_tron_bo_dem_luot_tai_cho_tung_giay_to(): void
+    {
+        $this->dungHaiNhom();
+
+        $truoc = DB::table('dossier_items')->where('dossier_set_id', $this->idNhomTam[0])->value('download_count');
+
+        $tra = $this->get('/ho-so/nhom-thu-a/tron-bo')->assertOk();
+        $tep = $tra->baseResponse->getFile()->getPathname();
+
+        $sau = DB::table('dossier_items')->where('dossier_set_id', $this->idNhomTam[0])->value('download_count');
+
+        $this->assertSame((int) $truoc + 1, (int) $sau, 'Không đếm lượt tải');
+
+        @unlink($tep);
+    }
+
+    public function test_tai_tron_bo_khong_ton_tai_thi_bao_404(): void
+    {
+        $this->get('/ho-so/khong-co-nhom-nay/tron-bo')->assertNotFound();
+    }
+
+    /**
+     * Duong dan {bo} khong duoc nuot mat cac trang co dinh cua muc Ho so.
+     */
+    public function test_cac_trang_ho_so_co_dinh_van_mo_duoc(): void
+    {
+        $this->get('/ho-so/mau-don')->assertOk();
+        $this->get('/ho-so/checklist')->assertOk();
+        $this->get('/ho-so/can-chuan-bi')->assertOk();
     }
 }

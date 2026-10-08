@@ -10,7 +10,7 @@
     // rieng /tags/... chu khong phai mot cau tim kiem.
     $tuKhoa = $bai->tags;
 
-    $moTaBai = trim(strip_tags((string) $bai->description));
+    $moTaBai = nx_chu_thuan((string) $bai->description);
     $chuThich = trim((string) ($bai->image_caption ?? ''));
 
     $duongDan = ['Tin tức' => url('/tin-tuc')];

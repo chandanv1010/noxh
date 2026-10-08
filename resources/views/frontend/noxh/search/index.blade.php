@@ -49,7 +49,7 @@
                                 <a href="{{ url('/tin-tuc/' . $bai->canonical) }}">{{ $bai->name }}</a>
                             </h3>
                             @if($bai->description)
-                                <p class="nx-article__description">{{ \Illuminate\Support\Str::words(strip_tags($bai->description), 22, '…') }}</p>
+                                <p class="nx-article__description">{{ nx_chu_thuan($bai->description, 22) }}</p>
                             @endif
                             <div class="nx-article__meta">
                                 <span>

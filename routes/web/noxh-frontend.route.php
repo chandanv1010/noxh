@@ -75,6 +75,12 @@ Route::name('noxh.')->group(function () {
     Route::get('ho-so/can-chuan-bi', [DossierController::class, 'index'])->name('dossier.prepare');
     Route::get('ho-so/mau-don', [DossierController::class, 'templates'])->name('dossier.templates');
     Route::get('ho-so/checklist', [DossierController::class, 'checklist'])->name('dossier.checklist');
+    // Tai ca bo ho so cua mot nhom doi tuong trong MOT lan (goi ZIP).
+    // Dat SAU cac duong dan co dinh o tren, va rang buoc {bo} chi gom chu/so/gach
+    // ngang - neu khong thi "mau-don" va "checklist" se bi {bo} nuot mat.
+    Route::get('ho-so/{bo}/tron-bo', [DossierController::class, 'tronBo'])
+        ->where(['bo' => '[A-Za-z0-9\-]+'])
+        ->name('dossier.tron-bo');
 
     // --- Tai chinh -----------------------------------------------------------
     Route::get('tai-chinh', [FinanceController::class, 'index'])->name('finance.index');

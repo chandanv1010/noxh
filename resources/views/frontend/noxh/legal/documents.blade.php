@@ -48,7 +48,7 @@
                             <p>{{ trim($vb->doc_number . ($vb->issuer ? ' · ' . $vb->issuer : ''), ' ·') }}</p>
                         @endif
                         @if($vb->summary)
-                            <p>{{ \Illuminate\Support\Str::words(strip_tags($vb->summary), 30, '…') }}</p>
+                            <p>{{ nx_chu_thuan($vb->summary, 30) }}</p>
                         @endif
                         <time>
                             @php

@@ -375,7 +375,7 @@
                             @foreach($faq as $ch)
                                 <details class="nx-faq">
                                     <summary>{{ $ch->question }}</summary>
-                                    <div class="nx-faq__body">{!! nl2br(e(strip_tags($ch->answer))) !!}</div>
+                                    <div class="nx-faq__body">{!! nl2br(e(nx_chu_thuan($ch->answer))) !!}</div>
                                 </details>
                             @endforeach
                         </section>

@@ -28,7 +28,7 @@
 
                         @if($ch->content)
                             <p style="margin:0 0 6px;color:#4a5a70;font-size:13.5px">
-                                {{ \Illuminate\Support\Str::words(strip_tags($ch->content), 30, '…') }}
+                                {{ nx_chu_thuan($ch->content, 30) }}
                             </p>
                         @endif
 

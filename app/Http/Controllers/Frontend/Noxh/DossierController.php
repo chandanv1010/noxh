@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend\Noxh;
 
 use App\Http\Controllers\FrontendController;
+use App\Models\DossierItem;
 use App\Models\DossierSet;
 use Illuminate\Http\Request;
 
@@ -27,6 +28,92 @@ class DossierController extends FrontendController
     public function checklist(Request $request)
     {
         return $this->hien($request, 'checklist', 'Checklist hồ sơ nhà ở xã hội', url('/ho-so/checklist'));
+    }
+
+    /**
+     * "Download trọn bộ" — tải ca bo ho so cua mot nhom doi tuong trong MOT lan.
+     *
+     * Trong goi ZIP luon co:
+     *   - Huong-dan-ho-so.html: ban in liet ke day du giay to (ten, ghi chu, noi
+     *     cap, so ban, giay to nao bat buoc). Mo duoc bang trinh duyet hoac Word.
+     *   - Cac tep mau don that, neu giay to do co dinh kem.
+     *
+     * Vi sao KHONG dung PDF: du an khong co thu vien sinh PDF nao (xem
+     * composer.json). Them mot thu vien chi de in mot danh sach la khong dang, ma
+     * tep HTML lai mo duoc o moi may va in ra giay duoc.
+     *
+     * Vi sao luon nhet tep huong dan: hien tai gan nhu chua co tep mau nao duoc
+     * tai len, nen neu chi nhet tep mau thi nguoi dung bam xong se nhan mot goi
+     * ZIP RONG - ho se tuong nut hong.
+     */
+    public function tronBo(string $bo)
+    {
+        $boHoSo = DossierSet::with(['items' => fn ($q) => $q->where('publish', 2)->orderBy('order')])
+            ->where('publish', 2)
+            ->where(function ($q) use ($bo) {
+                $q->where('canonical', $bo);
+                if (ctype_digit($bo)) {
+                    $q->orWhere('id', (int) $bo);
+                }
+            })
+            ->firstOrFail();
+
+        $huongDan = view('frontend.noxh.dossier.tron-bo', [
+            'bo' => $boHoSo,
+            'system' => $this->system,
+        ])->render();
+
+        $duongTam = tempnam(sys_get_temp_dir(), 'nxh') . '.zip';
+
+        $zip = new \ZipArchive();
+
+        if ($zip->open($duongTam, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+            abort(500, 'Không tạo được tệp nén.');
+        }
+
+        $zip->addFromString('Huong-dan-ho-so.html', $huongDan);
+
+        foreach ($boHoSo->items as $thuTu => $gt) {
+            $this->nhetTepMau($zip, $gt, $thuTu + 1);
+        }
+
+        $zip->close();
+
+        // Dem luot tai: giay to nao nam trong goi thi tinh cho giay to do.
+        DossierItem::whereIn('id', $boHoSo->items->pluck('id'))->increment('download_count');
+
+        $ten = 'ho-so-' . ($boHoSo->canonical ?: $boHoSo->id) . '.zip';
+
+        return response()->download($duongTam, $ten, [
+            'Content-Type' => 'application/zip',
+        ])->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Nhet tep mau cua mot giay to vao goi ZIP, neu tep that su nam tren may.
+     *
+     * Duong dan trong CSDL co the la duong dan noi bo (/uploads/...) hoac dia chi
+     * mang day du. Chi nhet duoc loai thu nhat; loai thu hai thi de nguyen trong
+     * tep huong dan, khong tai ve (tai trong luc nguoi dung dang cho la khong nen).
+     */
+    private function nhetTepMau(\ZipArchive $zip, DossierItem $gt, int $thuTu): void
+    {
+        $duong = trim((string) $gt->template_file);
+
+        if ($duong === '' || preg_match('#^https?://#i', $duong)) {
+            return;
+        }
+
+        $tep = public_path(ltrim($duong, '/'));
+
+        if (!is_file($tep)) {
+            return;
+        }
+
+        $duoi = pathinfo($tep, PATHINFO_EXTENSION);
+        $ten = sprintf('%02d-%s%s', $thuTu, \Illuminate\Support\Str::slug($gt->title), $duoi ? '.' . $duoi : '');
+
+        $zip->addFile($tep, 'Mau-don/' . $ten);
     }
 
     private function hien(Request $request, string $kieu, string $tieuDe, string $canonical)

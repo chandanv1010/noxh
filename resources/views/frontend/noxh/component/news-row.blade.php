@@ -8,7 +8,7 @@
 @php
     $duong = url('/tin-tuc/' . $bai->canonical);
     $ngayBai = \Illuminate\Support\Carbon::parse($bai->created_at);
-    $tomTat = trim(strip_tags((string) $bai->description));
+    $tomTat = nx_chu_thuan((string) $bai->description);
     $luot = (int) ($bai->viewed ?? 0);
 @endphp
 

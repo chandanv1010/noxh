@@ -49,7 +49,7 @@
         </div>
 
         @if($d->description)
-            <p class="nx-du-an__mota">{{ \Illuminate\Support\Str::words(strip_tags($d->description), 24, '…') }}</p>
+            <p class="nx-du-an__mota">{{ nx_chu_thuan($d->description, 24) }}</p>
         @endif
 
         <div class="nx-du-an__thong-so">

@@ -8,7 +8,7 @@
 
 <div class="nx-listing nx-listing--right">
     <div class="nx-panel">
-        @if(trim(strip_tags($noiDung)) !== '')
+        @if(nx_chu_thuan($noiDung) !== '')
             <div class="nx-prose">{!! $noiDung !!}</div>
         @else
             <div class="nx-empty">

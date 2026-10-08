@@ -1225,6 +1225,38 @@ if (!function_exists('nx_anh')) {
     }
 }
 
+if (!function_exists('nx_chu_thuan')) {
+    /**
+     * Lay CHU THUAN tu noi dung soan bang trinh soan thao (WYSIWYG).
+     *
+     * VI SAO KHONG DUNG THANG strip_tags:
+     * Trinh soan thao luu chu co dau thanh HTML entity - "sách" thanh
+     * "s&aacute;ch". Ham strip_tags khong dung toi entity, ma Blade `{{ }}` lai
+     * ESCAPE ky tu `&` thanh `&amp;` - nen nguoi doc nhin thay nguyen si
+     * "s&aacute;ch" tren trang. Loi nay da gap that o mo ta bo ho so trang
+     * /ho-so.
+     *
+     * Phai go entity TRUOC khi de Blade escape. Du lieu nao luu chu that (khong
+     * phai entity) thi html_entity_decode khong lam gi ca, nen ham nay dung duoc
+     * cho ca hai kieu du lieu dang ton tai song song trong CSDL.
+     *
+     * $soTu: cat bot con bay nhieu tu (tuy chon). Dung Str::words chu khong phai
+     * substr: substr cat theo BYTE, gap chu co dau la dut doi mot ky tu UTF-8.
+     */
+    function nx_chu_thuan(?string $html, ?int $soTu = null): string
+    {
+        $chu = html_entity_decode((string) $html, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $chu = strip_tags($chu);
+        $chu = trim(preg_replace('/\s+/u', ' ', $chu) ?? '');
+
+        if ($soTu !== null && $soTu > 0) {
+            $chu = \Illuminate\Support\Str::words($chu, $soTu, '…');
+        }
+
+        return $chu;
+    }
+}
+
 if (!function_exists('nx_chu_dau')) {
     /**
      * Hai chu cai dau cua ten nguoi, dung lam anh dai dien khi chua co anh.

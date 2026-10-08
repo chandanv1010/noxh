@@ -61,7 +61,7 @@
         @endif
 
         @forelse($boHoSo as $bo)
-            <div class="nx-panel">
+            <div class="nx-panel" id="bo-{{ $bo->canonical ?: $bo->id }}">
                 <h2 class="nx-panel__title">
                     {{ $bo->name }}
                     <span style="color:#8695aa;font-size:12.5px;font-weight:500;text-transform:none">
@@ -70,8 +70,21 @@
                 </h2>
 
                 @if($bo->description)
-                    <p class="nx__subheading">{{ strip_tags($bo->description) }}</p>
+                    <p class="nx__subheading">{{ nx_chu_thuan($bo->description) }}</p>
                 @endif
+
+                {{-- Tai ca bo trong mot lan. Dat ngay duoi mo ta, tren danh sach
+                     giay to, de nguoi dung thay truoc khi doc tung dong. --}}
+                <p style="margin:0 0 4px">
+                    <a href="{{ route('noxh.dossier.tron-bo', $bo->canonical ?: $bo->id) }}"
+                       class="nx-btn nx-btn--sm">
+                        @include('frontend.noxh.component.icon', ['name' => 'download', 'size' => 15])
+                        Download trọn bộ
+                    </a>
+                    <span style="display:inline-block;margin-left:8px;color:#8695aa;font-size:12.5px">
+                        Cả {{ $bo->items->count() }} giấy tờ, gói trong một tệp ZIP
+                    </span>
+                </p>
 
                 @foreach($bo->items as $gt)
                     <div class="nx-dossier-item">
@@ -86,7 +99,7 @@
                         <div class="nx-dossier-item__body">
                             <strong>{{ $gt->title }}</strong>
                             @if($gt->description)
-                                <p>{{ strip_tags($gt->description) }}</p>
+                                <p>{{ nx_chu_thuan($gt->description) }}</p>
                             @endif
 
                             <div class="nx-dossier-item__tags">

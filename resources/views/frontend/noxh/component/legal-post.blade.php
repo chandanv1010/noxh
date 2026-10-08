@@ -27,7 +27,7 @@
 
     @if($bai->description)
         <p class="nx-lpost__mo-ta">
-            {{ \Illuminate\Support\Str::words(strip_tags($bai->description), 18, '…') }}
+            {{ nx_chu_thuan($bai->description, 18) }}
         </p>
     @endif
 
