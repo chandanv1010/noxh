@@ -3,7 +3,12 @@
  *
  * Chạy:
  *   $env:NOXH_ADMIN_EMAIL="..."; $env:NOXH_ADMIN_PASS="..."
- *   node scratch/chup-trang-quan-tri.cjs /user/catalogue/index /user/index
+ *   node scratch/chup-trang-quan-tri.cjs /user/catalogue/index
+ *   node scratch/chup-trang-quan-tri.cjs "/product/create|.ibox.w"   <- chỉ chụp một khối
+ *
+ * Cú pháp mỗi tham số: "<đường dẫn>" hoặc "<đường dẫn>|<selector>".
+ * Có selector thì cuộn tới phần tử đó rồi chụp ĐÚNG phần tử ấy thôi — form dự án
+ * dài hơn màn hình rất nhiều, chụp cả trang thì khối cần xem bé tí.
  *
  * Không ghi tài khoản vào tệp này: tệp nằm trong kho mã.
  */
@@ -90,13 +95,55 @@ function tenAnh(duongDan) {
     const thuMuc = path.join(__dirname, 'anh-chup');
     fs.mkdirSync(thuMuc, { recursive: true });
 
-    for (const duongDan of DUONG_DAN) {
+    for (const muc of DUONG_DAN) {
+      const [duongDan, selector] = muc.split('|');
+
       await gui('Page.navigate', { url: GOC + duongDan }, a.sessionId);
       await sleep(3500);
-      const duong = path.join(thuMuc, tenAnh(duongDan));
-      const r = await gui('Page.captureScreenshot', { format: 'png' }, a.sessionId);
+
+      let clip = null;
+
+      if (selector) {
+        // Cuộn tới khối cần chụp, rồi đo lại. Phải đo SAU khi cuộn: toạ độ đọc
+        // trước khi cuộn là toạ độ cũ.
+        const co = await doc(`(function () {
+          var e = document.querySelector(${JSON.stringify(selector)});
+          if (!e) return false;
+          e.scrollIntoView({ block: 'start' });
+          return true;
+        })()`);
+
+        if (!co) {
+          console.log('  ' + duongDan + '  ->  KHÔNG thấy ' + selector);
+          continue;
+        }
+
+        await sleep(400);
+
+        const o = JSON.parse(await doc(`(function () {
+          var e = document.querySelector(${JSON.stringify(selector)});
+          var r = e.getBoundingClientRect();
+          return JSON.stringify({
+            x: r.left, y: r.top + window.scrollY, width: r.width, height: r.height
+          });
+        })()`));
+
+        // Clip của CDP dùng toạ độ TRANG (đã cộng scrollY), không phải toạ độ
+        // khung nhìn.
+        const le = 14;
+        clip = {
+          x: Math.max(0, o.x - le),
+          y: Math.max(0, o.y - le),
+          width: o.width + le * 2,
+          height: o.height + le * 2,
+          scale: 1,
+        };
+      }
+
+      const duong = path.join(thuMuc, tenAnh(duongDan + (selector ? '-' + selector : '')));
+      const r = await gui('Page.captureScreenshot', clip ? { format: 'png', clip } : { format: 'png' }, a.sessionId);
       fs.writeFileSync(duong, Buffer.from(r.data, 'base64'));
-      console.log('  ' + duongDan + '  ->  ' + duong);
+      console.log('  ' + muc + '  ->  ' + duong);
     }
   } catch (e) {
     console.error('LỖI: ' + e.message);

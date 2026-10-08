@@ -27,8 +27,24 @@ class NoxhUserGroupTest extends TestCase
     private ?UserCatalogue $nhomThu = null;
     private array $emailTam = ['nhom.thu.a@example.com', 'nhom.thu.b@example.com', 'nhom.thu.c@example.com'];
 
+    /** Nhóm nào đang bật cờ is_sale lúc bắt đầu, để trả lại nguyên trạng. */
+    private array $nhomSaleGoc = [];
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->nhomSaleGoc = DB::table('user_catalogues')->where('is_sale', 1)->pluck('id')->all();
+    }
+
     protected function tearDown(): void
     {
+        // Trả lại cờ is_sale cho đúng những nhóm vốn có nó. Bài kiểm tra nào tạm
+        // tắt cờ thì phải bật lại, kể cả khi bài đó thất bại giữa đường.
+        if ($this->nhomSaleGoc) {
+            DB::table('user_catalogues')->whereIn('id', $this->nhomSaleGoc)->update(['is_sale' => 1]);
+        }
+
         DB::table('users')->whereIn('email', $this->emailTam)->delete();
 
         if ($this->nhomThu) {
@@ -218,5 +234,50 @@ class NoxhUserGroupTest extends TestCase
             ->getContent();
 
         $this->assertStringContainsString('user_catalogue_id=' . $this->nhomThu->id, $html);
+    }
+
+    /**
+     * Form du an phai noi RO vi sao o chon it nguoi hon so thanh vien cua nhom.
+     *
+     * Nhom co 7 nguoi ma o chon chi co 6 la chuyen lam nguoi quan tri thac mac
+     * dung nhu da thac mac vai lan truoc day. Khong the chi in ra con so cua o
+     * chon roi thoi.
+     *
+     * Bai kiem tra nay tam TAT co is_sale cua cac nhom dang co, de nhom tam cua
+     * no la nhom duy nhat duoc tinh - neu khong thi con so phu thuoc vao du lieu
+     * that cua may dang chay, va bai kiem tra se hong luc dung luc sai.
+     */
+    public function test_form_du_an_noi_ro_bao_nhieu_nguoi_bi_an_vi_dang_tat(): void
+    {
+        $qt = $this->quanTri();
+
+        if (!$qt) {
+            $this->markTestSkipped('Không có tài khoản quản trị nào.');
+        }
+
+        $this->dungDuLieu();
+
+        DB::table('user_catalogues')->where('is_sale', 1)->update(['is_sale' => 0]);
+        $this->nhomThu->update(['is_sale' => 1]);
+
+        // Nhom tam dang co 2 nguoi: A dang hoat dong, C dang TAT.
+        DB::table('users')->where('email', $this->emailTam[2])->update(['publish' => 1]);
+
+        $html = $this->actingAs($qt)->get('/product/create')->assertOk()->getContent();
+
+        $this->assertStringContainsString('Thành viên nhóm thử A', $html);
+        $this->assertStringNotContainsString('Thành viên nhóm thử C', $html, 'Người đang tắt vẫn hiện ở ô chọn');
+
+        $this->assertStringContainsString('Nhóm thử nghiệm bộ lọc', $html);
+        $this->assertMatchesRegularExpression(
+            '/<strong>2<\/strong>\s*thành viên/',
+            $html,
+            'Không in ra tổng số thành viên của nhóm'
+        );
+        $this->assertMatchesRegularExpression(
+            '/<strong>1<\/strong>\s*người trong nhóm đang ở trạng thái/',
+            $html,
+            'Không nói ra là còn người trong nhóm đang bị tắt nên không hiện ở ô chọn'
+        );
     }
 }

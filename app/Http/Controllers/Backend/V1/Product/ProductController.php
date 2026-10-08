@@ -252,9 +252,21 @@ class ProductController extends Controller
      */
     private function nhomKinhDoanh()
     {
-        return \App\Models\UserCatalogue::where('is_sale', 1)
+        $nhom = \App\Models\UserCatalogue::where('is_sale', 1)
             ->orderBy('id')
             ->first(['id', 'name']);
+
+        if (!$nhom) {
+            return null;
+        }
+
+        // Dem CA thanh vien dang o trang thai TAT. O chon ben tren chi hien nguoi
+        // dang hoat dong, nen neu chi in ra con so do thi quan tri se thac mac
+        // "nhom co 7 nguoi ma sao o day chi co 6" - dung kieu nham lan da gap vai
+        // lan trong chinh man hinh nay.
+        $nhom->tong_thanh_vien = $nhom->users()->count();
+
+        return $nhom;
     }
 
     /**
