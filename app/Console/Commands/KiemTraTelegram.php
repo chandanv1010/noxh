@@ -4,21 +4,30 @@ namespace App\Console\Commands;
 
 use App\Services\Noxh\TelegramService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 /**
- * Kiểm tra cấu hình Telegram ngay trên máy chủ, không cần mở trang quản trị.
+ * Kiểm tra và đặt cấu hình Telegram ngay trên máy chủ, không cần mở trang quản trị.
  *
  * Chạy:
- *   php artisan noxh:telegram            -> kiểm tra token và liệt kê chat id
- *   php artisan noxh:telegram --gui-thu  -> gửi thêm một tin thử
+ *   php artisan noxh:telegram                          -> kiểm tra token, liệt kê chat id
+ *   php artisan noxh:telegram --gui-thu                -> gửi thêm một tin thử
+ *   php artisan noxh:telegram --dat-token="123:ABC..." --dat-chat-id="987654321"
  *
  * Vì sao cần bản dòng lệnh: người quản trị máy chủ thường không muốn đăng nhập
  * trang quản trị chỉ để xem một thông báo lỗi, mà lỗi Telegram thì luôn xảy ra
  * đúng lúc đang cần gấp.
+ *
+ * CẤU HÌNH NẰM TRONG CSDL, KHÔNG NẰM TRONG .env: xem chu thich o
+ * TelegramService - nguoi quan tri website khong dong vao duoc tep .env, nen
+ * token de trong do thi ho khong tu doi duoc.
  */
 class KiemTraTelegram extends Command
 {
-    protected $signature = 'noxh:telegram {--gui-thu : Gửi thử một tin tới chat id đã lưu}';
+    protected $signature = 'noxh:telegram
+        {--gui-thu : Gửi thử một tin tới chat id đã lưu}
+        {--dat-token= : Lưu bot token mới vào cấu hình}
+        {--dat-chat-id= : Lưu chat id mới vào cấu hình}';
 
     protected $description = 'Kiểm tra bot token, chat id và gửi thử thông báo Telegram';
 
@@ -26,6 +35,8 @@ class KiemTraTelegram extends Command
     {
         $this->newLine();
         $this->info('=== Kiểm tra Telegram ===');
+
+        $this->luuNeuCo();
 
         // ── Token ───────────────────────────────────────────────────────────
         $token = app(\App\Services\Noxh\TelegramService::class)->kiemTraToken();
@@ -86,5 +97,53 @@ class KiemTraTelegram extends Command
         $this->newLine();
 
         return self::SUCCESS;
+    }
+
+    /** Lưu token / chat id nếu người chạy có truyền vào. */
+    private function luuNeuCo(): void
+    {
+        $cap = [
+            'telegram_bot_token' => $this->option('dat-token'),
+            'telegram_chat_id' => $this->option('dat-chat-id'),
+        ];
+
+        foreach ($cap as $keyword => $giaTri) {
+            if ($giaTri === null || $giaTri === '') {
+                continue;
+            }
+
+            $this->luuCaiDat($keyword, trim((string) $giaTri));
+            $this->line('  đã lưu     : ' . $keyword);
+        }
+    }
+
+    /**
+     * Ghi một khoá cấu hình vào bảng `systems`.
+     *
+     * Bảng này lưu theo (keyword, language_id): ghi vào ngôn ngữ mặc định để mọi
+     * màn hình đều đọc được, và sửa dòng đã có chứ không thêm dòng mới - thêm
+     * trùng thì `cai_dat()` chỉ đọc được một dòng và không ai biết dòng kia.
+     */
+    private function luuCaiDat(string $keyword, string $giaTri): void
+    {
+        $coSan = DB::table('systems')->where('keyword', $keyword)->exists();
+
+        if ($coSan) {
+            DB::table('systems')->where('keyword', $keyword)->update([
+                'content' => $giaTri,
+                'updated_at' => now(),
+            ]);
+
+            return;
+        }
+
+        DB::table('systems')->insert([
+            'keyword' => $keyword,
+            'content' => $giaTri,
+            'language_id' => DB::table('languages')->where('canonical', 'vn')->value('id') ?? 1,
+            'user_id' => DB::table('users')->min('id') ?? 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }

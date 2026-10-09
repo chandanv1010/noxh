@@ -197,4 +197,47 @@ class NoxhTelegramTest extends TestCase
             ->post('/system/telegram/kiem-tra', ['viec' => 'token'])
             ->assertRedirect(route('system.index'));
     }
+
+    /**
+     * Dat cau hinh Telegram bang dong lenh, khong can mo trang quan tri.
+     *
+     * Cau hinh nam trong bang `systems` chu KHONG nam trong .env, nen tren may
+     * chu nguoi quan tri phai co duong dat ma khong phai dong vao tep .env.
+     */
+    public function test_dat_cau_hinh_bang_dong_lenh(): void
+    {
+        // Lenh nay vua luu cau hinh vua KIEM TRA token, va tra ma loi khac 0 khi
+        // token hong. Gia lap Telegram tra loi tot de bai kiem tra di het duoc
+        // duong di tot, chu khong phai de che loi.
+        Http::fake([
+            'api.telegram.org/*/getMe' => Http::response([
+                'ok' => true,
+                'result' => ['first_name' => 'Bot Thử', 'username' => 'botthu_bot'],
+            ]),
+            'api.telegram.org/*/getUpdates' => Http::response(['ok' => true, 'result' => []]),
+        ]);
+
+        $tokenA = '123456789:' . str_repeat('A', 35);
+        $tokenB = '123456789:' . str_repeat('B', 35);
+
+        // Ghi nhan gia tri cu de tearDown tra lai.
+        foreach (['telegram_bot_token', 'telegram_chat_id'] as $k) {
+            $this->datCaiDat($k, (string) DB::table('systems')->where('keyword', $k)->value('content'));
+        }
+
+        $this->artisan('noxh:telegram', [
+            '--dat-token' => $tokenA,
+            '--dat-chat-id' => '987654321',
+        ])->assertExitCode(0);
+
+        $this->assertSame($tokenA, DB::table('systems')->where('keyword', 'telegram_bot_token')->value('content'));
+        $this->assertSame('987654321', DB::table('systems')->where('keyword', 'telegram_chat_id')->value('content'));
+
+        // Chay lan hai voi token khac: phai SUA dong cu. Them dong trung thi
+        // cai_dat() chi doc duoc mot dong va khong ai biet dong kia.
+        $this->artisan('noxh:telegram', ['--dat-token' => $tokenB])->assertExitCode(0);
+
+        $this->assertSame(1, DB::table('systems')->where('keyword', 'telegram_bot_token')->count());
+        $this->assertSame($tokenB, DB::table('systems')->where('keyword', 'telegram_bot_token')->value('content'));
+    }
 }

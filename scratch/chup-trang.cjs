@@ -113,7 +113,10 @@ function tenAnh(chuoi) {
         const co = await doc(`(function () {
           var e = document.querySelector(${JSON.stringify(selector)});
           if (!e) return false;
-          e.scrollIntoView({ block: 'start' });
+          // block:'center' chu khong phai 'start': thanh menu cua web dinh tren
+          // cung man hinh, cuon khung can chup len sat tren thi menu che mat
+          // dung phan dau - phan hay can xem nhat.
+          e.scrollIntoView({ block: 'center' });
           return true;
         })()`);
 

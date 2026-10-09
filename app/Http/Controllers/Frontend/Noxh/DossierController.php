@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend\Noxh;
 
 use App\Http\Controllers\FrontendController;
+use App\Http\ViewComposers\NoxhComposer;
 use App\Models\DossierItem;
 use App\Models\DossierSet;
 use Illuminate\Http\Request;
@@ -134,16 +135,48 @@ class DossierController extends FrontendController
             ->get()
             ->filter(fn($bo) => $bo->items->count());
 
+        $nhomDangXem = null;
+
         if ($boChon) {
             $loc = $boHoSo->firstWhere('canonical', $boChon) ?? $boHoSo->firstWhere('id', (int) $boChon);
             if ($loc) {
+                $nhomDangXem = $loc;
                 $boHoSo = collect([$loc]);
             }
         }
 
+        // The <title> va meta description la thu hien ra khi dan lien ket sang
+        // Zalo/Telegram/Facebook, hoac khi re chuot vao lien ket. Truoc day ca ba
+        // man hinh Ho so deu dung chung mot cau mo ta cua toan website, nen nguoi
+        // doc khong biet trang nay co gi - va khi da loc theo mot nhom doi tuong
+        // thi cang khong biet minh dang xem nhom nao.
+        $intro = NoxhComposer::intro();
+
+        if ($nhomDangXem) {
+            // Vai nhom da tu bat dau bang "Ho so cho..." - ghep them tien to nua
+            // thi tieu de thanh "Ho so can chuan bi - Ho so cho cong nhan...",
+            // doc rat loan. Nhom nao chua co thi moi ghep.
+            $tenNhom = trim((string) $nhomDangXem->name);
+
+            $tieuDeSeo = preg_match('/^hồ sơ/iu', $tenNhom)
+                ? $tenNhom
+                : $tieuDe . ' - ' . $tenNhom;
+
+            $moTaSeo = sprintf(
+                '%d giấy tờ cần chuẩn bị cho nhóm "%s". %s',
+                $nhomDangXem->items->count(),
+                $tenNhom,
+                nx_chu_thuan($nhomDangXem->description, 30)
+            );
+        } else {
+            $tieuDeSeo = $tieuDe;
+            $moTaSeo = nx_chu_thuan($intro['dossier_description'] ?? '')
+                ?: 'Danh sách giấy tờ cần chuẩn bị khi mua nhà ở xã hội, theo từng nhóm đối tượng.';
+        }
+
         return view('frontend.noxh.dossier.index', [
             'system' => $this->system,
-            'seo' => $this->seo($tieuDe, $canonical),
+            'seo' => $this->seo($tieuDeSeo, $canonical, $moTaSeo),
             'kieu' => $kieu,
             'tieuDe' => $tieuDe,
             'boHoSo' => $boHoSo,

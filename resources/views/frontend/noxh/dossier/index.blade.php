@@ -62,29 +62,28 @@
 
         @forelse($boHoSo as $bo)
             <div class="nx-panel" id="bo-{{ $bo->canonical ?: $bo->id }}">
-                <h2 class="nx-panel__title">
-                    {{ $bo->name }}
-                    <span style="color:#8695aa;font-size:12.5px;font-weight:500;text-transform:none">
-                        {{ $bo->items->count() }} giấy tờ
+                {{-- "Download tron bo" nam NGAY TREN CUNG cua khung, cung hang voi
+                     ten bo ho so: day la viec nguoi dung hay lam nhat, de duoi mo
+                     ta thi phai doc het doan van moi thay.
+                     flex-wrap de tren dien thoai cum ben phai (so giay to + nut)
+                     tu xuong dong, khong bi ep ra ngoai khung. --}}
+                <h2 class="nx-panel__title" style="flex-wrap:wrap;row-gap:6px">
+                    <span>{{ $bo->name }}</span>
+                    <span style="display:flex;align-items:center;gap:12px;white-space:nowrap">
+                        <span style="color:#8695aa;font-size:12.5px;font-weight:500;text-transform:none">
+                            {{ $bo->items->count() }} giấy tờ
+                        </span>
+                        <a href="{{ route('noxh.dossier.tron-bo', $bo->canonical ?: $bo->id) }}"
+                           title="Tải cả {{ $bo->items->count() }} giấy tờ trong một tệp ZIP">
+                            @include('frontend.noxh.component.icon', ['name' => 'download', 'size' => 14])
+                            Download trọn bộ
+                        </a>
                     </span>
                 </h2>
 
                 @if($bo->description)
                     <p class="nx__subheading">{{ nx_chu_thuan($bo->description) }}</p>
                 @endif
-
-                {{-- Tai ca bo trong mot lan. Dat ngay duoi mo ta, tren danh sach
-                     giay to, de nguoi dung thay truoc khi doc tung dong. --}}
-                <p style="margin:0 0 4px">
-                    <a href="{{ route('noxh.dossier.tron-bo', $bo->canonical ?: $bo->id) }}"
-                       class="nx-btn nx-btn--sm">
-                        @include('frontend.noxh.component.icon', ['name' => 'download', 'size' => 15])
-                        Download trọn bộ
-                    </a>
-                    <span style="display:inline-block;margin-left:8px;color:#8695aa;font-size:12.5px">
-                        Cả {{ $bo->items->count() }} giấy tờ, gói trong một tệp ZIP
-                    </span>
-                </p>
 
                 @foreach($bo->items as $gt)
                     <div class="nx-dossier-item">
