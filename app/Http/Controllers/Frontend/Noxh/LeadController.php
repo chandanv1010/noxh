@@ -48,6 +48,10 @@ class LeadController extends FrontendController
         $luu = $this->luu($duLieu);
 
         if (!$luu) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return $this->traLoi($request, false, 'Không gửi được thông tin. Bạn vui lòng thử lại hoặc gọi trực tiếp hotline.');
+            }
+
             return back()
                 ->withInput()
                 ->with('nx_error', 'Không gửi được thông tin. Bạn vui lòng thử lại hoặc gọi trực tiếp hotline.');
@@ -58,11 +62,19 @@ class LeadController extends FrontendController
         // Cau xac nhan phai noi dung viec nguoi dung vua lam. Form o trang Ho so
         // hua hen gui bo ho so, nen tra loi chung chung "chuyen vien se lien he"
         // se lam ho tuong minh bam hut.
-        $loiNhan = ($duLieu['source'] ?? '') === 'ho-so'
-            ? 'Đã gửi thông tin cho chuyên viên phụ trách. Trong lúc chờ, bạn xem và tải từng mẫu đơn ở phía trên trang này.'
-            : 'Đã nhận thông tin của bạn. Chuyên viên sẽ liên hệ trong thời gian sớm nhất.';
+        $nguon = $duLieu['source'] ?? '';
 
-        return back()->with('nx_success', $loiNhan);
+        $loiNhan = match ($nguon) {
+            // Popup "Download tron bo": gui xong la trinh duyet tai tep ngay,
+            // noi "chuyen vien se lien he" o day la lac de.
+            'ho-so-tron-bo' => 'Đã gửi thông tin. Hồ sơ đang được tải về.',
+            'ho-so' => 'Đã gửi thông tin cho chuyên viên phụ trách. Trong lúc chờ, bạn xem và tải từng mẫu đơn ở phía trên trang này.',
+            default => 'Đã nhận thông tin của bạn. Chuyên viên sẽ liên hệ trong thời gian sớm nhất.',
+        };
+
+        // Popup gui bang fetch nen can cau tra loi JSON; form thuong van duoc
+        // tra ve dung trang cu kem thong bao nhu truoc.
+        return $this->traLoi($request, true, $loiNhan);
     }
 
     /**
@@ -175,6 +187,7 @@ class LeadController extends FrontendController
      */
     private const NHAN_NGUON = [
         'ho-so' => 'Trang Hồ sơ',
+        'ho-so-tron-bo' => 'Trang Hồ sơ — popup tải trọn bộ',
         'website' => 'Form chung',
         'du-an' => 'Trang dự án',
         'tu-van' => 'Trang tư vấn',
@@ -189,7 +202,7 @@ class LeadController extends FrontendController
         // quan tam", con form trang Ho so dung no de chua NHOM DOI TUONG khach
         // chon. Gui Telegram ma de nguyen nhan "Quan tâm: Hộ gia đình nghèo..."
         // thi chuyen vien doc khong hieu khach muon gi.
-        $nhanQuanTam = ($nguon === 'ho-so') ? 'Đối tượng' : 'Quan tâm';
+        $nhanQuanTam = str_starts_with($nguon, 'ho-so') ? 'Đối tượng' : 'Quan tâm';
 
         $this->telegram->baoLienHe($tieuDe, [
             'Họ tên' => $duLieu['name'],

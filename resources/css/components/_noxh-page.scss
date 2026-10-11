@@ -183,6 +183,15 @@
             font-weight: 600;
             text-transform: none;
             text-decoration: none;
+            // Doi mau khi re chuot vao: truoc day duong dan nay dung yen hoan
+            // toan nen nhin khong ra la bam duoc.
+            transition: color 0.15s ease;
+
+            &:hover,
+            &:focus-visible {
+                color: $nx-ink;
+                text-decoration: underline;
+            }
         }
     }
 }

@@ -73,7 +73,12 @@
                         <span style="color:#8695aa;font-size:12.5px;font-weight:500;text-transform:none">
                             {{ $bo->items->count() }} giấy tờ
                         </span>
+                        {{-- href van la duong dan tai that: JS hong hay bi chan
+                             thi bam vao van tai duoc ho so. Co JS thi
+                             ho-so-modal.blade.php chan lai va mo popup xin
+                             ten / so dien thoai / nhom doi tuong truoc. --}}
                         <a href="{{ route('noxh.dossier.tron-bo', $bo->canonical ?: $bo->id) }}"
+                           data-nx-tron-bo="{{ $bo->name }}"
                            title="Tải cả {{ $bo->items->count() }} giấy tờ trong một tệp ZIP">
                             @include('frontend.noxh.component.icon', ['name' => 'download', 'size' => 14])
                             Download trọn bộ
@@ -140,6 +145,14 @@
         ])
     </div>
 </div>
+
+{{-- Popup cua nut "Download tron bo". In MOT lan cho ca trang du co bao nhieu
+     bo ho so - moi nut chi mang theo ma cua bo minh. --}}
+@include('frontend.noxh.component.ho-so-modal', [
+    'tatCaBo' => $tatCaBo,
+    'doiTuong' => $doiTuong,
+    'intro' => $intro,
+])
 
 @if($kieu === 'checklist')
 @push('script')

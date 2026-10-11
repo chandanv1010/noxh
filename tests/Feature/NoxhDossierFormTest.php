@@ -327,6 +327,207 @@ class NoxhDossierFormTest extends TestCase
         $this->get('/ho-so/khong-co-nhom-nay/tron-bo')->assertNotFound();
     }
 
+    // --- Popup cua nut "Download tron bo" ------------------------------------
+
+    public function test_nut_download_tron_bo_mo_popup(): void
+    {
+        $this->dungHaiNhom();
+
+        $html = $this->get('/ho-so/can-chuan-bi')->assertOk()->getContent();
+
+        // Nut mang theo TEN bo ho so de popup noi ro khach dang tai bo nao.
+        $this->assertStringContainsString('data-nx-tron-bo="Nhóm thử nghiệm A"', $html);
+        $this->assertStringContainsString('data-nx-ho-so-modal', $html, 'Không thấy popup trên trang');
+    }
+
+    /**
+     * Popup chi duoc in MOT lan du trang co bao nhieu bo ho so. In lai moi bo
+     * mot popup thi trang co nhieu the cung id, va JS se gan vao nham cai dau.
+     */
+    public function test_popup_chi_in_mot_lan_cho_ca_trang(): void
+    {
+        $this->dungHaiNhom();
+
+        $html = $this->get('/ho-so/can-chuan-bi')->assertOk()->getContent();
+
+        // Dem theo id, khong dem theo data-nx-ho-so-modal: ten thuoc tinh do
+        // con xuat hien lan nua trong doan JS querySelector o cuoi trang.
+        $this->assertSame(1, substr_count($html, 'id="nx-hs-ten"'));
+        $this->assertSame(1, substr_count($html, 'id="nx-hs-doi-tuong"'));
+    }
+
+    public function test_popup_co_du_ba_o_ten_sdt_doi_tuong(): void
+    {
+        $this->dungHaiNhom();
+
+        $html = $this->get('/ho-so/can-chuan-bi')->assertOk()->getContent();
+
+        $phanPopup = $this->catPopup($html);
+
+        $this->assertMatchesRegularExpression('/<input[^>]*id="nx-hs-ten"[^>]*name="name"/', $phanPopup);
+        $this->assertMatchesRegularExpression('/<input[^>]*id="nx-hs-sdt"[^>]*name="phone"/', $phanPopup);
+        $this->assertMatchesRegularExpression('/<select[^>]*name="interest"/', $phanPopup);
+        $this->assertStringContainsString('value="ho-so-tron-bo"', $phanPopup);
+    }
+
+    /**
+     * O "Doi tuong" trong popup la danh sach nhom NGUOI duoc mua nha o xa hoi
+     * (12-13 nhom), khong phai danh sach BO HO SO. Hai thu khac nhau: bo ho so
+     * la nhom giay to, con day la dien chinh sach cua khach.
+     *
+     * Va no do DONG tu dap an buoc "Doi tuong" cua bo kiem tra dieu kien, de
+     * nghi dinh doi thi quan tri sua mot cho la ca hai noi cung doi.
+     */
+    public function test_o_doi_tuong_trong_popup_la_nhom_chinh_sach_do_tu_csdl(): void
+    {
+        $this->dungHaiNhom();
+
+        $phanPopup = $this->catPopup($this->get('/ho-so/can-chuan-bi')->assertOk()->getContent());
+
+        $dapAn = $this->dapAnDoiTuong();
+
+        if ($dapAn->isEmpty()) {
+            $this->markTestSkipped('Chua chay NoxhEligibilityWizardSeeder nen chua co nhom doi tuong.');
+        }
+
+        $this->assertGreaterThanOrEqual(10, $dapAn->count(), 'Ô Đối tượng có quá ít nhóm');
+
+        foreach ($dapAn as $nhan) {
+            $this->assertStringContainsString(
+                '<option value="' . e($nhan) . '"',
+                $phanPopup,
+                "Ô Đối tượng thiếu nhóm \"{$nhan}\""
+            );
+        }
+
+        // Khong duoc lay nham danh sach bo ho so.
+        $this->assertStringNotContainsString('Nhóm thử nghiệm A', $phanPopup);
+    }
+
+    /** Dap an cua buoc "Doi tuong" trong bo kiem tra dieu kien. */
+    private function dapAnDoiTuong()
+    {
+        $cauHoi = DB::table('eligibility_questions')
+            ->whereNull('deleted_at')
+            ->where('publish', 2)
+            ->where('question', 'LIKE', '%nhóm đối tượng%')
+            ->value('id');
+
+        if (!$cauHoi) {
+            return collect();
+        }
+
+        return DB::table('eligibility_options')
+            ->where('eligibility_question_id', $cauHoi)
+            ->orderBy('order')
+            ->orderBy('id')
+            ->pluck('label');
+    }
+
+    /**
+     * JS hong hay bi chan thi bam nut phai van tai duoc ho so. Doi href thanh
+     * "#" la nguoi dung mat han duong tai.
+     */
+    public function test_khong_co_js_thi_nut_van_tai_duoc_ho_so(): void
+    {
+        $this->dungHaiNhom();
+
+        $html = $this->get('/ho-so/can-chuan-bi')->assertOk()->getContent();
+
+        $this->assertMatchesRegularExpression(
+            '#<a href="[^"]*/ho-so/nhom-thu-a/tron-bo"\s+data-nx-tron-bo#',
+            $html,
+            'Nút không còn trỏ tới đường dẫn tải thật'
+        );
+    }
+
+    public function test_popup_gui_bang_ajax_nhan_json_va_luu_thong_tin(): void
+    {
+        Http::fake();
+
+        $this->dungHaiNhom();
+
+        $this->postJson('/de-lai-thong-tin', [
+            'name' => 'Khách tải trọn bộ',
+            'phone' => '0911777999',
+            'interest' => 'Nhóm thử nghiệm A',
+            'source' => 'ho-so-tron-bo',
+        ])
+            ->assertOk()
+            ->assertJsonPath('xong', true);
+
+        $dong = DB::table('contacts')->where('phone', '0911777999')->latest('id')->first();
+
+        $this->assertNotNull($dong, 'Không lưu được thông tin khách');
+        $this->assertSame('ho-so-tron-bo', $dong->source);
+        $this->assertSame('Nhóm thử nghiệm A', $dong->interest);
+    }
+
+    /**
+     * Thieu so dien thoai thi phai tra loi kiem tra duoi dang JSON. Tra ve mot
+     * trang HTML chuyen huong thi popup doc khong ra, nguoi dung thay nut bam
+     * xong khong co gi xay ra.
+     */
+    public function test_popup_thieu_so_dien_thoai_thi_bao_loi_dang_json(): void
+    {
+        $this->postJson('/de-lai-thong-tin', [
+            'name' => 'Khách thiếu số',
+            'source' => 'ho-so-tron-bo',
+        ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('phone');
+    }
+
+    public function test_tin_telegram_cua_popup_goi_dung_ten_nguon_va_nhan_doi_tuong(): void
+    {
+        Http::fake();
+
+        $this->datCaiDat('telegram_bot_token', '123456789:' . str_repeat('A', 35));
+        $this->datCaiDat('telegram_chat_id', '123456');
+
+        $this->postJson('/de-lai-thong-tin', [
+            'name' => 'Khách tải trọn bộ',
+            'phone' => '0911777999',
+            'interest' => 'Nhóm thử nghiệm A',
+            'source' => 'ho-so-tron-bo',
+        ])->assertOk();
+
+        Http::assertSent(function ($yeuCau) {
+            $chu = $yeuCau['text'] ?? '';
+
+            return str_contains($yeuCau->url(), 'api.telegram.org')
+                && str_contains($chu, 'Đối tượng:')
+                && !str_contains($chu, 'Quan tâm:')
+                // Khong duoc de lo ma khoa noi bo 'ho-so-tron-bo' ra tin nhan.
+                && str_contains($chu, 'popup tải trọn bộ')
+                && !str_contains($chu, 'ho-so-tron-bo');
+        });
+    }
+
+    /**
+     * Chu trong popup phai sua duoc trong quan tri. Khoa dossier_modal_* va
+     * dossier_form_* truoc day duoc goi trong giao dien nhung khong khai bao o
+     * App\Classes\Introduce, nen khong bao gio hien ra o man hinh quan tri.
+     */
+    public function test_chu_trong_popup_sua_duoc_trong_quan_tri(): void
+    {
+        $o = (new \App\Classes\Introduce())->config()['dossier']['value'] ?? [];
+
+        foreach (['form_heading', 'form_note', 'modal_heading', 'modal_note', 'modal_button'] as $khoa) {
+            $this->assertArrayHasKey($khoa, $o, "Thiếu ô {$khoa} trong màn hình quản trị trang Hồ sơ");
+        }
+    }
+
+    /** Cat rieng doan HTML cua popup de khong dem nham form o cuoi trang. */
+    private function catPopup(string $html): string
+    {
+        $dau = strpos($html, 'data-nx-ho-so-modal');
+
+        $this->assertNotFalse($dau, 'Không thấy popup trên trang');
+
+        return substr($html, $dau);
+    }
+
     /**
      * Duong dan {bo} khong duoc nuot mat cac trang co dinh cua muc Ho so.
      */

@@ -539,9 +539,36 @@ class Introduce
             'value' => $this->oPhapLy($icon),
         ];
 
+        // --- Trang Ho so -------------------------------------------------------
+        // Tach rieng khoi vong lap ben duoi vi trang nay con hai form xin thong
+        // tin (form cuoi trang va popup "Download tron bo"), chu trong do quan
+        // tri phai sua duoc. Truoc day cac khoa dossier_form_* duoc goi trong
+        // giao dien nhung khong khai bao o day, nen khong bao gio hien ra o man
+        // hinh quan tri - sua chu chi con cach sua ma nguon.
+        $data['dossier'] = [
+            'label' => 'Trang Hồ sơ',
+            'description' => 'Tiêu đề đầu trang và chữ ở hai form xin thông tin',
+            'value' => [
+                'heading' => ['type' => 'text', 'label' => 'Tiêu đề'],
+                'description' => ['type' => 'textarea', 'label' => 'Mô tả'],
+                'form_heading' => [
+                    'type' => 'text',
+                    'label' => 'Tiêu đề form cuối trang',
+                    'title' => 'Form "Điền form để nhận hồ sơ" nằm ở cuối trang.',
+                ],
+                'form_note' => ['type' => 'textarea', 'label' => 'Mô tả form cuối trang'],
+                'modal_heading' => [
+                    'type' => 'text',
+                    'label' => 'Tiêu đề popup tải hồ sơ',
+                    'title' => 'Popup hiện lên khi bấm "Download trọn bộ".',
+                ],
+                'modal_note' => ['type' => 'textarea', 'label' => 'Mô tả popup tải hồ sơ'],
+                'modal_button' => ['type' => 'text', 'label' => 'Chữ trên nút tải trong popup'],
+            ],
+        ];
+
         // --- Chu o cac trang trong ---------------------------------------------
         foreach ([
-            'dossier' => 'Hồ sơ',
             'finance' => 'Tài chính',
             'qa' => 'Hỏi đáp',
         ] as $ma => $ten) {

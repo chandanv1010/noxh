@@ -238,7 +238,8 @@
         }
 
         input,
-        textarea {
+        textarea,
+        select {
             width: 100%;
             padding: 11px 13px;
             border: 1px solid $nx-line;
@@ -253,6 +254,13 @@
                 outline: 2px solid rgba(22, 104, 227, 0.16);
                 outline-offset: 0;
             }
+        }
+
+        // Trinh duyet ve o chon theo kieu he dieu hanh neu khong noi gi; khai
+        // bao chieu cao de no bang dung o nhap ben tren.
+        select {
+            height: 44px;
+            cursor: pointer;
         }
 
         textarea {

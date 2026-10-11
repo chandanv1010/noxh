@@ -7,6 +7,7 @@ use App\Http\ViewComposers\NoxhComposer;
 use App\Models\DossierItem;
 use App\Models\DossierSet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Ba man hinh HO SO dung chung mot bo du lieu, chi khac cach hien:
@@ -181,8 +182,41 @@ class DossierController extends FrontendController
             'tieuDe' => $tieuDe,
             'boHoSo' => $boHoSo,
             'tatCaBo' => DossierSet::where('publish', 2)->orderBy('order')->get(['id', 'name', 'canonical']),
+            'doiTuong' => $this->nhomDoiTuong(),
             'boChon' => $boChon,
         ]);
+    }
+
+    /**
+     * Danh sach nhom doi tuong duoc mua nha o xa hoi, cho o chon trong popup
+     * "Download tron bo".
+     *
+     * Lay tu dap an cua buoc "Doi tuong" trong bo kiem tra dieu kien chu
+     * KHONG viet cung: danh muc nay doi theo nghi dinh, va quan tri da sua
+     * duoc no o man hinh "Dap an dieu kien". Hai cho cung mot danh sach thi
+     * sua mot lan la dung ca hai.
+     *
+     * Khac voi $tatCaBo: $tatCaBo la cac BO HO SO (nhom giay to), con day la
+     * nhom NGUOI - khach chon minh thuoc dien nao de chuyen vien biet ma tu
+     * van.
+     */
+    private function nhomDoiTuong()
+    {
+        $cauHoi = DB::table('eligibility_questions')
+            ->whereNull('deleted_at')
+            ->where('publish', 2)
+            ->where('question', 'LIKE', '%nhóm đối tượng%')
+            ->value('id');
+
+        if (!$cauHoi) {
+            return collect();
+        }
+
+        return DB::table('eligibility_options')
+            ->where('eligibility_question_id', $cauHoi)
+            ->orderBy('order')
+            ->orderBy('id')
+            ->pluck('label');
     }
 
     private function seo(string $tieuDe, string $canonical, string $moTa = ''): array
