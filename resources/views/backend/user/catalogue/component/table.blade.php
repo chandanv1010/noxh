@@ -32,8 +32,18 @@
                 <td>
                     {{ $userCatalogue->description }}
                 </td>
+                {{-- Phai co ca class `js-switch`: HT.switchery() trong
+                     public/backend/library/library.js chi ve cong tac cho cac o
+                     mang class do. Thieu no thi o nay hien ra duoi dang o tick
+                     tran bang nho xiu, nguoi dung khong nhan ra la bat/tat duoc
+                     - va nhin lech han so voi cot "Tinh Trang" ben canh.
+
+                     KHONG dat them class `status`: class do do HT.changeStatus()
+                     bat, no gui len ajax/dashboard/changeStatus voi data-field /
+                     data-model. Co is_sale co duong rieng (user.catalogue.is-sale)
+                     vi con phai dem lai so thanh vien de tra ve. --}}
                 <td class="text-center">
-                    <input type="checkbox" class="doi-co-sale" data-id="{{ $userCatalogue->id }}"
+                    <input type="checkbox" class="js-switch doi-co-sale" data-id="{{ $userCatalogue->id }}"
                            {{ ($userCatalogue->is_sale == 1) ? 'checked' : '' }}
                            aria-label="Nhóm {{ $userCatalogue->name }} là nhóm nhân viên kinh doanh">
                 </td>

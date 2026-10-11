@@ -134,6 +134,83 @@ class NoxhUserGroupTest extends TestCase
         );
     }
 
+    /**
+     * O bat co phai la CONG TAC, khong phai o tich tran.
+     *
+     * HT.switchery() trong public/backend/library/library.js chi ve cong tac
+     * cho cac o mang class `js-switch`. Lan dau lam cot nay chi dat class
+     * `doi-co-sale`, nen no hien ra duoi dang o tich mac dinh cua trinh duyet -
+     * be xiu, nam lech so voi cot "Tinh Trang" ngay ben canh, va nguoi dung
+     * bao lai la "danh sach khong co nut switch".
+     */
+    public function test_o_bat_co_duoc_ve_thanh_cong_tac(): void
+    {
+        $qt = $this->quanTri();
+
+        if (!$qt) {
+            $this->markTestSkipped('Không có tài khoản quản trị nào.');
+        }
+
+        $this->dungDuLieu();
+
+        $html = $this->actingAs($qt)->get('/user/catalogue/index')->assertOk()->getContent();
+
+        $this->assertMatchesRegularExpression(
+            '/<input[^>]*class="[^"]*\bjs-switch\b[^"]*\bdoi-co-sale\b[^"]*"/',
+            $html,
+            'Ô bật cờ thiếu class js-switch nên Switchery không vẽ thành công tắc'
+        );
+
+        // KHONG duoc mang them class `status`: class do do HT.changeStatus()
+        // bat, no se ban them mot yeu cau toi ajax/dashboard/changeStatus voi
+        // data-field rong - moi lan bam la mot loi thua o nhat ky may chu.
+        $this->assertDoesNotMatchRegularExpression(
+            '/<input[^>]*doi-co-sale[^>]*\bstatus\b/',
+            $html,
+            'Ô bật cờ không được mang class status'
+        );
+    }
+
+    /**
+     * Doan JS bat/tat co phai lay duoc ma CSRF.
+     *
+     * Trang danh sach nhom KHONG co the <form> nao mang @csrf - o loc ben tren
+     * la form GET. Ban dau doan JS doc token tu input[name="_token"], nen bien
+     * do luon null, fetch gui len X-CSRF-TOKEN rong va Laravel tra 419: cong
+     * tac bat len roi tu nhay ve, kem mot hop thoai bao loi kho hieu. Token
+     * that nam o the meta, dung chung voi library.js.
+     */
+    public function test_doan_js_bat_co_lay_duoc_ma_csrf(): void
+    {
+        $qt = $this->quanTri();
+
+        if (!$qt) {
+            $this->markTestSkipped('Không có tài khoản quản trị nào.');
+        }
+
+        $html = $this->actingAs($qt)->get('/user/catalogue/index')->assertOk()->getContent();
+
+        $this->assertMatchesRegularExpression(
+            '/<meta name="csrf-token" content="[^"]+"/',
+            $html,
+            'Trang thiếu thẻ meta csrf-token'
+        );
+
+        $this->assertStringContainsString(
+            'meta[name="csrf-token"]',
+            $html,
+            'Đoạn JS bật cờ không đọc mã CSRF từ thẻ meta'
+        );
+
+        // Neu van con doc tu input[name="_token"] lam nguon DUY NHAT thi loi cu
+        // quay lai - tren trang nay khong he co o do.
+        $this->assertDoesNotMatchRegularExpression(
+            '/var oToken = document\.querySelector\(\x27input\[name="_token"\]\x27\);\s*\n\s*var MAU/',
+            $html,
+            'Đoạn JS vẫn chỉ lấy mã CSRF từ input[name="_token"] - ô đó không tồn tại trên trang này'
+        );
+    }
+
     public function test_bat_co_nhan_vien_kinh_doanh_ngay_trong_danh_sach(): void
     {
         $qt = $this->quanTri();
